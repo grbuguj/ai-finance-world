@@ -9,6 +9,7 @@
 ![Gradle](https://img.shields.io/badge/Gradle-8.x-02303A?style=flat&logo=gradle&logoColor=white)
 
 > 멀티에이전트 기반 금융 거래 백엔드 시뮬레이션 시스템
+<img width="1128" height="573" alt="image" src="https://github.com/user-attachments/assets/38b26162-58f0-4c8b-82bb-e84964693518" />
 
 <br>
 
