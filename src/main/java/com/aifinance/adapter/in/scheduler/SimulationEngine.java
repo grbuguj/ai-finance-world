@@ -1,7 +1,6 @@
 package com.aifinance.adapter.in.scheduler;
 
 import com.aifinance.adapter.in.web.FeedSseService;
-import com.aifinance.adapter.out.llm.LlmClient;
 import com.aifinance.application.port.out.AccountPort;
 import com.aifinance.application.port.out.AgentPort;
 import com.aifinance.application.port.out.LedgerPort;
@@ -16,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
@@ -23,12 +23,31 @@ public class SimulationEngine {
 
     public enum State { RUNNING, PAUSED, STOPPED }
 
+    private static final List<String> REASONS = List.of(
+            "어제 먹은 삼겹살 값", "지난주 치킨 값", "새벽 라면 끓여줘서", "떡볶이 먹은 거 계산",
+            "곱창 내가 쏜다더니 결국", "편의점 야식 대납", "오마카세 더치페이", "술값 n빵",
+            "점심 밥값", "커피 값 더치페이", "배달 음식 더치페이", "해장국 먹은 거 정산",
+            "마라탕 중독 비용", "새벽 2시 피자 값", "이번 달 생활비", "월세 이체",
+            "카드값 이체", "공과금 분할", "인터넷 요금 반반", "넷플릭스 구독비",
+            "헬스장 회원권 분할", "주차비 반반", "빌린 돈 갚기", "생일 축하금",
+            "결혼 축의금 대납", "경조사비", "이사 도움 사례금", "명절 용돈",
+            "스터디 회비", "동아리 회비", "콘서트 티켓 분할", "여행 경비 정산",
+            "카풀비 정산", "택시비 분할", "게임 아이템 거래", "온라인 쇼핑 대납",
+            "선물 공동구매", "운동 내기 벌금", "지각비", "카톡 씹은 벌금",
+            "다이어트 실패 벌금", "늦잠 벌금", "내기 골프 진 거", "스쿼트 내기 졌음",
+            "그냥 줌", "왜 줬는지 모르겠음", "술김에 쏜다고 했음", "기분이 너무 좋아서",
+            "갑자기 미안해서", "생각보다 고마워서", "언젠가 받을 거 미리", "묻지마 송금",
+            "복권 당첨 기념", "연봉 협상 성공 기념", "승진 자축", "퇴근 기념",
+            "월급날 기념", "시험 끝난 기념", "헤어진 기념", "재회 기념",
+            "그냥 보고싶어서", "너 생각나서", "빚진 기분이 들어서", "내 양심이 허락하지 않아"
+    );
+    private static final Random RANDOM = new Random();
+
     private final TransferUseCase transferUseCase;
     private final AgentPort agentPort;
     private final AccountPort accountPort;
     private final TransferPort transferPort;
     private final LedgerPort ledgerPort;
-    private final LlmClient llmClient;
     private final FeedSseService feedSseService;
 
     private final AtomicLong tickIntervalMs = new AtomicLong(1000);
@@ -37,14 +56,12 @@ public class SimulationEngine {
 
     public SimulationEngine(TransferUseCase transferUseCase, AgentPort agentPort,
                             AccountPort accountPort, TransferPort transferPort,
-                            LedgerPort ledgerPort, LlmClient llmClient,
-                            FeedSseService feedSseService) {
+                            LedgerPort ledgerPort, FeedSseService feedSseService) {
         this.transferUseCase = transferUseCase;
         this.agentPort = agentPort;
         this.accountPort = accountPort;
         this.transferPort = transferPort;
         this.ledgerPort = ledgerPort;
-        this.llmClient = llmClient;
         this.feedSseService = feedSseService;
     }
 
@@ -119,7 +136,7 @@ public class SimulationEngine {
 
                 if (amount.signum() <= 0) continue;
 
-                String reason = llmClient.generateReason(agent.getName(), target.getName(), amount);
+                String reason = REASONS.get(RANDOM.nextInt(REASONS.size()));
                 try {
                     Transfer saved = transferUseCase.transfer(
                             agent.getAccount().getId(),
