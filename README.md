@@ -1,26 +1,175 @@
 # AI Finance World
 
-> 인천대학교 정보통신공학과 졸업작품  
-> 멀티 에이전트 금융 거래 시뮬레이션 백엔드 + 실시간 대시보드
 
----
+![Java](https://img.shields.io/badge/Java-17-007396?style=flat&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0-6DB33F?style=flat&logo=springboot&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat&logo=mysql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-latest-DC382D?style=flat&logo=redis&logoColor=white)
+![Kafka](https://img.shields.io/badge/Apache_Kafka-latest-231F20?style=flat&logo=apachekafka&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white)
+![Gradle](https://img.shields.io/badge/Gradle-8.x-02303A?style=flat&logo=gradle&logoColor=white)
 
-## 프로젝트 개요
+> 멀티에이전트 기반 금융 거래 백엔드 시뮬레이션 시스템
+<img width="1128" height="573" alt="image" src="https://github.com/user-attachments/assets/38b26162-58f0-4c8b-82bb-e84964693518" />
+<br>
 
-10명의 AI 에이전트가 각자의 성격(지출 확률)에 따라 자율적으로 송금 거래를 수행하는 금융 시뮬레이션입니다.  
-모든 거래는 복식부기(DEBIT/CREDIT) 원장으로 기록되며, SSE를 통해 실시간으로 대시보드에 반영됩니다.
+## 📅 개발 로드맵
 
-## 주요 기능
+| 주차 | 기간 | 목표 | 상태 |
+|------|------|------|------|
+| 1주 | 5/11~5/17 | 프로젝트 뼈대 (헥사고날 구조, DB 스키마) | ✅ 완료 |
+| 2주 | 5/18~5/24 | 계좌 도메인 (복식부기 원장) | ✅ 완료 |
+| 3주 | 5/25~5/31 | 송금 코어 (비관적 락, 데드락 방지) | ✅ 완료 |
+| 4주 | 6/1~6/7 | 동시성 검증 (부하 테스트) | ✅ 완료 |
+| 5주 | 6/8~6/14 | 에이전트 엔진 (@Scheduled, 시뮬레이션) | ✅ 완료 |
+| 6주 | 6/15~6/21 | 실시간 대시보드 (SSE, SVG 그래프) | ✅ 완료 |
+| 7주 | 6/22~6/28 | 시뮬레이션 제어 + 속도 슬라이더 | ✅ 완료 |
+| 8주 | 6/29~7/5 | Redis 추가 | ⬜ |
+| 9주 | 7/6~7/12 | Kafka 추가 | ⬜ |
+| 10주 | 7/13~7/19 | 부하 테스트 | ⬜ |
+| 11~12주 | 7/20~7/31 | 마무리 및 발표 준비 | ⬜ |
 
-- **멀티 에이전트 시뮬레이션** — 에이전트별 `chancePay` 확률로 자율 거래 발생
-- **실시간 대시보드** — SSE(Server-Sent Events)로 거래 피드 즉시 push
-- **복식부기 원장** — 모든 거래를 DEBIT/CREDIT으로 이중 기록, 차변=대변 무결성 검증
-- **비관적 락 + 데드락 방지** — 계좌 ID 오름차순 락 획득으로 동시 송금 충돌 해결
-- **시뮬레이션 제어** — 시작 / 일시정지 / 정지 / 초기화, 속도 슬라이더(1ms ~ 3000ms/틱)
-- **SVG 거래흐름 그래프** — 에이전트 노드 크기가 잔액 비례, 거래 발생 시 애니메이션
-- **잔액 예측 패널** — 선형회귀로 에이전트별 상승/하락 트렌드 예측
+<br>
 
-## 에이전트 목록
+## 💡 프로젝트 배경
+
+대부분의 학부 프로젝트는 **단순 CRUD**에 머물러 있습니다.
+
+실제 금융 서비스에서 가장 중요한 것은 기능 구현 자체가 아닙니다.  
+수많은 요청이 동시에 몰렸을 때도 **단 1원의 오차 없이** 처리해내는 시스템의 신뢰성입니다.
+
+이 프로젝트는 그 질문에서 출발했습니다.
+
+> **"학부생이 만든 시스템이 실제 금융 트래픽을 버텨낼 수 있는가?"**
+
+토스뱅크의 코어뱅킹 MSA 전환 사례를 분석하고, 실무에서 사용하는 설계 원칙을  
+직접 구현하고 검증하는 것이 이 프로젝트의 출발점입니다.
+
+<br>
+
+## 🎯 무엇을 증명하는가
+
+이 프로젝트는 단순히 "돌아가는 시스템"을 만드는 것이 목표가 아닙니다.  
+**극한 상황에서도 데이터 정합성을 유지하는 시스템**을 설계하고 코드로 증명합니다.
+
+| 검증 시나리오 | 테스트 방법 | 기대 결과 |
+|-------------|-----------|---------|
+| 단일 계좌 동시 송금 | 멀티스레드로 동시 100건 요청 | Lost Update 없이 잔액 정합성 100% 보장 |
+| 양방향 동시 송금 | A→B, B→A 정확히 동시 실행 | 데드락 예외 없이 모든 요청 정상 처리 |
+| 잔액 초과 검증 | 현재 잔액보다 큰 금액 동시 다발 송금 | 조건 위반 시 즉시 예외 및 DB 전체 롤백 |
+| 원장 무결성 검사 | 장기 시뮬레이션 후 원장 합산 비교 | ∑ DEBIT = ∑ CREDIT (수학적 무결성 증명) |
+
+<br>
+
+## 🆚 기존 학부 프로젝트와의 차별성
+
+| | 일반적인 학부 프로젝트 | AI Finance World |
+|--|---------------------|-----------------|
+| 핵심 관심사 | 기능 구현 (CRUD) | 트랜잭션 제어 · 원장 설계 |
+| AI의 역할 | 화려한 메인 기능 | 부하를 발생시키는 테스트 도구 |
+| 동시성 | 1인 사용자 가정 | 다수 에이전트 동시 접근 설계 |
+| 데이터 설계 | 잔액 필드 직접 수정 | 복식부기 원장 기반 잔액 재계산 |
+| 아키텍처 | 단일 계층 강결합 | 헥사고날 아키텍처 (도메인 분리) |
+| 검증 방식 | 눈으로 확인 | 부하 테스트 · 수학적 무결성 증명 |
+
+<br>
+
+## 📌 프로젝트 소개
+
+AI 에이전트 10명이 가상 금융 생태계에서 **송금** 등  
+실제 경제 활동을 수행하고, 그 모든 거래를 은행 백엔드가 안정적으로 처리합니다.  
+모든 거래는 **SSE(Server-Sent Events)** 로 실시간 대시보드에 push됩니다.
+
+```
+에이전트 10명 ── 자율 송금 ──▶  은행 백엔드  ──▶  실시간 대시보드
+                              (핵심 시스템)       SSE push / SVG 그래프
+                              비관적 락           잔액 예측 패널
+                              복식부기 원장        시뮬레이션 제어
+```
+
+> "이 프로젝트의 주인공은 AI가 아니라, **백엔드 시스템**입니다."
+
+<br>
+
+## 🏗 아키텍처
+
+헥사고날 아키텍처(Ports & Adapters) 기반으로 설계했습니다.  
+비즈니스 로직이 외부 기술(DB, Kafka, Redis)에 종속되지 않습니다.
+
+```
+com.aifinance
+├── domain                  # 순수 비즈니스 로직 (외부 기술 0)
+│   ├── account             # 계좌 엔티티 + Repository 인터페이스
+│   ├── ledger              # 원장 엔트리 (복식부기)
+│   ├── transfer            # 송금 도메인
+│   └── agent               # AI 에이전트 페르소나
+├── application             # 흐름 조율 (UseCase)
+│   └── usecase
+│       └── TransferUseCase # 핵심 송금 로직 (비관적 락 + 복식부기)
+└── adapter                 # 외부 기술 연결
+    ├── in
+    │   ├── scheduler       # SimulationEngine (@Scheduled 틱 엔진)
+    │   └── web             # REST API + SSE 엔드포인트
+    └── out
+        ├── persistence     # JPA 구현체
+        ├── messaging       # Kafka Producer
+        └── cache           # Redis
+```
+
+<br>
+
+## 🛠 기술 스택
+
+| 분류 | 기술 | 선택 이유 |
+|------|------|---------|
+| Language | Java 17 | 금융권 표준 언어 |
+| Framework | Spring Boot 4.0 | 금융권 백엔드 표준 스택 |
+| ORM | Spring Data JPA | `@Lock`으로 비관적 락 적용 |
+| Database | MySQL 8.0 | 토스뱅크 채널계 스택 기준 |
+| Cache | Redis | 잔액 캐싱 (예정) |
+| Message Queue | Apache Kafka | 비동기 이벤트 분리 (예정) |
+| 실시간 통신 | SSE (Server-Sent Events) | 폴링 없는 실시간 거래 피드 |
+| Infra | Docker Compose | 로컬 환경 일관성 |
+
+<br>
+
+## 🔑 핵심 설계 원칙
+
+**복식부기 원장 (Double-Entry Ledger)**
+```
+하나의 송금 이벤트 = LedgerEntry 2건 원자적 생성
+송금자 DEBIT + 수신자 CREDIT
+잔액 = ∑ CREDIT - ∑ DEBIT
+∑ DEBIT = ∑ CREDIT → 수학적 무결성 보장
+```
+
+**동시성 제어**
+```java
+// 비관적 락으로 동시 접근 차단
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+
+// 계좌 ID 오름차순 락 획득 → 데드락 방지
+// A→B, B→A 동시 요청에도 데드락 없음
+if (fromAccountId < toAccountId) {
+    first  = accountPort.findByIdWithLock(fromAccountId);
+    second = accountPort.findByIdWithLock(toAccountId);
+} else {
+    first  = accountPort.findByIdWithLock(toAccountId);
+    second = accountPort.findByIdWithLock(fromAccountId);
+}
+```
+
+**SSE 실시간 피드**
+```
+거래 발생 → SimulationEngine → FeedSseService.publish(json)
+                                      ↓
+                            연결된 모든 브라우저에 즉시 push
+                            (EventSource('/feed/stream'))
+```
+
+<br>
+
+## 👤 에이전트 페르소나
 
 | 에이전트 | 초기 잔액 | 특성 |
 |---------|---------|------|
@@ -35,102 +184,67 @@
 | 🎬 김태희 | 2,600,000원 | 트렌드 세터 |
 | ⚔️ 이순신 | 3,300,000원 | 수호자 |
 
-## 기술 스택
+<br>
 
-| 분류 | 기술 |
+## 🖥 대시보드 기능
+
+| 기능 | 설명 |
 |------|------|
-| Backend | Spring Boot 4.0.6, Java 17 |
-| Architecture | Hexagonal Architecture (Port & Adapter) |
-| Database | MySQL 8.0, Spring Data JPA |
-| 동시성 | Pessimistic Lock (`SELECT FOR UPDATE`) |
-| 실시간 통신 | SSE (Server-Sent Events) |
-| Frontend | Vanilla JS, CSS Glassmorphism, SVG |
-| 인프라 | Docker Compose |
+| SVG 거래흐름 그래프 | 에이전트 노드 크기 = 잔액 비례, 거래 시 애니메이션 |
+| 실시간 거래 피드 | SSE push — 새 거래가 위에서 쌓이는 채팅창 방식 |
+| 터미널 로그 | 거래 발생 시 백엔드 로그처럼 출력 |
+| 통계 패널 | 총 거래건수, 총 통화량, 복식부기 무결성(balanced) |
+| 잔액 예측 패널 | 선형회귀로 에이전트별 상승/하락 트렌드 예측 |
+| 에이전트 팝업 | 클릭 시 잔액·성격·지출확률 정보 표시 |
+| 속도 슬라이더 | 1ms ~ 3000ms/틱 실시간 조절 (느림/보통/빠름/초고속) |
+| 시뮬레이션 제어 | 시작 / 일시정지 / 정지 / 초기화 |
 
-## 아키텍처
+<br>
 
-```
-Inbound Adapter (Web/Scheduler)
-    └── Application Layer (UseCase)
-            └── Port (Interface)
-                    └── Outbound Adapter (JPA/Cache/Messaging)
-```
-
-```
-domain/
-  account/     # 계좌 잔액 관리
-  agent/       # 에이전트 정의 (chancePay, salary)
-  transfer/    # 거래 내역
-  ledger/      # 복식부기 원장
-
-application/
-  usecase/     # TransferUseCase (핵심 송금 로직)
-  port/out/    # AccountPort, TransferPort, LedgerPort, AgentPort
-
-adapter/in/
-  scheduler/   # SimulationEngine (@Scheduled 틱 엔진)
-  web/         # REST API, SSE 엔드포인트
-  init/        # DataInitializer (에이전트 초기 데이터)
-
-adapter/out/
-  persistence/ # JPA 어댑터
-```
-
-## API
+## 🌐 API
 
 | Method | Endpoint | 설명 |
 |--------|----------|------|
 | GET | `/` | 대시보드 메인 페이지 |
 | GET | `/feed/stream` | SSE 실시간 거래 피드 |
 | GET | `/feed` | 최근 거래 20건 |
-| GET | `/stats` | 통계 (총 거래건수, 총 잔액, 복식부기 검증) |
+| GET | `/stats` | 통계 + 복식부기 무결성 검증 |
 | GET | `/agents` | 에이전트 목록 + 잔액 |
-| GET | `/simulation/status` | 시뮬레이션 상태 조회 |
 | POST | `/simulation/start` | 시뮬레이션 시작 |
 | POST | `/simulation/pause` | 일시정지 |
 | POST | `/simulation/stop` | 정지 |
-| POST | `/simulation/reset` | 초기화 (거래 전체 삭제 + 잔액 복원) |
+| POST | `/simulation/reset` | 초기화 (거래 삭제 + 잔액 복원) |
 | POST | `/simulation/speed?ms={n}` | 틱 속도 설정 (1 ~ 3000ms) |
 
-## 실행 방법
+<br>
 
-**1. MySQL 실행**
+## ⚙️ 실행 방법
 
+### 1. DB 환경 실행
 ```bash
 docker-compose up -d
 ```
 
-**2. 애플리케이션 실행**
-
+### 2. 애플리케이션 실행
 ```bash
 ./gradlew bootRun
 ```
 
-**3. 대시보드 접속**
-
+### 3. 대시보드 접속
 ```
 http://localhost:8080
 ```
 
-## 핵심 구현 포인트
+<br>
 
-### 데드락 방지
-두 에이전트가 동시에 서로에게 송금할 때, 항상 ID가 작은 계좌부터 락을 획득해 순환 대기를 방지합니다.
+## 📁 참고 자료
 
-```java
-if (fromAccountId < toAccountId) {
-    first  = accountPort.findByIdWithLock(fromAccountId);
-    second = accountPort.findByIdWithLock(toAccountId);
-} else {
-    first  = accountPort.findByIdWithLock(toAccountId);
-    second = accountPort.findByIdWithLock(fromAccountId);
-}
-```
+- [토스뱅크 은행 최초 코어뱅킹 MSA 전환기 — SLASH23](https://toss.tech/article/slash23-corebanking)
+- 인천대학교 정보통신공학과 분포학습연구실
 
-### 복식부기 무결성
-모든 거래는 차변(DEBIT)과 대변(CREDIT) 두 개의 원장 항목으로 기록되며,
-`/stats` 응답에 `"balanced": true/false` 로 실시간 검증 결과를 노출합니다.
+<br>
 
-### SSE 실시간 피드
-거래 발생 즉시 `FeedSseService`가 연결된 모든 브라우저에 JSON을 push합니다.  
-프론트엔드는 폴링 없이 `EventSource('/feed/stream')`으로 수신합니다.
+---
+
+> 개발 기간: 2026.05 ~ 2026.07  
+> 개발자: 김재웅 (인천대학교 정보통신공학과)
