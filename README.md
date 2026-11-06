@@ -156,6 +156,11 @@ OutboxRelay (100ms) : PENDING 을 id 순으로 동기 발행 → ack 받으면 P
 | 브로커 장애 중 송금 30건 → 복구 | 송금은 계속 성공, 복구 후 전량 전달, 커밋 거래 수 = 정산 장부 행 수 |
 | ACK 유실 3회 → 재발행 | 중복 도착 3건을 소비자가 제거, 장부는 거래당 1행 |
 | 잔액 부족으로 롤백된 거래 | Outbox 에도 없음 (외부로 새지 않음) |
+| **실제 Kafka 컨테이너 일시정지**(`docker pause`) 중 송금 → 재가동 | 거래 성공, 대사 `PENDING_IN_FLIGHT` → 재가동 후 전량 도착, `MATCHED` (MySQL+Kafka+Redis 컨테이너) |
+| 처리할 수 없는 독(poison) 메시지 | 건너뛰지 않고 DLT 에 원인과 함께 보존, 뒤 메시지는 계속 처리 |
+
+- 발행 완료 이벤트는 7일 보관 후 1,000건 단위로 정리(`OutboxCleaner`), 대기·DEAD 이벤트는 지우지 않는다.
+- 대시보드 상단 **신뢰성 컨트롤 룸**에서 Outbox 대기 건수, 장애 주입 버튼, 대사 결과를 실시간으로 볼 수 있다.
 
 ```bash
 curl -X POST localhost:8080/chaos/broker/down   # 장애 주입 (local 프로필)
@@ -375,7 +380,9 @@ http://localhost:8080
 | `LedgerScenarioTest` | 소비 / 환불 / 중복환불 거절 / 투자 수익·손실·전액손실 / 급여 / 잔액 초과 롤백 |
 | `SimulationIntegrityTest` | 300틱 시뮬레이션 후 무결성 4가지 조건 모두 성립 |
 | `IdempotencyTest` | 같은 Idempotency-Key 50건 동시 재전송 → 송금 1건, 키 재사용·내용 불일치 거절 |
-| `OutboxReliabilityTest` | 브로커 장애·ACK 유실·롤백·동시 200건·DEAD 격리에서 유실 0 / 중복 0 |
+| `OutboxReliabilityTest` | 브로커 장애·ACK 유실·롤백·동시 200건·DEAD 격리에서 유실 0 / 중복 0, 보관 기간 정리 |
+| `FullInfraOutboxIntegrationTest` | MySQL + **실제 Kafka + Redis** 컨테이너: Kafka 일시정지·재가동, 독 메시지 DLT, Redis 캐시 일치 |
+| `MySqlIndexUsageTest` | 릴레이 폴링·대사·환불 조회가 의도한 인덱스를 쓸 수 있는지 `EXPLAIN` 확인 |
 | `ReconciliationTest` | MATCHED / 전달 중 오탐 방지 / 누락·불명·금액불일치 정확 탐지 / 이력 |
 | `ArchitectureTest` | 헥사고날 의존 방향·외부 시스템 분리·순환 의존 금지 (ArchUnit) |
 | `LockStrategyBenchmark` | 락 전략 4종 × 시나리오 4종 처리량·지연·정합성 (`benchmark` 태그, 별도 실행) |
