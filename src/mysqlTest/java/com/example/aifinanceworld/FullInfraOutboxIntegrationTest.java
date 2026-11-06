@@ -16,7 +16,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.testcontainers.kafka.KafkaContainer;
+
+import java.time.Duration;
+import java.util.Map;
+import java.util.UUID;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -49,6 +58,7 @@ class FullInfraOutboxIntegrationTest {
     @Autowired BalanceCachePort balanceCache;
     @Autowired TransactionEventPort eventPort;
     @Autowired KafkaContainer kafka;
+    @Autowired KafkaTemplate<String, String> kafkaTemplate;
     @Autowired JdbcTemplate jdbc;
 
     Account a;
@@ -140,5 +150,39 @@ class FullInfraOutboxIntegrationTest {
 
         assertTrue(balanceCache.getClass().getSimpleName().contains("Redis"), "Redis 캐시 어댑터가 활성화되어야 함");
         assertEquals(0, balanceCache.get(b.getId()).orElseThrow().compareTo(dbBalance));
+    }
+
+    @Test
+    void 처리할_수_없는_메시지는_건너뛰지_않고_DLT_로_보존된다() throws Exception {
+        long settledBefore = settled();
+        String poison = "{ 이건 JSON 이 아님 " + UUID.randomUUID();
+        kafkaTemplate.send("ai-finance.transactions", "poison", poison).get();
+
+        try (KafkaConsumer<String, String> dlt = new KafkaConsumer<>(Map.of(
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafka.getBootstrapServers(),
+                ConsumerConfig.GROUP_ID_CONFIG, "dlt-check-" + UUID.randomUUID(),
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class))) {
+            dlt.subscribe(List.of("ai-finance.transactions.DLT"));
+            boolean found = false;
+            long deadline = System.currentTimeMillis() + 30_000;
+            while (!found && System.currentTimeMillis() < deadline) {
+                ConsumerRecords<String, String> records = dlt.poll(Duration.ofMillis(500));
+                for (var r : records) {
+                    if (poison.equals(r.value())) {
+                        found = true;
+                        assertNotNull(r.headers().lastHeader("kafka_dlt-exception-message"), "실패 원인이 헤더에 남아야 함");
+                    }
+                }
+            }
+            assertTrue(found, "독 메시지가 DLT 에 보존되어야 함");
+        }
+        assertEquals(settledBefore, settled(), "독 메시지는 정산 장부에 기록되지 않아야 함");
+
+        // 독 메시지 뒤의 정상 메시지는 막히지 않고 계속 처리된다
+        transferUseCase.transfer(a.getId(), b.getId(), BigDecimal.valueOf(300), "독 메시지 이후");
+        publishAllPending(30_000);
+        waitUntil(() -> settled() == transfers(), 30_000, "독 메시지 이후 정상 메시지가 처리되어야 함");
     }
 }

@@ -64,6 +64,15 @@ jobs:
       - name: MySQL integration tests
         run: ./gradlew mysqlTest --console=plain --no-daemon
 
+      - name: MySQL test report
+        if: always()
+        uses: mikepenz/action-junit-report@v5
+        with:
+          check_name: MySQL Test Report
+          report_paths: 'build/test-results/mysqlTest/*.xml'
+          include_passed: true
+          detailed_summary: true
+
       - name: Upload MySQL test results
         if: always()
         uses: actions/upload-artifact@v4
