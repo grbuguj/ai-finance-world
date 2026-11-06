@@ -40,6 +40,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.1'   // 헥사고날 의존 규칙 테스트
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -62,7 +63,22 @@ dependencies {
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'benchmark'
+    }
+}
+
+// ── 락 전략 비교 실험 (오래 걸리므로 일반 테스트에서 분리) ──────────────
+//   ./gradlew benchmark        (H2)
+//   ./gradlew mysqlBenchmark   (Testcontainers MySQL 8, Docker 필요) → build/benchmark/*.md
+tasks.register('benchmark', Test) {
+    description = '락 전략 비교 실험 (H2)'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform { includeTags 'benchmark' }
+    testLogging { showStandardStreams = true }
+    outputs.upToDateWhen { false }
 }
 
 tasks.register('mysqlTest', Test) {
@@ -70,6 +86,16 @@ tasks.register('mysqlTest', Test) {
     group = 'verification'
     testClassesDirs = sourceSets.mysqlTest.output.classesDirs
     classpath = sourceSets.mysqlTest.runtimeClasspath
-    useJUnitPlatform()
+    useJUnitPlatform { excludeTags 'benchmark' }
     shouldRunAfter tasks.named('test')
+}
+
+tasks.register('mysqlBenchmark', Test) {
+    description = '락 전략 비교 실험 (Testcontainers MySQL, Docker 필요)'
+    group = 'verification'
+    testClassesDirs = sourceSets.mysqlTest.output.classesDirs
+    classpath = sourceSets.mysqlTest.runtimeClasspath
+    useJUnitPlatform { includeTags 'benchmark' }
+    testLogging { showStandardStreams = true }
+    outputs.upToDateWhen { false }
 }
