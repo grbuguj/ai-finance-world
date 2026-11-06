@@ -164,6 +164,22 @@ jobs:
           cat recon.json; echo
           grep -q '"status":"MATCHED"' recon.json
 
+      - name: Lock variants on hot merchants (mixed)
+        # ADR-0005: 같은 혼합 부하에서 분산 락 방식만 바꿔 실측 (앱을 설정만 바꿔 재기동)
+        run: |
+          run_variant() {
+            label=$1; dist=$2; backoff=$3
+            APP_LOCK_DISTRIBUTED_ENABLED=$dist APP_LOCK_MAX_BACKOFF_MS=$backoff \
+              docker compose --profile app up -d --no-deps --force-recreate app
+            for i in $(seq 1 90); do curl -fs localhost:8080/actuator/health | grep -q '"UP"' && break; sleep 2; done
+            docker run --rm --network ai-finance-world_default -v "$PWD":/work -w /work grafana/k6:0.54.0 \
+              run -e BASE_URL=http://app:8080 -e VUS=30 -e DURATION=30s -e LABEL=$label loadtest/k6/mixed.js
+            curl -fs localhost:8080/integrity | grep -q '"balanced":true'
+          }
+          run_variant lock-redis-spin50 true 50
+          run_variant lock-redis-spin5 true 5
+          run_variant lock-db-only false 50
+
       - name: Results to job summary
         if: always()
         run: |

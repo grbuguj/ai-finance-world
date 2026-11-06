@@ -77,6 +77,8 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       APP_CHAOS_ENABLED: "true"   # 시연용 장애 주입 버튼 활성화
+      APP_LOCK_DISTRIBUTED_ENABLED: ${APP_LOCK_DISTRIBUTED_ENABLED:-true}
+      APP_LOCK_MAX_BACKOFF_MS: ${APP_LOCK_MAX_BACKOFF_MS:-50}
     depends_on:
       mysql: { condition: service_healthy }
       redis: { condition: service_healthy }
