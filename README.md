@@ -345,7 +345,7 @@ toAccount.deposit(amount);
 | GET | `/agents` | 에이전트 목록 + 잔액 |
 | GET | `/accounts` | 전체 계좌 (시스템 계좌 포함) |
 | GET | `/accounts/{id}/balance` | 잔액 조회 (Redis 캐시 우선, 없으면 DB) |
-| GET | `/transfers` | 전체 거래 이력 |
+| GET | `/transfers?limit=50&beforeId=` | 거래 이력 (최신순 키셋 페이지네이션, 최대 200건) |
 | POST | `/transfers?from=&to=&amount=` | 송금 (`Idempotency-Key` 헤더 지원) |
 | POST | `/spends?from=&merchant=&amount=` | 소비 (가맹점 결제, `Idempotency-Key` 헤더 지원) |
 | POST | `/refunds/{spendTransferId}` | 환불 |

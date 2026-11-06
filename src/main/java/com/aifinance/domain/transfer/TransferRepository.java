@@ -1,6 +1,7 @@
 package com.aifinance.domain.transfer;
 
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,11 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
 
     // 대시보드 피드용 - 최신 20건
     List<Transfer> findTop20ByOrderByIdDesc();
+
+    // 거래 이력 키셋 페이지네이션 - PK 인덱스만 타므로 페이지 깊이와 무관하게 일정
+    List<Transfer> findAllByOrderByIdDesc(Pageable pageable);
+
+    List<Transfer> findByIdLessThanOrderByIdDesc(Long beforeId, Pageable pageable);
 
     // 사유 미생성건 - 최신순 3건
     List<Transfer> findTop3ByDescriptionIsNullOrderByIdDesc();
