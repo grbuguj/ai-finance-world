@@ -20,7 +20,16 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.AbstractMessageListenerContainer;
+import org.springframework.kafka.listener.MessageListenerContainer;
 import org.testcontainers.kafka.KafkaContainer;
 
 import java.time.Duration;
@@ -59,6 +68,7 @@ class FullInfraOutboxIntegrationTest {
     @Autowired TransactionEventPort eventPort;
     @Autowired KafkaContainer kafka;
     @Autowired KafkaTemplate<String, String> kafkaTemplate;
+    @Autowired KafkaListenerEndpointRegistry listenerRegistry;
     @Autowired JdbcTemplate jdbc;
 
     Account a;
@@ -155,6 +165,12 @@ class FullInfraOutboxIntegrationTest {
     @Test
     void 처리할_수_없는_메시지는_건너뛰지_않고_DLT_로_보존된다() throws Exception {
         long settledBefore = settled();
+        Logger springKafka = (Logger) LoggerFactory.getLogger("org.springframework.kafka");
+        Logger appKafka = (Logger) LoggerFactory.getLogger("com.aifinance");
+        ListAppender<ILoggingEvent> logs = new ListAppender<>();
+        logs.start();
+        springKafka.addAppender(logs);
+        appKafka.addAppender(logs);
         String poison = "{ 이건 JSON 이 아님 " + UUID.randomUUID();
         kafkaTemplate.send("ai-finance.transactions", "poison", poison).get();
 
@@ -176,7 +192,28 @@ class FullInfraOutboxIntegrationTest {
                     }
                 }
             }
-            assertTrue(found, "독 메시지가 DLT 에 보존되어야 함");
+            if (!found) {
+                StringBuilder diag = new StringBuilder();
+                for (MessageListenerContainer c : listenerRegistry.getListenerContainers()) {
+                    diag.append("container=").append(c.getListenerId()).append(" running=").append(c.isRunning());
+                    if (c instanceof AbstractMessageListenerContainer<?, ?> a) {
+                        diag.append(" errorHandler=").append(a.getCommonErrorHandler());
+                    }
+                    diag.append("; ");
+                }
+                try (AdminClient admin = AdminClient.create(Map.of("bootstrap.servers", kafka.getBootstrapServers()))) {
+                    diag.append("topics=").append(admin.listTopics().names().get()).append("; ");
+                }
+                logs.list.stream().filter(e -> e.getLevel().isGreaterOrEqual(Level.WARN)).limit(8)
+                        .forEach(e -> diag.append("[").append(e.getLevel()).append(" ").append(e.getLoggerName()).append("] ")
+                                .append(e.getFormattedMessage()).append(" | ")
+                                .append(e.getThrowableProxy() == null ? "" : e.getThrowableProxy().getClassName() + ": " + e.getThrowableProxy().getMessage())
+                                .append("; "));
+                fail("독 메시지가 DLT 에 보존되어야 함 — " + diag);
+            }
+        } finally {
+            springKafka.detachAppender(logs);
+            appKafka.detachAppender(logs);
         }
         assertEquals(settledBefore, settled(), "독 메시지는 정산 장부에 기록되지 않아야 함");
 
