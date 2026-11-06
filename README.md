@@ -349,9 +349,16 @@ toAccount.deposit(amount);
 
 ## ⚙️ 실행 방법
 
-### 1. 인프라 실행
+### 0. 한 번에 전부 (시연용)
 ```bash
-docker-compose up -d          # MySQL + Redis + Kafka
+docker compose --profile app up -d --build   # 앱 + MySQL + Redis + Kafka + Prometheus + Grafana
+```
+- 대시보드 http://localhost:8080 · Grafana http://localhost:3000 · 장애 주입 버튼 활성화 상태
+- CI 의 `E2E` 잡이 같은 명령으로 전체 스택을 띄워 k6 부하를 건 뒤 무결성·Outbox 전량 발행·대사 일치를 확인한다
+
+### 1. 인프라만 실행 (개발용)
+```bash
+docker compose up -d          # MySQL + Redis + Kafka (+ Prometheus, Grafana)
 ```
 
 ### 2. 애플리케이션 실행

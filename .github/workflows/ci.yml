@@ -110,3 +110,82 @@ jobs:
         with:
           name: benchmark-report
           path: build/benchmark/
+
+  e2e:
+    name: E2E (docker compose + k6)
+    # 전체 스택을 컨테이너로 띄워 실제 HTTP 부하를 건 뒤, 원장 무결성·Outbox 전량 발행·대사 일치를 확인
+    if: github.event_name != 'push' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    needs: test
+    timeout-minutes: 25
+    env:
+      APP_PROFILES: infra,loadtest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start stack
+        run: docker compose --profile app up -d --build
+
+      - name: Wait for app health
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fs localhost:8080/actuator/health | grep -q '"UP"'; then echo "app is UP"; exit 0; fi
+            sleep 2
+          done
+          docker compose logs app | tail -100
+          exit 1
+
+      - name: k6 load (transfer, mixed)
+        run: |
+          mkdir -p loadtest/results && chmod 777 loadtest/results
+          for s in transfer mixed; do
+            docker run --rm --network ai-finance-world_default -v "$PWD":/work -w /work grafana/k6:0.54.0 \
+              run -e BASE_URL=http://app:8080 -e VUS=30 -e DURATION=30s -e LABEL=ci loadtest/k6/$s.js
+          done
+
+      - name: Verify integrity, outbox drain and reconciliation
+        run: |
+          curl -fs localhost:8080/integrity | tee integrity.json; echo
+          grep -q '"balanced":true' integrity.json
+          for i in $(seq 1 60); do
+            curl -fs localhost:8080/ops/outbox > outbox.json
+            if grep -q '"pending":0' outbox.json; then break; fi
+            sleep 2
+          done
+          cat outbox.json; echo
+          grep -q '"pending":0' outbox.json
+          grep -q '"dead":0' outbox.json
+          # Outbox 가 비어도 Kafka 소비자가 따라잡는 데 시간이 걸리므로 대사가 MATCHED 가 될 때까지 재시도
+          for i in $(seq 1 30); do
+            curl -fs -X POST localhost:8080/ops/reconciliation > recon.json
+            if grep -q '"status":"MATCHED"' recon.json; then break; fi
+            sleep 2
+          done
+          cat recon.json; echo
+          grep -q '"status":"MATCHED"' recon.json
+
+      - name: Results to job summary
+        if: always()
+        run: |
+          {
+            echo "## E2E load (docker compose + k6, VUS 30 × 30s)"
+            for f in loadtest/results/*.json; do
+              [ -f "$f" ] || continue
+              python3 - "$f" <<'PY'
+          import json, sys
+          d = json.load(open(sys.argv[1]))["metrics"]
+          name = sys.argv[1].split("/")[-1]
+          dur = d["http_req_duration"]["values"]
+          print(f"- **{name}**: TPS {d['http_reqs']['values']['rate']:.0f}, p95 {dur['p(95)']:.1f}ms, p99 {dur['p(99)']:.1f}ms, 실패율 {d['http_req_failed']['values']['rate']*100:.2f}%")
+          PY
+            done
+            echo; echo '```'; cat integrity.json outbox.json recon.json 2>/dev/null; echo; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: App logs on failure
+        if: failure()
+        run: docker compose logs app | tail -200
+
+      - name: Stop stack
+        if: always()
+        run: docker compose --profile app down -v
