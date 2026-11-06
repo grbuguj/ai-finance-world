@@ -48,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  *  PESSIMISTIC   SELECT ... FOR UPDATE (계좌 ID 오름차순) → 검증 → UPDATE           ← 현재 서비스 방식
  *  OPTIMISTIC    SELECT balance, version → UPDATE ... WHERE version = ?  충돌 시 재시도(지수 백오프 + 지터)
+ *  OPTIMISTIC_DELTA  낙관적 락이지만 잔액은 상대값(balance = balance ± ?)으로 갱신 — 대조군
  *  CONDITIONAL   UPDATE ... SET balance = balance - ? WHERE id = ? AND balance >= ?  (읽기 없이 원자적 차감)
  *
  * 시나리오
@@ -67,7 +68,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         properties = {"spring.datasource.hikari.maximum-pool-size=32", "app.outbox.relay.auto=false"})
 class LockStrategyBenchmark {
 
-    enum Strategy { PESSIMISTIC, OPTIMISTIC, CONDITIONAL }
+    enum Strategy { PESSIMISTIC, OPTIMISTIC, OPTIMISTIC_DELTA, CONDITIONAL }
 
     enum Scenario { UNIFORM, HOTSPOT, HOTSPOT_SHARD, PINGPONG }
 
@@ -110,7 +111,6 @@ class LockStrategyBenchmark {
             jdbc.execute("create table bench_audit (id bigint auto_increment primary key, account_id bigint,"
                     + " read_version bigint, read_balance decimal(38,2), new_balance decimal(38,2), conn_id bigint, iso varchar(30),"
                     + " side varchar(4), index idx_audit_acc (account_id, read_version))");
-            audit = true;
         }
     }
 
@@ -148,20 +148,37 @@ class LockStrategyBenchmark {
     void 낙관적_락_정합성_진단() throws Exception {
         if (!auditSupported()) return;
         System.out.println("AUDIT|global isolation=" + jdbc.queryForObject("select @@global.transaction_isolation", String.class)
-                + " | jdbc default=" + jdbc.queryForObject("select @@transaction_isolation", String.class));
+                + " | session=" + jdbc.queryForObject("select @@transaction_isolation", String.class)
+                + " | version=" + jdbc.queryForObject("select version()", String.class));
+        audit = true;
         try {
-            for (int round = 1; round <= 5; round++) {
-                jdbc.execute("delete from bench_audit");
-                Workload w = workload(Scenario.HOTSPOT, "audit" + round);
-                long receiver = w.allIds().get(w.allIds().size() - 1);
-                runOps(Strategy.OPTIMISTIC, w, 1_000);
-                List<String> mismatches = mismatchedAccounts(w.allIds());
-                List<String> breaks = chainBreaks(receiver);
-                System.out.printf("AUDIT|round=%d|mismatchedAccounts=%s|chain=%s%n",
-                        round, mismatches, breaks.stream().limit(4).toList());
+            for (Strategy strategy : List.of(Strategy.OPTIMISTIC, Strategy.OPTIMISTIC_DELTA)) {
+                long commits = 0, lostAccounts = 0, chainBreakCount = 0;
+                for (int round = 1; round <= 6; round++) {
+                    for (Scenario scenario : List.of(Scenario.HOTSPOT, Scenario.HOTSPOT_SHARD)) {
+                        jdbc.execute("delete from bench_audit");
+                        Workload w = workload(scenario, "audit-" + strategy.ordinal() + "-" + round);
+                        runOps(strategy, w, 2_000);
+                        List<String> mismatches = mismatchedAccounts(w.allIds());
+                        lostAccounts += mismatches.size();
+                        commits += jdbc.queryForObject("select count(*) from bench_audit where side = 'TO'", Long.class);
+                        int receivers = scenario == Scenario.HOTSPOT ? 1 : SHARDS;
+                        List<Long> ids = w.allIds();
+                        for (long id : ids.subList(ids.size() - receivers, ids.size())) {
+                            List<String> chain = chainBreaks(id);
+                            int breaks = Math.max(0, chain.size() - 1);
+                            chainBreakCount += breaks;
+                            if (breaks > 0) {
+                                System.out.println("AUDIT-BREAK|" + strategy + "|" + scenario + "|round=" + round + "|" + chain.subList(1, chain.size()));
+                            }
+                        }
+                    }
+                }
+                System.out.printf("AUDIT-SUMMARY|%s|commits=%d|chainBreaks=%d|mismatchedAccounts=%d%n",
+                        strategy, commits, chainBreakCount, lostAccounts);
             }
         } finally {
-            // 감사 플래그는 init 에서 켠 상태 유지
+            audit = false;
         }
     }
 
@@ -264,6 +281,7 @@ class LockStrategyBenchmark {
             case PESSIMISTIC -> { pessimistic(from, to); yield 0; }
             case CONDITIONAL -> { conditional(from, to); yield 0; }
             case OPTIMISTIC -> optimistic(from, to);
+            case OPTIMISTIC_DELTA -> optimisticDelta(from, to);
         };
     }
 
@@ -295,6 +313,37 @@ class LockStrategyBenchmark {
                 if (n1 == 0) { s.setRollbackOnly(); return false; }
                 int n2 = fromFirst ? casUpdate(to, ((BigDecimal) t.get("balance")).add(AMOUNT), t.get("version"))
                         : casUpdate(from, fb.subtract(AMOUNT), f.get("version"));
+                if (n2 == 0) { s.setRollbackOnly(); return false; }
+                writeLedger(from, to);
+                if (audit) {
+                    auditCas(from, f, AMOUNT.negate(), "FROM");
+                    auditCas(to, t, AMOUNT, "TO");
+                }
+                return true;
+            });
+            if (Boolean.TRUE.equals(ok)) return attempt;
+            backoff(attempt);
+        }
+        throw new IllegalStateException("낙관적 락 재시도 한도 초과");
+    }
+
+    /**
+     * 대조군: 버전 검사는 같지만 잔액을 '읽은 값으로 덮어쓰지' 않고 DB 의 현재 값에 상대적으로 더하고 뺀다.
+     * 읽은 스냅샷이 어떤 이유로 낡았더라도 잔액이 덮어써지지 않는다.
+     */
+    long optimisticDelta(long from, long to) {
+        for (int attempt = 0; attempt <= MAX_OPTIMISTIC_RETRIES; attempt++) {
+            Boolean ok = tx.execute(s -> {
+                Map<String, Object> f = jdbc.queryForMap("select balance, version from accounts where id = ?", from);
+                Map<String, Object> t = jdbc.queryForMap("select balance, version from accounts where id = ?", to);
+                if (((BigDecimal) f.get("balance")).compareTo(AMOUNT) < 0) throw new IllegalStateException("잔액 부족");
+                long fv = ((Number) f.get("version")).longValue(), tv = ((Number) t.get("version")).longValue();
+                String debit = "update accounts set balance = balance - ?, version = version + 1 where id = ? and version = ? and balance >= ?";
+                String credit = "update accounts set balance = balance + ?, version = version + 1 where id = ? and version = ?";
+                boolean fromFirst = from < to;
+                int n1 = fromFirst ? jdbc.update(debit, AMOUNT, from, fv, AMOUNT) : jdbc.update(credit, AMOUNT, to, tv);
+                if (n1 == 0) { s.setRollbackOnly(); return false; }
+                int n2 = fromFirst ? jdbc.update(credit, AMOUNT, to, tv) : jdbc.update(debit, AMOUNT, from, fv, AMOUNT);
                 if (n2 == 0) { s.setRollbackOnly(); return false; }
                 writeLedger(from, to);
                 if (audit) {
