@@ -66,6 +66,7 @@ tasks.named('test') {
     useJUnitPlatform {
         excludeTags 'benchmark'
     }
+    testLogging { events 'failed'; exceptionFormat 'full' }
 }
 
 // ── 락 전략 비교 실험 (오래 걸리므로 일반 테스트에서 분리) ──────────────
@@ -88,6 +89,7 @@ tasks.register('mysqlTest', Test) {
     classpath = sourceSets.mysqlTest.runtimeClasspath
     useJUnitPlatform { excludeTags 'benchmark' }
     shouldRunAfter tasks.named('test')
+    testLogging { events 'failed'; exceptionFormat 'full' }
 }
 
 tasks.register('mysqlBenchmark', Test) {

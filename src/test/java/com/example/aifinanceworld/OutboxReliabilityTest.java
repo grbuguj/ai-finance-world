@@ -53,6 +53,7 @@ class OutboxReliabilityTest {
         faults.loseNextAcks(0);
         engine.reset();
         relay.drain(100); // 초기 자본금(OPENING) 이벤트 정리
+        assertEquals(0, outboxPending(), () -> "초기 이벤트 발행 실패: " + diag());
         List<Account> accounts = agentUseCase.findAll().stream().map(ag -> ag.getAccount()).toList();
         a = accounts.get(0);
         b = accounts.get(1);
@@ -72,6 +73,12 @@ class OutboxReliabilityTest {
     private long settled()          { return count("select count(*) from settlement_records"); }
     private long outboxTotal()      { return count("select count(*) from outbox_events"); }
     private long outboxPending()    { return count("select count(*) from outbox_events where status = 'PENDING'"); }
+
+    /** 실패 진단: 발행되지 못한 이벤트의 상태와 마지막 오류 */
+    private String diag() {
+        return jdbc.queryForList("select status, attempts, last_error from outbox_events where status <> 'PUBLISHED' order by id limit 3")
+                .toString();
+    }
 
     @Test
     void 브로커_장애_중에도_거래는_성공하고_복구_후_유실없이_전량_전달된다() {
