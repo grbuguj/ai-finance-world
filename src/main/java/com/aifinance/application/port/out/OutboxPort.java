@@ -22,5 +22,8 @@ public interface OutboxPort {
 
     List<OutboxEvent> findDead();
 
+    /** 보관 기간이 지난 PUBLISHED 이벤트를 최대 batchSize 건 삭제하고 삭제 건수를 돌려준다 */
+    int deletePublishedBefore(LocalDateTime before, int batchSize);
+
     void deleteAll();
 }

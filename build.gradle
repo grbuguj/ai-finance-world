@@ -60,6 +60,7 @@ dependencies {
     mysqlTestImplementation 'org.springframework.boot:spring-boot-testcontainers'
     mysqlTestImplementation 'org.testcontainers:testcontainers-junit-jupiter'
     mysqlTestImplementation 'org.testcontainers:testcontainers-mysql'
+    mysqlTestImplementation 'org.testcontainers:testcontainers-kafka'   // 실제 Kafka 브로커로 Outbox 전 구간 검증
 }
 
 tasks.named('test') {

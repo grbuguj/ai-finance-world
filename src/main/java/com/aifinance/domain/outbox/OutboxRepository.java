@@ -21,4 +21,9 @@ public interface OutboxRepository extends JpaRepository<OutboxEvent, Long> {
     LocalDateTime oldestCreatedAt(@Param("status") OutboxStatus status);
 
     List<OutboxEvent> findByStatusOrderByIdAsc(OutboxStatus status);
+
+    /** 보관 기간이 지난 발행 완료 이벤트 id (청크 단위 삭제용) */
+    @Query("select o.id from OutboxEvent o where o.status = :status and o.publishedAt < :before order by o.id asc")
+    List<Long> findIdsPublishedBefore(@Param("status") OutboxStatus status, @Param("before") LocalDateTime before,
+                                      Pageable pageable);
 }

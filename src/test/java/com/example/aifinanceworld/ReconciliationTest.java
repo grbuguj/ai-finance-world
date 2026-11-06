@@ -104,10 +104,12 @@ class ReconciliationTest {
         // 정산 시스템 쪽 사고를 재현
         jdbc.update("delete from settlement_records where transfer_id = ?", ids.get(0));                 // 누락
         jdbc.update("update settlement_records set amount = amount + 1 where transfer_id = ?", ids.get(1)); // 금액 불일치
+        // 불명 — 시각은 DB 서버 시계(current_timestamp, 컨테이너는 UTC)가 아니라 앱 시계로 넣어야 대사 기간과 맞는다
+        java.sql.Timestamp now = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
         jdbc.update("""
                 insert into settlement_records (transfer_id, tx_type, sender_account_id, receiver_account_id,
                                                 amount, occurred_at, received_at, delivery_count)
-                values (999999, 'TRANSFER', 1, 2, 1000, current_timestamp, current_timestamp, 1)""");       // 불명
+                values (999999, 'TRANSFER', 1, 2, 1000, ?, ?, 1)""", now, now);
 
         RunView run = reconciliation.reconcileToday();
 

@@ -1,6 +1,7 @@
 package com.example.aifinanceworld;
 
 import com.aifinance.AiFinanceWorldApplication;
+import com.aifinance.adapter.in.scheduler.OutboxCleaner;
 import com.aifinance.adapter.in.scheduler.SimulationEngine;
 import com.aifinance.application.port.out.FaultInjectionPort;
 import com.aifinance.application.service.OutboxRelayService;
@@ -43,6 +44,7 @@ class OutboxReliabilityTest {
     @Autowired FaultInjectionPort faults;
     @Autowired SettlementInbox inbox;
     @Autowired JdbcTemplate jdbc;
+    @Autowired OutboxCleaner cleaner;
 
     Account a;
     Account b;
@@ -181,5 +183,26 @@ class OutboxReliabilityTest {
 
         assertEquals(0L, count("select count(*) from outbox_events where status <> 'PUBLISHED'"));
         assertEquals(transfers(), settled());
+    }
+
+    @Test
+    void 보관_기간이_지난_발행_완료_이벤트만_정리하고_대기_이벤트는_남긴다() {
+        for (int i = 0; i < 5; i++) {
+            transferUseCase.transfer(a.getId(), b.getId(), BigDecimal.valueOf(100), "정리 대상 " + i);
+        }
+        relay.drain(10);
+        faults.setBrokerDown(true);
+        transferUseCase.transfer(a.getId(), b.getId(), BigDecimal.valueOf(100), "대기 중");
+        relay.relayOnce();
+        long published = count("select count(*) from outbox_events where status = 'PUBLISHED'");
+
+        // 발행 완료 이벤트를 8일 전에 발행된 것으로 만든다
+        jdbc.update("update outbox_events set published_at = ? where status = 'PUBLISHED'",
+                java.sql.Timestamp.valueOf(java.time.LocalDateTime.now().minusDays(8)));
+        int deleted = cleaner.cleanupBefore(java.time.LocalDateTime.now().minusDays(7));
+
+        assertEquals(published, deleted);
+        assertEquals(0L, count("select count(*) from outbox_events where status = 'PUBLISHED'"));
+        assertEquals(1L, outboxPending(), "전달되지 않은 이벤트는 절대 지우면 안 된다");
     }
 }

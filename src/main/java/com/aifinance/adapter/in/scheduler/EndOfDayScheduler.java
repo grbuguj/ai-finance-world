@@ -1,5 +1,6 @@
 package com.aifinance.adapter.in.scheduler;
 
+import com.aifinance.AiFinanceWorldApplication;
 import com.aifinance.application.service.OutboxRelayService;
 import com.aifinance.application.usecase.ReconciliationUseCase;
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 /**
  * 일마감(EOD) 배치.
@@ -31,9 +33,10 @@ public class EndOfDayScheduler {
         this.reconciliationUseCase = reconciliationUseCase;
     }
 
-    @Scheduled(cron = "${app.eod.cron:0 10 0 * * *}", zone = "Asia/Seoul")
+    @Scheduled(cron = "${app.eod.cron:0 10 0 * * *}", zone = AiFinanceWorldApplication.BUSINESS_ZONE)
     public void closeBusinessDay() {
-        LocalDate businessDate = LocalDate.now().minusDays(1);
+        // cron 과 같은 시간대로 '어제'를 계산 (JVM 기본 시간대 = BUSINESS_ZONE)
+        LocalDate businessDate = LocalDate.now(ZoneId.of(AiFinanceWorldApplication.BUSINESS_ZONE)).minusDays(1);
         int drained = relayService.drain(50);
         var result = reconciliationUseCase.reconcileDay(businessDate);
         log.info("[EOD] {} 마감 완료 — 마감 전 발행 {}건, 대사 결과 {}", businessDate, drained, result.status());

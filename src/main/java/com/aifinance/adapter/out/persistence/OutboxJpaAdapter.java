@@ -6,6 +6,7 @@ import com.aifinance.domain.outbox.OutboxRepository;
 import com.aifinance.domain.outbox.OutboxStatus;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,6 +49,16 @@ public class OutboxJpaAdapter implements OutboxPort {
     @Override
     public List<OutboxEvent> findDead() {
         return repository.findByStatusOrderByIdAsc(OutboxStatus.DEAD);
+    }
+
+    @Override
+    @Transactional
+    public int deletePublishedBefore(LocalDateTime before, int batchSize) {
+        List<Long> ids = repository.findIdsPublishedBefore(OutboxStatus.PUBLISHED, before, PageRequest.of(0, batchSize));
+        if (!ids.isEmpty()) {
+            repository.deleteAllByIdInBatch(ids);
+        }
+        return ids.size();
     }
 
     @Override
