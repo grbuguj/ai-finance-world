@@ -4,10 +4,10 @@ import com.aifinance.AiFinanceWorldApplication;
 import com.aifinance.adapter.in.scheduler.SimulationEngine;
 import com.aifinance.adapter.in.web.TransferController;
 import com.aifinance.adapter.in.web.dto.FeedItem;
-import com.aifinance.application.port.out.TransferPort;
 import com.aifinance.application.usecase.AgentUseCase;
 import com.aifinance.application.usecase.TransferUseCase;
 import com.aifinance.domain.account.Account;
+import com.aifinance.domain.transfer.TransferRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ class TransferPaginationTest {
     @Autowired SimulationEngine engine;
     @Autowired AgentUseCase agentUseCase;
     @Autowired TransferUseCase transferUseCase;
-    @Autowired TransferPort transferPort;
+    @Autowired TransferRepository transferRepository;
     @Autowired TransferController controller;
 
     @BeforeEach
@@ -45,7 +45,7 @@ class TransferPaginationTest {
 
     @Test
     void 페이지를_이어_붙이면_빠짐도_중복도_없이_최신순이다() {
-        long total = transferPort.count();
+        long total = transferRepository.count(); // 개설(OPENING) 거래 포함 전체 행 — 피드는 이를 모두 보여준다
         List<Long> ids = new ArrayList<>();
         Long beforeId = null;
         while (true) {
