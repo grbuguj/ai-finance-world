@@ -89,7 +89,7 @@ AI 에이전트 10명이 가상 금융 생태계에서 **송금 · 소비 · 투
 ```
 에이전트 10명 ── 송금/소비/투자/환불 ──▶  은행 백엔드  ──▶  실시간 대시보드
                                         (핵심 시스템)       SSE push / SVG 그래프
-                                        분산 락 + 비관적 락  잔액 예측 패널
+                                        비관적 락(ID 오름차순)  잔액 예측 패널
                                         복식부기 원장        시뮬레이션 제어
                                              │
                                              ├─ 같은 트랜잭션 ──▶ Outbox ──릴레이──▶ Kafka ──▶ 외부 정산 시스템(멱등)
@@ -121,7 +121,7 @@ com.aifinance
 │   │                            #   DistributedLock, BalanceCache, TransactionEvent)
 │   ├── service
 │   │   ├── LedgerPostingService # 모든 거래의 단일 기장 지점 (ID 오름차순 비관적 락 + 분개 2건)
-│   │   ├── AccountLockExecutor  # 분산 락 → 트랜잭션 → 락 해제 템플릿
+│   │   ├── AccountLockExecutor  # (선택) 분산 락 → 트랜잭션 → 해제 템플릿
 │   │   ├── OutboxRelayService   # Outbox → 브로커 동기 발행 (순서 보장, 재시도, DEAD 격리)
 │   │   └── TransactionPostedListener # AFTER_COMMIT → 잔액 캐시 갱신
 │   └── usecase                  # Transfer / Spend / Invest / Refund / Agent(급여)
@@ -203,6 +203,23 @@ curl -X POST localhost:8080/chaos/broker/up     # 복구 → pending 0 으로 �
 
 <br>
 
+## 🔍 2차 고도화에서 찾아 고친 결함
+
+테스트와 실측을 늘리면서 기존 코드와 새 코드에서 다음 결함을 찾았다. 모두 **재현 테스트를 먼저 만들고** 고쳤다.
+
+| 결함 | 드러난 방법 | 영향 | 조치 |
+|---|---|---|---|
+| 커밋 후 Kafka 직접 발행 → 장애 시 이벤트 유실 | 코드 리뷰, 장애 주입 테스트 | 원장엔 있고 정산엔 없는 거래 | Transactional Outbox + 멱등 소비자 ([ADR-0002](docs/adr/0002-transactional-outbox.md)) |
+| **OSIV + 선조회 엔티티 재사용** | 전체 스택 E2E(k6) 결제 실패율 26.6%, HTTP 대조 실험 | `@Version` 없었다면 가맹점 잔액 덮어쓰기 | OSIV 끔, 실제 HTTP 동시성 테스트 ([ADR-0005](docs/adr/0005-hot-account-and-locking-under-http.md)) |
+| 공정성 없는 Redis 스핀 락 | 같은 E2E 에서 락 방식 3종 실측 | 핫 계좌 p99 1.2초 | 계좌 락은 DB 행 락만 (p99 412ms, TPS 1.4배) |
+| 소수 금액 송금 시 잔액·원장 따로 반올림 | `AmountPrecisionTest` | 0.005원 × 3 → 시스템 총액 +0.03원 | 원 단위 정수만 허용 |
+| `/stats` 가 요청마다 원장 전체 집계 | `StatsScaleBenchmark` | 51만 건에서 요청 1회 4.2초 | 스냅샷 캐시 + 적응형 주기 무결성 감시 |
+| EOD cron(KST)과 날짜 계산(서버 시간대) 불일치 | 코드 리뷰 | 서버가 UTC 면 엉뚱한 날 대사 | 영업일 시간대 고정 |
+| 정산 소비자가 처리 불가 메시지를 건너뜀 | 실제 Kafka 통합 테스트 | 정산 누락 | DLT 보존 (기본 이름 `-dlt` 함정도 테스트로 발견) |
+| Gradle 9 에서 `mysqlTest` 실행 불가 | CI | MySQL 검증이 돌지 않음 | 소스셋 중복 등록 제거 |
+
+<br>
+
 ## 🛠 기술 스택
 
 | 분류 | 기술 | 선택 이유 |
@@ -211,7 +228,7 @@ curl -X POST localhost:8080/chaos/broker/up     # 복구 → pending 0 으로 �
 | Framework | Spring Boot 4.0 | 금융권 백엔드 표준 스택 |
 | ORM | Spring Data JPA | `@Lock`으로 비관적 락 적용 |
 | Database | MySQL 8.0 | 토스뱅크 채널계 스택 기준 |
-| Cache / Lock | Redis | 분산 락(다중 인스턴스 대비), 잔액 캐시 — `infra` 프로필에서 활성화 |
+| Cache / Lock | Redis | 잔액 캐시, Outbox 릴레이 단일 실행 락 (계좌 분산 락은 선택) — `infra` 프로필 |
 | Message Queue | Apache Kafka | 커밋된 거래 이벤트 비동기 발행 — `infra` 프로필에서 활성화 |
 | 실시간 통신 | SSE (Server-Sent Events) | 폴링 없는 실시간 거래 피드 |
 | Infra | Docker Compose | 로컬 환경 일관성 |
@@ -240,16 +257,17 @@ curl -X POST localhost:8080/chaos/broker/up     # 복구 → pending 0 으로 �
 > 송금만 있을 때는 ①이 구조상 항상 참이라 검증력이 약했습니다.
 > 시스템 계좌를 도입하고 ③·④를 추가해, 잔액 필드와 원장이 실제로 일치하는지까지 증명합니다.
 
-**동시성 제어 (2단 락)**
+**동시성 제어**
 ```
-[Redis 분산 락: 계좌 ID 오름차순]          ← 서버 여러 대일 때 (infra 프로필)
-   └─ [DB 트랜잭션 시작]
-         └─ [비관적 락 SELECT ... FOR UPDATE: 계좌 ID 오름차순]
-               잔액 검증 → 잔액 변경 → Transfer + DEBIT/CREDIT 기록
-      [커밋]
-   └─ AFTER_COMMIT: Redis 잔액 캐시 갱신, Kafka 이벤트 발행
-[분산 락 해제]   ← 반드시 커밋 이후에 해제
+[DB 트랜잭션 시작]
+   └─ [비관적 락 SELECT ... FOR UPDATE: 계좌 ID 오름차순]   ← 정합성의 근거 (단일 DB)
+         잔액 검증 → 잔액 변경 → Transfer + DEBIT/CREDIT + Outbox 기록
+[커밋]
+   └─ AFTER_COMMIT: Redis 잔액 캐시 갱신
 ```
+> 처음에는 앞단에 Redis 분산 락을 두는 2단 락이었다. 전체 스택 E2E 실측에서 공정성 없는 스핀 락이
+> 핫 계좌의 꼬리 지연만 키우는 것을 확인하고(p99 1,245ms → 412ms), 계좌 락은 DB 행 락만 쓰도록 바꿨다.
+> Redis 분산 락은 `app.lock.distributed.enabled=true` 로 다시 켤 수 있다 ([ADR-0005](docs/adr/0005-hot-account-and-locking-under-http.md)).
 ```java
 // LedgerPostingService — 모든 거래가 이 한 곳을 지난다
 // 계좌 ID 오름차순 락 획득 → A→B, B→A 동시 요청에도 데드락 없음
@@ -391,6 +409,10 @@ http://localhost:8080
 | `OutboxReliabilityTest` | 브로커 장애·ACK 유실·롤백·동시 200건·DEAD 격리에서 유실 0 / 중복 0, 보관 기간 정리 |
 | `FullInfraOutboxIntegrationTest` | MySQL + **실제 Kafka + Redis** 컨테이너: Kafka 일시정지·재가동, 독 메시지 DLT, Redis 캐시 일치 |
 | `MySqlIndexUsageTest` | 릴레이 폴링·대사·환불 조회가 의도한 인덱스를 쓸 수 있는지 `EXPLAIN` 확인 |
+| `HttpSpendConcurrencyTest` | **실제 HTTP** 로 같은 가맹점 동시 결제 400건 전량 성공 + 무결성 (서비스 직접 호출 대조군 포함) |
+| `AmountPrecisionTest` | 원 단위가 아닌 금액 거절, 잔액·원장 불변 |
+| `DashboardStatsCacheTest` | 통계 스냅샷 TTL 재사용, 동시 50건 단일 집계, 만료 후 반영 |
+| `StatsScaleBenchmark` | 원장 1만~51만 건에서 `/stats` 비용 수정 전후 비교 (`benchmark` 태그) |
 | `ReconciliationTest` | MATCHED / 전달 중 오탐 방지 / 누락·불명·금액불일치 정확 탐지 / 이력 |
 | `ArchitectureTest` | 헥사고날 의존 방향·외부 시스템 분리·순환 의존 금지 (ArchUnit) |
 | `LockStrategyBenchmark` | 락 전략 4종 × 시나리오 4종 처리량·지연·정합성 (`benchmark` 태그, 별도 실행) |

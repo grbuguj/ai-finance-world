@@ -34,7 +34,7 @@ public class AccountLockExecutor {
                                PlatformTransactionManager transactionManager,
                                @Value("${app.lock.wait-ms:3000}") long waitMs,
                                @Value("${app.lock.lease-ms:5000}") long leaseMs,
-                               @Value("${app.lock.distributed.enabled:true}") boolean distributedEnabled) {
+                               @Value("${app.lock.distributed.enabled:false}") boolean distributedEnabled) {
         this.lockPort = lockPort;
         this.distributedEnabled = distributedEnabled;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
