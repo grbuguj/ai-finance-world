@@ -1,0 +1,249 @@
+Initialized native services in: C:\Users\finger\scoop\apps\gradle\current\.gradle\native
+Initialized jansi services in: C:\Users\finger\scoop\apps\gradle\current\.gradle\native
+Removing 0 daemon stop events from registry
+Starting a Gradle Daemon, 1 busy Daemon could not be reused, use --status for details
+Starting process 'Gradle build daemon'. Working directory: C:\Users\finger\scoop\apps\gradle\current\.gradle\daemon\9.4.1 Command: C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot\bin\java.exe --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED -XX:MaxMetaspaceSize=384m -XX:+HeapDumpOnOutOfMemoryError -Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Duser.country=KR -Duser.language=ko -Duser.variant -cp C:\Users\finger\scoop\apps\gradle\current\.gradle\wrapper\dists\gradle-9.4.1-bin\arn2x92ynaizyzdaamcbpbhtj\gradle-9.4.1\lib\gradle-daemon-main-9.4.1.jar -javaagent:C:\Users\finger\scoop\apps\gradle\current\.gradle\wrapper\dists\gradle-9.4.1-bin\arn2x92ynaizyzdaamcbpbhtj\gradle-9.4.1\lib\agents\gradle-instrumentation-agent-9.4.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 9.4.1
+Successfully started process 'Gradle build daemon'
+An attempt to start the daemon took 2.287 secs.
+The client will now receive all logging from the daemon (pid: 3436). The daemon log file: C:\Users\finger\scoop\apps\gradle\current\.gradle\daemon\9.4.1\daemon-3436.out.log
+Starting build in new daemon [memory: 512 MiB]
+Using 12 worker leases.
+Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=false, resilientModelBuilding=false}
+Received JVM installation metadata from 'C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot': {JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot, JAVA_VERSION=21.0.12, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=21.0.12+8-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=21.0.12+8-LTS, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
+Watching the file system is configured to be enabled if available
+Now considering [C:\Users\finger\IdeaProjects\ai-finance-world] as hierarchies to watch
+File system watching is active
+Starting Build
+Settings evaluated using settings file 'C:\Users\finger\IdeaProjects\ai-finance-world\settings.gradle'.
+Projects loaded. Root project using build file 'C:\Users\finger\IdeaProjects\ai-finance-world\build.gradle'.
+Included projects: [root project 'ai-finance-world']
+
+> Configure project :
+Evaluating root project 'ai-finance-world' using build file 'C:\Users\finger\IdeaProjects\ai-finance-world\build.gradle'.
+Resolved plugin [id: 'java']
+Resolved plugin [id: 'org.springframework.boot', version: '4.0.6']
+Resolved plugin [id: 'io.spring.dependency-management', version: '1.1.7']
+Applying dependency management to configuration 'annotationProcessor' in project 'ai-finance-world'
+Applying dependency management to configuration 'apiElements' in project 'ai-finance-world'
+Applying dependency management to configuration 'archives' in project 'ai-finance-world'
+Applying dependency management to configuration 'bootArchives' in project 'ai-finance-world'
+Applying dependency management to configuration 'compileClasspath' in project 'ai-finance-world'
+Applying dependency management to configuration 'compileOnly' in project 'ai-finance-world'
+Applying dependency management to configuration 'default' in project 'ai-finance-world'
+Applying dependency management to configuration 'developmentOnly' in project 'ai-finance-world'
+Applying dependency management to configuration 'implementation' in project 'ai-finance-world'
+Applying dependency management to configuration 'mainSourceElements' in project 'ai-finance-world'
+Applying dependency management to configuration 'productionRuntimeClasspath' in project 'ai-finance-world'
+Applying dependency management to configuration 'runtimeClasspath' in project 'ai-finance-world'
+Applying dependency management to configuration 'runtimeElements' in project 'ai-finance-world'
+Applying dependency management to configuration 'runtimeOnly' in project 'ai-finance-world'
+Applying dependency management to configuration 'testAndDevelopmentOnly' in project 'ai-finance-world'
+Applying dependency management to configuration 'testAnnotationProcessor' in project 'ai-finance-world'
+Applying dependency management to configuration 'testCompileClasspath' in project 'ai-finance-world'
+Applying dependency management to configuration 'testCompileOnly' in project 'ai-finance-world'
+Applying dependency management to configuration 'testImplementation' in project 'ai-finance-world'
+Applying dependency management to configuration 'testResultsElementsForTest' in project 'ai-finance-world'
+Applying dependency management to configuration 'testRuntimeClasspath' in project 'ai-finance-world'
+Applying dependency management to configuration 'testRuntimeOnly' in project 'ai-finance-world'
+All projects evaluated.
+Task name matched 'test'
+Selected primary task 'test' from project :
+Starting process 'command 'C:\Users\finger\.jdks\openjdk-26.0.2.1\bin\java.exe''. Working directory: C:\Users\finger\scoop\apps\gradle\current\.gradle\.tmp\tmp-jvm316250950625568348probe Command: C:\Users\finger\.jdks\openjdk-26.0.2.1\bin\java.exe -Xmx32m -Xms32m -cp . JavaProbe
+Successfully started process 'command 'C:\Users\finger\.jdks\openjdk-26.0.2.1\bin\java.exe''
+Received JVM installation metadata from 'C:\Users\finger\.jdks\openjdk-26.0.2.1': {JAVA_HOME=C:\Users\finger\.jdks\openjdk-26.0.2.1, JAVA_VERSION=26.0.2.1, JAVA_VENDOR=Oracle Corporation, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=26.0.2.1+1-7, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=26.0.2.1+1-7, VM_VENDOR=Oracle Corporation, OS_ARCH=amd64}
+Starting process 'command 'C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin\java.exe''. Working directory: C:\Users\finger\scoop\apps\gradle\current\.gradle\.tmp\tmp-jvm9244768991900764185probe Command: C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin\java.exe -Xmx32m -Xms32m -cp . JavaProbe
+Successfully started process 'command 'C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin\java.exe''
+Received JVM installation metadata from 'C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2': {JAVA_HOME=C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2, JAVA_VERSION=17.0.20.1, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=17.0.20.1+1, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=17.0.20.1+1, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
+Resolving global dependency management for project 'ai-finance-world'
+Excluding [com.google.protobuf:protobuf-java]
+Excluding []
+Excluding []
+Excluding []
+Excluding []
+Excluding []
+Tasks to be executed: [task ':compileJava', task ':processResources', task ':classes', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :compileJava (Thread[#94,Execution worker Thread 4,5,main]) started.
+:compileJava (Thread[#94,Execution worker Thread 4,5,main]) started.
+
+> Task :compileJava
+Custom actions are attached to task ':compileJava'.
+Caching disabled for task ':compileJava' because:
+  Build cache is disabled
+Task ':compileJava' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+The input changes require a full rebuild for incremental task ':compileJava'.
+Compilation mode: default, forking compiler
+Full recompilation is required because no incremental change information is available. This is usually caused by clean builds or changing compiler arguments.
+Compiling with toolchain 'C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2'.
+Starting process 'Gradle Worker Daemon 1'. Working directory: C:\Users\finger\scoop\apps\gradle\current\.gradle\workers Command: C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin\java.exe --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED @C:\Users\finger\scoop\apps\gradle\current\.gradle\.tmp\gradle-worker-classpath16481457304854755332txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country=KR -Duser.language=ko -Duser.variant worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Worker Daemon 1'
+Successfully started process 'Gradle Worker Daemon 1'
+Started Gradle worker daemon (1.074 secs) with fork options DaemonForkOptions{executable=C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin\java.exe, minHeapSize=null, maxHeapSize=null, jvmArgs=[--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED, --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED], keepAliveMode=DAEMON}.
+
+This JVM does not support getting OS memory, so no OS memory status updates will be broadcast
+
+> Task :compileJava
+Compiling with JDK Java compiler API.
+C:\Users\finger\IdeaProjects\ai-finance-world\src\main\java\com\aifinance\domain\account\Account.java:29: warning: @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+    private BigDecimal balance = BigDecimal.ZERO;
+                       ^
+1 warning
+Class dependency analysis for incremental compilation took 0.069 secs.
+Created classpath snapshot for incremental compilation in 0.329 secs.
+Resolve mutations for :processResources (Thread[#93,Execution worker Thread 3,5,main]) started.
+:processResources (Thread[#93,Execution worker Thread 3,5,main]) started.
+
+> Task :processResources
+Caching disabled for task ':processResources' because:
+  Build cache is disabled
+  Not worth caching
+Task ':processResources' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+Resolve mutations for :classes (Thread[#93,Execution worker Thread 3,5,main]) started.
+:classes (Thread[#93,Execution worker Thread 3,5,main]) started.
+
+> Task :classes
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :compileTestJava (Thread[#93,Execution worker Thread 3,5,main]) started.
+:compileTestJava (Thread[#93,Execution worker Thread 3,5,main]) started.
+
+> Task :compileTestJava
+Custom actions are attached to task ':compileTestJava'.
+Caching disabled for task ':compileTestJava' because:
+  Build cache is disabled
+Task ':compileTestJava' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+The input changes require a full rebuild for incremental task ':compileTestJava'.
+Compilation mode: default, forking compiler
+Full recompilation is required because no incremental change information is available. This is usually caused by clean builds or changing compiler arguments.
+Compiling with toolchain 'C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2'.
+Compiling with JDK Java compiler API.
+Class dependency analysis for incremental compilation took 0.023 secs.
+Created classpath snapshot for incremental compilation in 0.124 secs.
+Resolve mutations for :processTestResources (Thread[#93,Execution worker Thread 3,5,main]) started.
+:processTestResources (Thread[#93,Execution worker Thread 3,5,main]) started.
+
+> Task :processTestResources
+Caching disabled for task ':processTestResources' because:
+  Build cache is disabled
+  Not worth caching
+Task ':processTestResources' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+Resolve mutations for :testClasses (Thread[#93,Execution worker Thread 3,5,main]) started.
+:testClasses (Thread[#93,Execution worker Thread 3,5,main]) started.
+
+> Task :testClasses
+Skipping task ':testClasses' as it has no actions.
+Resolve mutations for :test (Thread[#93,Execution worker Thread 3,5,main]) started.
+:test (Thread[#93,Execution worker Thread 3,5,main]) started.
+Gradle Test Executor 2 started executing tests.
+
+> Task :test
+Caching disabled for task ':test' because:
+  Build cache is disabled
+Task ':test' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+Starting process 'Gradle Test Executor 2'. Working directory: C:\Users\finger\IdeaProjects\ai-finance-world Command: C:\Users\finger\scoop\apps\gradle\current\.gradle\jdks\eclipse_adoptium-17-amd64-windows.2\bin\java.exe -Dorg.gradle.internal.worker.tmpdir=C:\Users\finger\IdeaProjects\ai-finance-world\build\tmp\test\work @C:\Users\finger\scoop\apps\gradle\current\.gradle\.tmp\gradle-worker-classpath8599835583337712030txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country=KR -Duser.language=ko -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 2'
+Successfully started process 'Gradle Test Executor 2'
+
+ConcurrentTransferTest STANDARD_OUT
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v4.0.6)
+
+    2026-09-29T16:11:17.455+09:00  INFO 26992 --- [    Test worker] c.e.a.ConcurrentTransferTest             : Starting ConcurrentTransferTest using Java 17.0.20.1 with PID 26992 (started by finger in C:\Users\finger\IdeaProjects\ai-finance-world)
+    2026-09-29T16:11:17.462+09:00  INFO 26992 --- [    Test worker] c.e.a.ConcurrentTransferTest             : No active profile set, falling back to 1 default profile: "default"
+    2026-09-29T16:11:18.939+09:00  INFO 26992 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-09-29T16:11:18.944+09:00  INFO 26992 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-09-29T16:11:19.271+09:00  INFO 26992 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 308 ms. Found 4 JPA repository interfaces.
+    2026-09-29T16:11:19.344+09:00  INFO 26992 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+    2026-09-29T16:11:19.345+09:00  INFO 26992 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+    2026-09-29T16:11:19.391+09:00  INFO 26992 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.aifinance.domain.account.AccountRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+    2026-09-29T16:11:19.391+09:00  INFO 26992 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.aifinance.domain.agent.AgentRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+    2026-09-29T16:11:19.392+09:00  INFO 26992 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.aifinance.domain.ledger.LedgerRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+    2026-09-29T16:11:19.393+09:00  INFO 26992 --- [    Test worker] .RepositoryConfigurationExtensionSupport : Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.aifinance.domain.transfer.TransferRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+    2026-09-29T16:11:19.393+09:00  INFO 26992 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 27 ms. Found 0 Redis repository interfaces.
+    2026-09-29T16:11:20.603+09:00  INFO 26992 --- [    Test worker] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+    2026-09-29T16:11:20.765+09:00  INFO 26992 --- [    Test worker] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.12.Final
+    2026-09-29T16:11:22.063+09:00  INFO 26992 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-09-29T16:11:22.114+09:00  INFO 26992 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+    2026-09-29T16:11:22.362+09:00  INFO 26992 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+    2026-09-29T16:11:22.366+09:00  INFO 26992 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+    2026-09-29T16:11:22.466+09:00  INFO 26992 --- [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [jdbc:h2:mem:testdb]
+    	Database driver: H2 JDBC Driver
+    	Database dialect: H2Dialect
+    	Database version: 2.4.240
+    	Default catalog/schema: TESTDB/PUBLIC
+    	Autocommit mode: undefined/unknown
+    	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+    	JDBC fetch size: 100
+    	Pool: DataSourceConnectionProvider
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-09-29T16:11:24.052+09:00  INFO 26992 --- [    Test worker] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-09-29T16:11:24.183+09:00  INFO 26992 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-09-29T16:11:24.310+09:00  INFO 26992 --- [    Test worker] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+    2026-09-29T16:11:26.178+09:00  WARN 26992 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+    2026-09-29T16:11:26.224+09:00  INFO 26992 --- [    Test worker] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+    2026-09-29T16:11:27.987+09:00  INFO 26992 --- [    Test worker] c.e.a.ConcurrentTransferTest             : Started ConcurrentTransferTest in 11.076 seconds (process running for 13.726)
+
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :test
+
+ConcurrentTransferTest > 단일방향_동시송금_100건_10회() STANDARD_OUT
+    [단일방향 #1] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=716ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [단일방향 #2] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=487ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [단일방향 #3] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=358ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [단일방향 #4] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=293ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [단일방향 #5] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=250ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [단일방향 #6] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=265ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [단일방향 #7] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=264ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [단일방향 #8] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=258ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [단일방향 #9] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=251ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [단일방향 #10] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=295ms A=9900000.00 B=100000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+
+ConcurrentTransferTest > 양방향_동시송금_100건_10회() STANDARD_OUT
+    [양방향 #1] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=211ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [양방향 #2] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=220ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [양방향 #3] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=214ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [양방향 #4] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=187ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [양방향 #5] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=178ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [양방향 #6] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=182ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [양방향 #7] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=177ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [양방향 #8] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=209ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [양방향 #9] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=176ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+    [양방향 #10] submitted=100 ok=100 fail=0 unfinished=0 timeout=false elapsed=212ms A=5000000.00 B=5000000.00 debit=100000.00/100 credit=100000.00/100 transfers=100 verified=true 
+
+Gradle Test Executor 2 finished executing tests.
+2026-09-29T16:11:34.790+09:00  INFO 26992 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-09-29T16:11:34.800+09:00  INFO 26992 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-09-29T16:11:34.803+09:00  INFO 26992 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :test
+Generating HTML test report...
+Finished generating test html results (0.087 secs) into: C:\Users\finger\IdeaProjects\ai-finance-world\build\reports\tests\test
+Finished generating test XML results (0.031 secs) into: C:\Users\finger\IdeaProjects\ai-finance-world\build\test-results\test
+
+[Incubating] Problems report is available at: file:///C:/Users/finger/IdeaProjects/ai-finance-world/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 45s
+5 actionable tasks: 5 executed
+Watched directory hierarchies: [C:\Users\finger\IdeaProjects\ai-finance-world]
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.4.1/userguide/configuration_cache_enabling.html
+VCS Checkout Cache (C:\Users\finger\IdeaProjects\ai-finance-world\.gradle\vcs-1) removing files not accessed on or after Tue Sep 22 16:11:35 KST 2026.
+VCS Checkout Cache (C:\Users\finger\IdeaProjects\ai-finance-world\.gradle\vcs-1) cleanup deleted 0 files/directories.
+VCS Checkout Cache (C:\Users\finger\IdeaProjects\ai-finance-world\.gradle\vcs-1) cleaned up in 0.004 secs.

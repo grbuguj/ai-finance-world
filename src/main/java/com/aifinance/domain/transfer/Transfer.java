@@ -12,13 +12,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * 하나의 거래(송금/소비/투자/환불/급여 ...) 이력.
+ * 원장(LedgerEntry) 2건이 transfer_id 로 이 거래를 가리킨다.
+ */
 @Getter
-///  @Getter 어노테이션 - transfer.getAmount() 와 같은 방식으로, transfer 테이블의 amount를 읽을 수 있음
-
 @NoArgsConstructor
-///  @Getter 어노테이션 - transfer.getAmount() 와 같은 방식으로, transfer 테이블의 amount를 읽을 수 있음
-
-
 @AllArgsConstructor
 @Builder
 @EntityListeners(AuditingEntityListener.class)
@@ -27,7 +26,6 @@ import java.time.LocalDateTime;
 @Table(name = "transfers")
 
 public class Transfer {
-    /// 테이블의 PK 설정 - @Id
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,15 +43,38 @@ public class Transfer {
     @Enumerated(EnumType.STRING)
     private TransferStatus type;
 
-    // LLM이 생성한 자연어 사유 (예: "어제 먹은 삼겹살 값"). 처음엔 null, 스케줄러가 채움
+    // 거래 유형 (송금/소비/투자/환불 ...)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tx_type")
+    @Builder.Default
+    private TransactionType txType = TransactionType.TRANSFER;
+
+    // 거래 사유 / 결제 내역
     @Column(length = 255)
     private String description;
+
+    // 환불 거래일 때 원거래 id
+    private Long originalTransferId;
+
+    // 소비 거래가 환불되었는지 (중복 환불 방지)
+    @Builder.Default
+    private boolean refunded = false;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
-    // 도메인 메서드 - Setter 대신 의미있는 메서드로 사유를 붙인다
     public void describe(String description) {
         this.description = description;
+    }
+
+    /** 환불 처리 표시. 소비 거래만, 한 번만 환불할 수 있다. */
+    public void markRefunded() {
+        if (txType != TransactionType.SPEND) {
+            throw new IllegalStateException("소비 거래만 환불할 수 있습니다 (거래 " + id + ", 유형 " + txType + ")");
+        }
+        if (refunded) {
+            throw new IllegalStateException("이미 환불된 거래입니다 (거래 " + id + ")");
+        }
+        this.refunded = true;
     }
 }

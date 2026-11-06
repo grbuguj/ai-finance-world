@@ -1,0 +1,171 @@
+package com.example.aifinanceworld;
+
+import com.aifinance.AiFinanceWorldApplication;
+import com.aifinance.application.port.out.AccountPort;
+import com.aifinance.application.usecase.TransferUseCase;
+import com.aifinance.domain.account.Account;
+import com.aifinance.domain.ledger.EntryType;
+import com.aifinance.domain.ledger.LedgerEntry;
+import com.aifinance.domain.ledger.LedgerRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import java.math.BigDecimal;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@SpringBootTest(classes = AiFinanceWorldApplication.class)
+public class ConcurrentTransferTest {
+
+    @Autowired
+    private TransferUseCase transferUseCase;
+
+    @Autowired
+    private AccountPort accountPort;
+
+    @Autowired
+    private LedgerRepository ledgerRepository;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    // AiFinanceWorldApplication 전체 컨텍스트를 띄우면 SimulationEngine 스케줄러가 DataInitializer가
+    // 만든 샘플 Agent 계좌들 사이에서 실제 송금을 계속 발생시킨다. 다만 이 테스트가 만드는 accountA/accountB는
+    // 어떤 Agent에도 연결돼 있지 않아 SimulationEngine이 절대 건드리지 않으므로, 원장 합계를 이 두 계좌로
+    // 한정해서 집계하면 백그라운드 시뮬레이션과 무관하게 결정론적인 수치를 얻을 수 있다.
+    private BigDecimal sumByAccountsAndType(Set<Long> accountIds, EntryType type) {
+        return ledgerRepository.findAll().stream()
+                .filter(e -> e.getType() == type && accountIds.contains(e.getAccount().getId()))
+                .map(LedgerEntry::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Test
+    void 단일방향_동시송금_100건() throws InterruptedException {
+        Account accountA = accountPort.save(
+                Account.builder().balance(new BigDecimal("10000000")).build()
+        );
+        Account accountB = accountPort.save(
+                Account.builder().balance(BigDecimal.ZERO).build()
+        );
+        Set<Long> testAccountIds = Set.of(accountA.getId(), accountB.getId());
+
+        int threadCount = 100;
+        BigDecimal transferAmount = new BigDecimal("1000");
+
+        ExecutorService executor = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        long start = System.currentTimeMillis();
+
+        for (int i = 0; i < threadCount; i++) {
+            executor.submit(() -> {
+                try {
+                    transferUseCase.transfer(accountA.getId(), accountB.getId(), transferAmount, "동시성 테스트");
+                } catch (Exception e) {
+                    System.out.println("실패: " + e.getMessage());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await(30, TimeUnit.SECONDS);
+        long elapsed = System.currentTimeMillis() - start;
+        executor.shutdown();
+
+        TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
+        Account[] results = txTemplate.execute(status -> new Account[]{
+                accountPort.findByIdWithLock(accountA.getId()).get(),
+                accountPort.findByIdWithLock(accountB.getId()).get()
+        });
+        Account resultA = results[0];
+        Account resultB = results[1];
+
+        System.out.println("===== 테스트 결과 =====");
+        System.out.println("소요 시간: " + elapsed + "ms");
+        System.out.println("A 최종 잔액: " + resultA.getBalance() + " (기대값: 9900000)");
+        System.out.println("B 최종 잔액: " + resultB.getBalance() + " (기대값: 100000)");
+
+        assertEquals(0, new BigDecimal("9900000").compareTo(resultA.getBalance()));
+        assertEquals(0, new BigDecimal("100000").compareTo(resultB.getBalance()));
+
+        BigDecimal totalDebit = sumByAccountsAndType(testAccountIds, EntryType.DEBIT);
+        BigDecimal totalCredit = sumByAccountsAndType(testAccountIds, EntryType.CREDIT);
+
+        System.out.println("총 DEBIT: " + totalDebit);
+        System.out.println("총 CREDIT: " + totalCredit);
+
+        assertEquals(0, totalDebit.compareTo(totalCredit));
+    }
+
+    @Test
+    void 양방향_동시송금_데드락_검증() throws InterruptedException {
+        Account accountA = accountPort.save(
+                Account.builder().balance(new BigDecimal("5000000")).build()
+        );
+        Account accountB = accountPort.save(
+                Account.builder().balance(new BigDecimal("5000000")).build()
+        );
+
+        int eachDirection = 50;
+        BigDecimal transferAmount = new BigDecimal("1000");
+
+        ExecutorService executor = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(eachDirection * 2);
+
+        long start = System.currentTimeMillis();
+
+        for (int i = 0; i < eachDirection; i++) {
+            executor.submit(() -> {
+                try {
+                    transferUseCase.transfer(accountA.getId(), accountB.getId(), transferAmount, "A->B");
+                } catch (Exception e) {
+                    System.out.println("A->B 실패: " + e.getMessage());
+                } finally {
+                    latch.countDown();
+                }
+            });
+            executor.submit(() -> {
+                try {
+                    transferUseCase.transfer(accountB.getId(), accountA.getId(), transferAmount, "B->A");
+                } catch (Exception e) {
+                    System.out.println("B->A 실패: " + e.getMessage());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        boolean finished = latch.await(30, TimeUnit.SECONDS);
+        long elapsed = System.currentTimeMillis() - start;
+        executor.shutdown();
+
+        System.out.println("===== 양방향 테스트 결과 =====");
+        System.out.println("타임아웃 없이 완료: " + finished);
+        System.out.println("소요 시간: " + elapsed + "ms");
+
+        assertEquals(true, finished, "30초 내에 모든 요청이 처리되어야 함 (데드락 없음)");
+
+        TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
+        Account[] results = txTemplate.execute(status -> new Account[]{
+                accountPort.findByIdWithLock(accountA.getId()).get(),
+                accountPort.findByIdWithLock(accountB.getId()).get()
+        });
+        Account resultA = results[0];
+        Account resultB = results[1];
+        System.out.println("A 최종 잔액: " + resultA.getBalance() + " (기대값: 5000000)");
+        System.out.println("B 최종 잔액: " + resultB.getBalance() + " (기대값: 5000000)");
+
+        assertEquals(0, new BigDecimal("5000000").compareTo(resultA.getBalance()));
+        assertEquals(0, new BigDecimal("5000000").compareTo(resultB.getBalance()));
+    }
+}

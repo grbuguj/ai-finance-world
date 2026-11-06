@@ -22,13 +22,13 @@
 | 3주 | 5/25~5/31 | 송금 코어 | TransferUseCase, 비관적 락, 데드락 방지(ID 오름차순) | ✅ 완료 |
 | 4주 | 6/1~6/14 | 에이전트 엔진 | SimulationEngine(@Scheduled), 에이전트 10명, chancePay 기반 자율 송금 | ✅ 완료 |
 | 5주 | 6/15~6/28 | 실시간 대시보드 | SSE 피드, SVG 거래흐름 그래프, 예측 패널, 시뮬레이션 제어 | ✅ 완료 |
-| 6주 | 6/29~7/5 | 소비 UseCase | SpendUseCase — 에이전트 → 외부 가맹점 결제 (chanceSpend 기반) | 🔨 진행중 |
-| 7주 | 7/6~7/12 | 투자 UseCase | InvestUseCase — 수익률 정규분포 N(μ,σ²), 음수 수익률 포함 (chanceInvest 기반) | ⬜ |
-| 8주 | 7/13~7/19 | 환불 UseCase | RefundUseCase — 소비 트랜잭션 역거래, 원장 보정 (chanceRefund 기반) | ⬜ |
-| 9주 | 7/20~7/26 | Redis 캐시 | 잔액 캐싱, Redisson 분산 락 | ⬜ |
-| 10주 | 7/27~8/2 | Kafka 이벤트 | 거래 이벤트 비동기 발행, 외부 시스템 연동 시뮬레이션 | ⬜ |
-| 11주 | 8/3~8/9 | 부하 테스트 | 동시 N건 송금 → Lost Update 0건 증명, ∑DEBIT=∑CREDIT 검증 | ⬜ |
-| 12주 | 8/10~8/16 | 마무리 | 발표 준비, 문서화 | ⬜ |
+| 6주 | 6/29~7/5 | 소비 UseCase | SpendUseCase — 에이전트 → 외부 가맹점 결제 (chanceSpend 기반) | ✅ 완료 |
+| 7주 | 7/6~7/12 | 투자 UseCase | InvestUseCase — 수익률 정규분포 N(μ,σ²), 음수 수익률 포함 (chanceInvest 기반) | ✅ 완료 |
+| 8주 | 7/13~7/19 | 환불 UseCase | RefundUseCase — 소비 트랜잭션 역거래, 원장 보정 (chanceRefund 기반) | ✅ 완료 |
+| 9주 | 7/20~7/26 | Redis 캐시 | 잔액 캐싱(버전 비교), Redis 분산 락(SET NX PX + Lua 해제) | ✅ 완료 |
+| 10주 | 7/27~8/2 | Kafka 이벤트 | 커밋 후(AFTER_COMMIT) 거래 이벤트 발행, 외부 정산 시스템 Consumer | ✅ 완료 |
+| 11주 | 8/3~8/9 | 부하 테스트 | 동시 N건 송금 → Lost Update 0건 증명, ∑DEBIT=∑CREDIT 검증 | ✅ 완료 |
+| 12주 | 8/10~8/16 | 마무리 | 발표 준비, 문서화 | 🔨 진행중 |
 
 <br>
 
@@ -77,15 +77,18 @@
 
 ## 📌 프로젝트 소개
 
-AI 에이전트 10명이 가상 금융 생태계에서 **송금** 등  
+AI 에이전트 10명이 가상 금융 생태계에서 **송금 · 소비 · 투자 · 환불** 등  
 실제 경제 활동을 수행하고, 그 모든 거래를 은행 백엔드가 안정적으로 처리합니다.  
 모든 거래는 **SSE(Server-Sent Events)** 로 실시간 대시보드에 push됩니다.
 
 ```
-에이전트 10명 ── 자율 송금 ──▶  은행 백엔드  ──▶  실시간 대시보드
-                              (핵심 시스템)       SSE push / SVG 그래프
-                              비관적 락           잔액 예측 패널
-                              복식부기 원장        시뮬레이션 제어
+에이전트 10명 ── 송금/소비/투자/환불 ──▶  은행 백엔드  ──▶  실시간 대시보드
+                                        (핵심 시스템)       SSE push / SVG 그래프
+                                        분산 락 + 비관적 락  잔액 예측 패널
+                                        복식부기 원장        시뮬레이션 제어
+                                             │
+                                             └─ 커밋 후 ──▶ Kafka ──▶ 외부 정산 시스템
+                                                         └─ Redis 잔액 캐시
 ```
 
 > "이 프로젝트의 주인공은 AI가 아니라, **백엔드 시스템**입니다."
@@ -99,22 +102,30 @@ AI 에이전트 10명이 가상 금융 생태계에서 **송금** 등
 
 ```
 com.aifinance
-├── domain                  # 순수 비즈니스 로직 (외부 기술 0)
-│   ├── account             # 계좌 엔티티 + Repository 인터페이스
-│   ├── ledger              # 원장 엔트리 (복식부기)
-│   ├── transfer            # 송금 도메인
-│   └── agent               # AI 에이전트 페르소나
-├── application             # 흐름 조율 (UseCase)
-│   └── usecase
-│       └── TransferUseCase # 핵심 송금 로직 (비관적 락 + 복식부기)
-└── adapter                 # 외부 기술 연결
+├── domain                       # 비즈니스 규칙
+│   ├── account                  # 계좌 (AGENT / MERCHANT / MARKET / CAPITAL), 잔액 부족 규칙
+│   ├── ledger                   # 원장 엔트리 (복식부기, transfer_id 로 거래와 연결)
+│   ├── transfer                 # 거래 이력 + 거래유형(송금/소비/투자/환불/급여/개설)
+│   ├── investment               # 투자 포지션 (만기, 수익률, 정산)
+│   └── agent                    # AI 에이전트 페르소나
+├── application
+│   ├── port/out                 # 외부 기술 추상화 (Account/Ledger/Transfer/Investment,
+│   │                            #   DistributedLock, BalanceCache, TransactionEvent)
+│   ├── service
+│   │   ├── LedgerPostingService # 모든 거래의 단일 기장 지점 (ID 오름차순 비관적 락 + 분개 2건)
+│   │   ├── AccountLockExecutor  # 분산 락 → 트랜잭션 → 락 해제 템플릿
+│   │   └── TransactionPostedListener # AFTER_COMMIT → 캐시 갱신 + Kafka 발행
+│   └── usecase                  # Transfer / Spend / Invest / Refund / Agent(급여)
+│                                #   Integrity(무결성 검증) / SimulationSetup(생성·초기화)
+└── adapter
     ├── in
-    │   ├── scheduler       # SimulationEngine (@Scheduled 틱 엔진)
-    │   └── web             # REST API + SSE 엔드포인트
+    │   ├── scheduler            # SimulationEngine (@Scheduled 틱 엔진)
+    │   ├── init                 # DataInitializer
+    │   └── web                  # REST API + SSE 엔드포인트
     └── out
-        ├── persistence     # JPA 구현체
-        ├── messaging       # Kafka Producer
-        └── cache           # Redis
+        ├── persistence          # JPA 구현체
+        ├── messaging            # Kafka Producer / 외부 정산 Consumer / 로그 대체 구현
+        └── cache                # Redis 분산 락 · 잔액 캐시 / NoOp 대체 구현
 ```
 
 <br>
@@ -127,8 +138,8 @@ com.aifinance
 | Framework | Spring Boot 4.0 | 금융권 백엔드 표준 스택 |
 | ORM | Spring Data JPA | `@Lock`으로 비관적 락 적용 |
 | Database | MySQL 8.0 | 토스뱅크 채널계 스택 기준 |
-| Cache | Redis | 잔액 캐싱 (예정) |
-| Message Queue | Apache Kafka | 비동기 이벤트 분리 (예정) |
+| Cache / Lock | Redis | 분산 락(다중 인스턴스 대비), 잔액 캐시 — `infra` 프로필에서 활성화 |
+| Message Queue | Apache Kafka | 커밋된 거래 이벤트 비동기 발행 — `infra` 프로필에서 활성화 |
 | 실시간 통신 | SSE (Server-Sent Events) | 폴링 없는 실시간 거래 피드 |
 | Infra | Docker Compose | 로컬 환경 일관성 |
 
@@ -136,29 +147,53 @@ com.aifinance
 
 ## 🔑 핵심 설계 원칙
 
-**복식부기 원장 (Double-Entry Ledger)**
+**복식부기 원장 (Double-Entry Ledger) — 닫힌 시스템**
 ```
-하나의 송금 이벤트 = LedgerEntry 2건 원자적 생성
-송금자 DEBIT + 수신자 CREDIT
-잔액 = ∑ CREDIT - ∑ DEBIT
-∑ DEBIT = ∑ CREDIT → 수학적 무결성 보장
-```
+모든 거래(송금/소비/투자/환불/급여/개설) = Transfer 1건 + LedgerEntry 2건(같은 transfer_id) 원자적 생성
+보내는 계좌 DEBIT + 받는 계좌 CREDIT
 
-**동시성 제어**
+은행 밖으로 나가는 돈도 상대 계좌를 가진다 (시스템 계좌)
+  소비   : 에이전트 → 가맹점(쿠팡, 무신사 ...)
+  투자   : 에이전트 → 투자시장(한국증권) → 만기 시 원금×(1+r) 정산, r ~ N(μ, σ²)
+  환불   : 가맹점 → 에이전트 (원거래는 그대로 두고 역거래 추가, 중복 환불 차단)
+  급여/초기자본 : 발행계정 → 에이전트
+
+무결성 검증 4가지 (GET /integrity)
+  ① ∑ DEBIT = ∑ CREDIT
+  ② 모든 거래는 분개를 정확히 2건 가진다
+  ③ 모든 계좌: 잔액 필드 = ∑ CREDIT - ∑ DEBIT   ← Lost Update 가 있으면 여기서 깨진다
+  ④ 모든 계좌(시스템 포함) 잔액 합 = 0          ← 돈이 새거나 생기지 않음
+```
+> 송금만 있을 때는 ①이 구조상 항상 참이라 검증력이 약했습니다.
+> 시스템 계좌를 도입하고 ③·④를 추가해, 잔액 필드와 원장이 실제로 일치하는지까지 증명합니다.
+
+**동시성 제어 (2단 락)**
+```
+[Redis 분산 락: 계좌 ID 오름차순]          ← 서버 여러 대일 때 (infra 프로필)
+   └─ [DB 트랜잭션 시작]
+         └─ [비관적 락 SELECT ... FOR UPDATE: 계좌 ID 오름차순]
+               잔액 검증 → 잔액 변경 → Transfer + DEBIT/CREDIT 기록
+      [커밋]
+   └─ AFTER_COMMIT: Redis 잔액 캐시 갱신, Kafka 이벤트 발행
+[분산 락 해제]   ← 반드시 커밋 이후에 해제
+```
 ```java
-// 비관적 락으로 동시 접근 차단
-@Lock(LockModeType.PESSIMISTIC_WRITE)
-
-// 계좌 ID 오름차순 락 획득 → 데드락 방지
-// A→B, B→A 동시 요청에도 데드락 없음
+// LedgerPostingService — 모든 거래가 이 한 곳을 지난다
+// 계좌 ID 오름차순 락 획득 → A→B, B→A 동시 요청에도 데드락 없음
 if (fromAccountId < toAccountId) {
-    first  = accountPort.findByIdWithLock(fromAccountId);
-    second = accountPort.findByIdWithLock(toAccountId);
+    fromAccount = lock(fromAccountId);
+    toAccount   = lock(toAccountId);
 } else {
-    first  = accountPort.findByIdWithLock(toAccountId);
-    second = accountPort.findByIdWithLock(fromAccountId);
+    toAccount   = lock(toAccountId);
+    fromAccount = lock(fromAccountId);
 }
+fromAccount.withdraw(amount);   // 에이전트 계좌는 잔액 초과 시 예외 → 전체 롤백
+toAccount.deposit(amount);
 ```
+- **환불 이중 처리 방지**: 원거래 행을 `PESSIMISTIC_WRITE` 로 잠근 뒤 `refunded` 플래그 확인
+- **투자 이중 정산 방지**: 투자 행을 잠근 뒤 상태(OPEN/SETTLED) 확인
+- **캐시 역전 방지**: Redis 에 `version(거래 id):잔액` 저장, Lua 스크립트로 더 최신 version 일 때만 덮어씀
+- **롤백된 거래는 외부로 안 나감**: `@TransactionalEventListener(AFTER_COMMIT)`
 
 **SSE 실시간 피드**
 ```
@@ -201,6 +236,8 @@ if (fromAccountId < toAccountId) {
 | 에이전트 팝업 | 클릭 시 잔액·성격·지출확률 정보 표시 |
 | 속도 슬라이더 | 1ms ~ 3000ms/틱 실시간 조절 (느림/보통/빠름/초고속) |
 | 시뮬레이션 제어 | 시작 / 일시정지 / 정지 / 초기화 |
+| 거래 유형 표시 | 피드에 송금 · 소비 · 투자 · 투자정산 · 환불 · 급여 표시 |
+| 외부 시스템 애니메이션 | 소비/투자/환불 시 에이전트 ↔ 은행 ↔ 가맹점·증권사 박스로 이동 |
 
 <br>
 
@@ -210,9 +247,19 @@ if (fromAccountId < toAccountId) {
 |--------|----------|------|
 | GET | `/` | 대시보드 메인 페이지 |
 | GET | `/feed/stream` | SSE 실시간 거래 피드 |
+| GET | `/actuator/prometheus` | 거래 지표 (Prometheus 수집용) |
 | GET | `/feed` | 최근 거래 20건 |
-| GET | `/stats` | 통계 + 복식부기 무결성 검증 |
+| GET | `/stats` | 통계 + 복식부기 무결성 요약 + 유형별 거래 건수 |
+| GET | `/integrity` | 무결성 검증 상세 (4가지 조건, 불일치 계좌 목록) |
 | GET | `/agents` | 에이전트 목록 + 잔액 |
+| GET | `/accounts` | 전체 계좌 (시스템 계좌 포함) |
+| GET | `/accounts/{id}/balance` | 잔액 조회 (Redis 캐시 우선, 없으면 DB) |
+| GET | `/transfers` | 전체 거래 이력 |
+| POST | `/transfers?from=&to=&amount=` | 송금 (`Idempotency-Key` 헤더 지원) |
+| POST | `/spends?from=&merchant=&amount=` | 소비 (가맹점 결제, `Idempotency-Key` 헤더 지원) |
+| POST | `/refunds/{spendTransferId}` | 환불 |
+| POST | `/investments?from=&amount=&holdTicks=` | 투자 납입 |
+| POST | `/investments/{id}/settle?rate=` | 투자 정산 (rate 생략 시 정규분포 샘플링) |
 | POST | `/simulation/start` | 시뮬레이션 시작 |
 | POST | `/simulation/pause` | 일시정지 |
 | POST | `/simulation/stop` | 정지 |
@@ -223,20 +270,34 @@ if (fromAccountId < toAccountId) {
 
 ## ⚙️ 실행 방법
 
-### 1. DB 환경 실행
+### 1. 인프라 실행
 ```bash
-docker-compose up -d
+docker-compose up -d          # MySQL + Redis + Kafka
 ```
 
 ### 2. 애플리케이션 실행
 ```bash
-./gradlew bootRun
+./gradlew bootRun --args='--spring.profiles.active=local' # DB 설치 없이 H2 메모리 DB로 실행 (시연용)
+./gradlew bootRun                                         # MySQL 만 사용 (Redis/Kafka OFF)
+./gradlew bootRun --args='--spring.profiles.active=infra' # Redis 분산 락·캐시 + Kafka 이벤트 ON
 ```
 
 ### 3. 대시보드 접속
 ```
 http://localhost:8080
 ```
+
+### 4. 테스트
+```bash
+./gradlew test   # H2 인메모리 DB 로 실행 (MySQL/Redis/Kafka 불필요)
+```
+
+| 테스트 | 검증 내용 |
+|--------|----------|
+| `ConcurrentTransferTest` | 단일방향 100건 / 양방향 50+50건 동시 송금 × 각 10회 — 성공 건수, 최종 잔액, 원장 건수·합계, 송금 이력 |
+| `ConcurrentRefundTest` | 같은 소비 건에 환불 20건 동시 요청 → 정확히 1건만 성공 |
+| `LedgerScenarioTest` | 소비 / 환불 / 중복환불 거절 / 투자 수익·손실·전액손실 / 급여 / 잔액 초과 롤백 |
+| `SimulationIntegrityTest` | 300틱 시뮬레이션 후 무결성 4가지 조건 모두 성립 |
 
 <br>
 

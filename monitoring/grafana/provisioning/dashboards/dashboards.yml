@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: ai-finance-world
+    folder: AI Finance World
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards
