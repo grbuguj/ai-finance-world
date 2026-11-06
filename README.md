@@ -1,6 +1,7 @@
 # AI Finance World
 
 
+[![CI](https://github.com/grbuguj/ai-finance-world/actions/workflows/ci.yml/badge.svg)](https://github.com/grbuguj/ai-finance-world/actions/workflows/ci.yml)
 ![Java](https://img.shields.io/badge/Java-17-007396?style=flat&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0-6DB33F?style=flat&logo=springboot&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat&logo=mysql&logoColor=white)
@@ -28,7 +29,8 @@
 | 9주 | 7/20~7/26 | Redis 캐시 | 잔액 캐싱(버전 비교), Redis 분산 락(SET NX PX + Lua 해제) | ✅ 완료 |
 | 10주 | 7/27~8/2 | Kafka 이벤트 | 커밋 후(AFTER_COMMIT) 거래 이벤트 발행, 외부 정산 시스템 Consumer | ✅ 완료 |
 | 11주 | 8/3~8/9 | 부하 테스트 | 동시 N건 송금 → Lost Update 0건 증명, ∑DEBIT=∑CREDIT 검증 | ✅ 완료 |
-| 12주 | 8/10~8/16 | 마무리 | 발표 준비, 문서화 | 🔨 진행중 |
+| 12주 | 8/10~8/16 | 마무리 | 멱등성 키, 관측성(Prometheus/Grafana), k6 부하 테스트 | ✅ 완료 |
+| 2차 | 11/6~11/15 | 신뢰성 고도화 | Transactional Outbox, 멱등 소비자, 일마감 대사, 락 전략 실험, ArchUnit, CI | ✅ 완료 |
 
 <br>
 
@@ -59,6 +61,9 @@
 | 양방향 동시 송금 | A→B, B→A 정확히 동시 실행 | 데드락 예외 없이 모든 요청 정상 처리 |
 | 잔액 초과 검증 | 현재 잔액보다 큰 금액 동시 다발 송금 | 조건 위반 시 즉시 예외 및 DB 전체 롤백 |
 | 원장 무결성 검사 | 장기 시뮬레이션 후 원장 합산 비교 | ∑ DEBIT = ∑ CREDIT (수학적 무결성 증명) |
+| 이벤트 유실 | 브로커 장애 / ACK 유실을 주입한 채 송금 | 커밋된 거래 수 = 외부 정산 장부 행 수 (유실 0, 중복 0) |
+| 장부 대사 | 정산 장부에 누락·변조·불명 거래를 일부러 만듦 | 일마감 대사가 거래 id 단위로 정확히 탐지 |
+| 락 전략 선택 | 비관적·낙관적·조건부 UPDATE 를 4개 시나리오로 실측 | 핫스팟에서 비관적 락 4배 처리량, 낙관적 락 Lost Update 발견 |
 
 <br>
 
@@ -87,8 +92,9 @@ AI 에이전트 10명이 가상 금융 생태계에서 **송금 · 소비 · 투
                                         분산 락 + 비관적 락  잔액 예측 패널
                                         복식부기 원장        시뮬레이션 제어
                                              │
-                                             └─ 커밋 후 ──▶ Kafka ──▶ 외부 정산 시스템
-                                                         └─ Redis 잔액 캐시
+                                             ├─ 같은 트랜잭션 ──▶ Outbox ──릴레이──▶ Kafka ──▶ 외부 정산 시스템(멱등)
+                                             ├─ 커밋 후 ──▶ Redis 잔액 캐시                         │
+                                             └─ 매일 00:10 일마감 대사 ◀──────────────────────────┘
 ```
 
 > "이 프로젝트의 주인공은 AI가 아니라, **백엔드 시스템**입니다."
@@ -107,6 +113,8 @@ com.aifinance
 │   ├── ledger                   # 원장 엔트리 (복식부기, transfer_id 로 거래와 연결)
 │   ├── transfer                 # 거래 이력 + 거래유형(송금/소비/투자/환불/급여/개설)
 │   ├── investment               # 투자 포지션 (만기, 수익률, 정산)
+│   ├── outbox                   # 발행 대기 이벤트 (PENDING / PUBLISHED / DEAD, 백오프)
+│   ├── reconciliation           # 일마감 대사 결과·차이 내역
 │   └── agent                    # AI 에이전트 페르소나
 ├── application
 │   ├── port/out                 # 외부 기술 추상화 (Account/Ledger/Transfer/Investment,
@@ -114,9 +122,10 @@ com.aifinance
 │   ├── service
 │   │   ├── LedgerPostingService # 모든 거래의 단일 기장 지점 (ID 오름차순 비관적 락 + 분개 2건)
 │   │   ├── AccountLockExecutor  # 분산 락 → 트랜잭션 → 락 해제 템플릿
-│   │   └── TransactionPostedListener # AFTER_COMMIT → 캐시 갱신 + Kafka 발행
+│   │   ├── OutboxRelayService   # Outbox → 브로커 동기 발행 (순서 보장, 재시도, DEAD 격리)
+│   │   └── TransactionPostedListener # AFTER_COMMIT → 잔액 캐시 갱신
 │   └── usecase                  # Transfer / Spend / Invest / Refund / Agent(급여)
-│                                #   Integrity(무결성 검증) / SimulationSetup(생성·초기화)
+│                                #   Integrity(무결성 검증) / Reconciliation(대사) / SimulationSetup
 └── adapter
     ├── in
     │   ├── scheduler            # SimulationEngine (@Scheduled 틱 엔진)
@@ -124,9 +133,67 @@ com.aifinance
     │   └── web                  # REST API + SSE 엔드포인트
     └── out
         ├── persistence          # JPA 구현체
-        ├── messaging            # Kafka Producer / 외부 정산 Consumer / 로그 대체 구현
+        ├── messaging            # Kafka Producer / 인프로세스 브로커 / 장애 주입기 / 정산 Consumer
+        ├── settlement           # 대사용 정산 장부 조회 (SQL anti-join)
         └── cache                # Redis 분산 락 · 잔액 캐시 / NoOp 대체 구현
+com.aifinance.external.settlement  # 외부 정산 시스템 시뮬레이션 (멱등 수신함) — 은행 코어를 모른다
 ```
+
+<br>
+
+## 🛡 이벤트 유실 방지 — Transactional Outbox ([ADR-0002](docs/adr/0002-transactional-outbox.md))
+
+커밋 직후 Kafka 로 보내던 구조는 "DB 커밋 ✅ → (장애) → 발행 ❌" 사이에서 이벤트가 **조용히 사라질 수 있었다.**
+
+```
+트랜잭션 { 잔액 변경 → 거래·분개 기록 → outbox_events INSERT }   ← 커밋되면 함께 남고, 롤백되면 함께 사라짐
+OutboxRelay (100ms) : PENDING 을 id 순으로 동기 발행 → ack 받으면 PUBLISHED, 실패 시 지수 백오프·순서 보장, 10회 실패 시 DEAD 격리
+외부 정산 시스템    : 거래 id 를 PK 로 기록 → 같은 이벤트가 몇 번 와도 1행 (at-least-once 발행 → effectively-once 효과)
+```
+
+| 검증 (`OutboxReliabilityTest`, H2 + MySQL) | 결과 |
+|---|---|
+| 브로커 장애 중 송금 30건 → 복구 | 송금은 계속 성공, 복구 후 전량 전달, 커밋 거래 수 = 정산 장부 행 수 |
+| ACK 유실 3회 → 재발행 | 중복 도착 3건을 소비자가 제거, 장부는 거래당 1행 |
+| 잔액 부족으로 롤백된 거래 | Outbox 에도 없음 (외부로 새지 않음) |
+
+```bash
+curl -X POST localhost:8080/chaos/broker/down   # 장애 주입 (local 프로필)
+curl localhost:8080/ops/outbox                  # pending 증가 — 거래는 계속 성공
+curl -X POST localhost:8080/chaos/broker/up     # 복구 → pending 0 으로 수렴
+```
+
+<br>
+
+## 📒 일마감 대사 — Reconciliation ([ADR-0003](docs/adr/0003-end-of-day-reconciliation.md))
+
+매일 00:10 전날 영업일의 **은행 원장 ↔ 외부 정산 장부**를 맞춰 본다. 두 장부를 메모리에 올리지 않고 SQL anti-join 으로 차이만 뽑는다.
+
+| 분류 | 의미 |
+|---|---|
+| `MISSING_IN_SETTLEMENT` | 은행에만 있음 (진짜 유실) |
+| `IN_FLIGHT` | Outbox 에 대기 중 — 차이로 보지 않음 (오탐 방지) |
+| `UNEXPECTED_IN_SETTLEMENT` | 정산 장부에만 있음 |
+| `AMOUNT_MISMATCH` | 금액 불일치 |
+
+결과(`MATCHED` / `PENDING_IN_FLIGHT` / `UNMATCHED`)와 차이 내역, 같은 시점의 원장 무결성 검증 결과를 이력으로 남긴다.
+
+<br>
+
+## ⚖️ 락 전략 비교 실험 ([보고서](docs/experiments/lock-strategy-benchmark.md) · [ADR-0004](docs/adr/0004-pessimistic-locking.md))
+
+같은 원장 기록을 두고 잔액 갱신 방식만 바꿔 MySQL 8.0 에서 실측했다 (32 스레드, 실행당 2,000건, CI 에서 매번 재실행).
+
+| 핫스팟(1개 계좌로 집중) | 비관적 락 | 낙관적 락 | 조건부 UPDATE |
+|---|---:|---:|---:|
+| TPS | 731 | 187 | 844 |
+| p99 | 50ms | 822ms | 76ms |
+| 실패 | 0% | 5.3% | 0% |
+| 무결성 | ✅ | ❌ Lost Update | ✅ |
+
+- **발견**: 읽은 잔액을 절대값으로 덮어쓰는 낙관적 락이 MySQL 에서 약 7,600 커밋당 1건 돈을 잃었다.
+  감사 로그로 커밋 사슬이 끊긴 지점을 찾아냈고, 상대값(`balance = balance ± ?`)으로 갱신한 대조군은 22,989 커밋 중 0건.
+- **핫스팟 완화**: 같은 비관적 락에서 수신 계좌를 8개 서브계좌로 나누면 TPS **2.3배**.
 
 <br>
 
@@ -265,6 +332,12 @@ toAccount.deposit(amount);
 | POST | `/simulation/stop` | 정지 |
 | POST | `/simulation/reset` | 초기화 (거래 삭제 + 잔액 복원) |
 | POST | `/simulation/speed?ms={n}` | 틱 속도 설정 (1 ~ 3000ms) |
+| GET | `/ops/outbox` | Outbox 상태 (PENDING / PUBLISHED / DEAD, 가장 오래된 대기 시간) |
+| POST | `/ops/outbox/relay` | 릴레이 즉시 1회 실행 |
+| POST | `/ops/outbox/requeue-dead` | DEAD 이벤트 재발행 대기열로 |
+| POST | `/ops/reconciliation?date=` | 대사 실행 (date 생략 시 오늘 0시~지금) |
+| GET | `/ops/reconciliation[/latest]` | 대사 이력 / 최근 결과 상세 |
+| POST | `/chaos/broker/down` · `/up` · `/ack-loss?n=` | 장애 주입 (`app.chaos.enabled=true` 일 때만) |
 
 <br>
 
@@ -289,8 +362,11 @@ http://localhost:8080
 
 ### 4. 테스트
 ```bash
-./gradlew test   # H2 인메모리 DB 로 실행 (MySQL/Redis/Kafka 불필요)
+./gradlew test            # H2 인메모리 DB (MySQL/Redis/Kafka 불필요)
+./gradlew mysqlTest       # Testcontainers MySQL 8 에서 같은 테스트 (Docker 필요)
+./gradlew mysqlBenchmark  # 락 전략 비교 실험 (Docker 필요) → build/benchmark/
 ```
+모든 push 마다 GitHub Actions 가 세 가지를 모두 실행한다.
 
 | 테스트 | 검증 내용 |
 |--------|----------|
@@ -298,6 +374,11 @@ http://localhost:8080
 | `ConcurrentRefundTest` | 같은 소비 건에 환불 20건 동시 요청 → 정확히 1건만 성공 |
 | `LedgerScenarioTest` | 소비 / 환불 / 중복환불 거절 / 투자 수익·손실·전액손실 / 급여 / 잔액 초과 롤백 |
 | `SimulationIntegrityTest` | 300틱 시뮬레이션 후 무결성 4가지 조건 모두 성립 |
+| `IdempotencyTest` | 같은 Idempotency-Key 50건 동시 재전송 → 송금 1건, 키 재사용·내용 불일치 거절 |
+| `OutboxReliabilityTest` | 브로커 장애·ACK 유실·롤백·동시 200건·DEAD 격리에서 유실 0 / 중복 0 |
+| `ReconciliationTest` | MATCHED / 전달 중 오탐 방지 / 누락·불명·금액불일치 정확 탐지 / 이력 |
+| `ArchitectureTest` | 헥사고날 의존 방향·외부 시스템 분리·순환 의존 금지 (ArchUnit) |
+| `LockStrategyBenchmark` | 락 전략 4종 × 시나리오 4종 처리량·지연·정합성 (`benchmark` 태그, 별도 실행) |
 
 <br>
 
@@ -310,5 +391,5 @@ http://localhost:8080
 
 ---
 
-> 개발 기간: 2026.05 ~ 2026.07  
+> 개발 기간: 2026.05 ~ 2026.11  
 > 개발자: 김재웅 (인천대학교 정보통신공학과)
