@@ -6,6 +6,9 @@ import com.aifinance.application.port.out.BalanceCachePort;
 import com.aifinance.application.port.out.IdempotencyPort;
 import com.aifinance.application.port.out.InvestmentPort;
 import com.aifinance.application.port.out.LedgerPort;
+import com.aifinance.application.port.out.OutboxPort;
+import com.aifinance.application.port.out.ReconciliationPort;
+import com.aifinance.application.port.out.SettlementLedgerPort;
 import com.aifinance.application.port.out.TransferPort;
 import com.aifinance.application.service.LedgerPostingService;
 import com.aifinance.domain.account.Account;
@@ -54,11 +57,15 @@ public class SimulationSetupUseCase {
     private final BalanceCachePort balanceCachePort;
     private final IdempotencyPort idempotencyPort;
     private final LedgerPostingService postingService;
+    private final OutboxPort outboxPort;
+    private final SettlementLedgerPort settlementLedgerPort;
+    private final ReconciliationPort reconciliationPort;
 
     public SimulationSetupUseCase(AccountPort accountPort, AgentPort agentPort, LedgerPort ledgerPort,
                                   TransferPort transferPort, InvestmentPort investmentPort,
                                   BalanceCachePort balanceCachePort, IdempotencyPort idempotencyPort,
-                                  LedgerPostingService postingService) {
+                                  LedgerPostingService postingService, OutboxPort outboxPort,
+                                  SettlementLedgerPort settlementLedgerPort, ReconciliationPort reconciliationPort) {
         this.accountPort = accountPort;
         this.agentPort = agentPort;
         this.ledgerPort = ledgerPort;
@@ -67,6 +74,9 @@ public class SimulationSetupUseCase {
         this.balanceCachePort = balanceCachePort;
         this.idempotencyPort = idempotencyPort;
         this.postingService = postingService;
+        this.outboxPort = outboxPort;
+        this.settlementLedgerPort = settlementLedgerPort;
+        this.reconciliationPort = reconciliationPort;
     }
 
     /** 최초 1회: 시스템 계좌 + 에이전트 10명 생성 후 초기 자본금 지급 */
@@ -95,9 +105,12 @@ public class SimulationSetupUseCase {
         fundOpeningBalances();
     }
 
-    /** 초기화: 거래/원장/투자 삭제 → 모든 잔액 0 → 개설 거래로 초기 잔액 재지급 */
+    /** 초기화: 거래/원장/투자/이벤트/정산/대사 삭제 → 모든 잔액 0 → 개설 거래로 초기 잔액 재지급 */
     @Transactional
     public void reset() {
+        reconciliationPort.deleteAll();
+        outboxPort.deleteAll();
+        settlementLedgerPort.deleteAll(); // 외부 정산 장부도 같은 세계의 일부이므로 함께 초기화
         investmentPort.deleteAll();
         idempotencyPort.deleteAll(); // 원거래가 삭제되므로 키도 함께 정리
         ledgerPort.deleteAll();   // FK 순서: ledger → transfer
