@@ -359,15 +359,14 @@ class LockStrategyBenchmark {
         for (int i = 0; i < ids.size() && out.size() < 5; i += 500) {
             List<Long> chunk = ids.subList(i, Math.min(ids.size(), i + 500));
             String in = String.join(",", Collections.nCopies(chunk.size(), "?"));
-            jdbc.query("""
-                    select a.id, a.balance, a.version,
-                           coalesce(sum(case when l.type = 'CREDIT' then l.amount else -l.amount end), 0) as ledger,
-                           count(l.id) as entries
-                    from accounts a left join ledger_entries l on l.account_id = a.id
-                    where a.id in (""" + in + """)
-                    group by a.id, a.balance, a.version
-                    having a.balance <> coalesce(sum(case when l.type = 'CREDIT' then l.amount else -l.amount end), 0)
-                    """, rs -> {
+            String sql = "select a.id, a.balance, a.version,"
+                    + " coalesce(sum(case when l.type = 'CREDIT' then l.amount else -l.amount end), 0) as ledger,"
+                    + " count(l.id) as entries"
+                    + " from accounts a left join ledger_entries l on l.account_id = a.id"
+                    + " where a.id in (" + in + ")"
+                    + " group by a.id, a.balance, a.version"
+                    + " having a.balance <> coalesce(sum(case when l.type = 'CREDIT' then l.amount else -l.amount end), 0)";
+            jdbc.query(sql, rs -> {
                 if (out.size() < 5) {
                     out.add("id=" + rs.getLong(1) + " balance=" + rs.getBigDecimal(2) + " version=" + rs.getLong(3)
                             + " ledger=" + rs.getBigDecimal(4) + " entries=" + rs.getLong(5));
