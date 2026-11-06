@@ -26,6 +26,9 @@ public class IntegrityMonitor {
 
     public record Snapshot(IntegrityReport report, LocalDateTime checkedAt, long durationMillis) {}
 
+    /** 검증 소요 시간의 몇 배 간격으로만 다시 검증할지 — DB 점유율 상한 ≈ 10% */
+    static final int CHECK_COST_MULTIPLIER = 10;
+
     private final IntegrityUseCase integrityUseCase;
     private final IntegrityMetricsPort metrics;
     private final AtomicReference<Snapshot> latest = new AtomicReference<>();
@@ -53,18 +56,36 @@ public class IntegrityMonitor {
         return latest.get();
     }
 
-    /** 보관된 결과가 maxAge 보다 오래됐으면 갱신하고, 아니면 그대로 돌려준다 */
+    /** 보관된 결과가 maxAge(적응형) 보다 오래됐으면 갱신하고, 아니면 그대로 돌려준다 */
     public Snapshot latest(Duration maxAge) {
         Snapshot s = latest.get();
-        if (s != null && Duration.between(s.checkedAt(), LocalDateTime.now()).compareTo(maxAge) <= 0) {
+        if (s != null && !due(s, maxAge)) {
             return s;
         }
         synchronized (this) {
             s = latest.get();
-            if (s != null && Duration.between(s.checkedAt(), LocalDateTime.now()).compareTo(maxAge) <= 0) {
+            if (s != null && !due(s, maxAge)) {
                 return s; // 기다리는 동안 다른 요청이 이미 갱신함 (single-flight)
             }
             return refresh();
         }
+    }
+
+    /** 배경 감시용: 주기가 됐을 때만 검증 (원장이 커져 검증이 느려지면 간격이 자동으로 늘어남) */
+    public void refreshIfDue(Duration interval) {
+        Snapshot s = latest.get();
+        if (s == null || due(s, interval)) {
+            refresh();
+        }
+    }
+
+    /**
+     * 적응형 주기: max(설정 간격, 직전 검증 소요 × 10).
+     * 원장 100만 분개(MySQL)에서는 검증이 수 초 걸려, 5초 고정 주기면 DB 를 절반 가까이 점유한다.
+     */
+    private static boolean due(Snapshot s, Duration interval) {
+        Duration effective = interval.compareTo(Duration.ofMillis(s.durationMillis() * CHECK_COST_MULTIPLIER)) >= 0
+                ? interval : Duration.ofMillis(s.durationMillis() * CHECK_COST_MULTIPLIER);
+        return Duration.between(s.checkedAt(), LocalDateTime.now()).compareTo(effective) > 0;
     }
 }

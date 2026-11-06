@@ -39,8 +39,12 @@ public class DashboardStatsCache {
     private final long refreshNanos;
     private final Duration integrityMaxAge;
 
+    /** 스냅샷 생성 소요 시간의 몇 배 동안 재사용할지 — DB 점유율 상한 ≈ 1/BUILD_COST_MULTIPLIER (20%) */
+    static final int BUILD_COST_MULTIPLIER = 5;
+
     private volatile Map<String, Object> snapshot;
     private volatile long builtAtNanos;
+    private volatile long lastBuildNanos;
 
     public DashboardStatsCache(TransferPort transferPort, AgentUseCase agentUseCase, InvestUseCase investUseCase,
                                OutboxRelayService outboxRelayService, SimulationEngine simulationEngine,
@@ -59,17 +63,34 @@ public class DashboardStatsCache {
 
     public Map<String, Object> snapshot() {
         Map<String, Object> s = snapshot;
-        if (s != null && System.nanoTime() - builtAtNanos < refreshNanos) {
+        if (s != null && fresh()) {
             return s;
         }
         synchronized (this) {
-            if (snapshot != null && System.nanoTime() - builtAtNanos < refreshNanos) {
+            if (snapshot != null && fresh()) {
                 return snapshot;
             }
+            long t0 = System.nanoTime();
             snapshot = Collections.unmodifiableMap(build());
             builtAtNanos = System.nanoTime();
+            lastBuildNanos = builtAtNanos - t0;
             return snapshot;
         }
+    }
+
+    /**
+     * 적응형 TTL: max(설정값, 생성 소요 × 5).
+     * 원장 51만 건(MySQL)에서는 생성에 0.75초가 걸려, 1초 고정 TTL 이면 DB 시간의 75% 를 집계에 썼다 (StatsScaleBenchmark).
+     * 생성이 느려질수록 재사용 기간을 늘려 집계가 차지하는 DB 시간을 약 20% 이하로 묶는다.
+     */
+    private boolean fresh() {
+        long ttl = Math.max(refreshNanos, lastBuildNanos * BUILD_COST_MULTIPLIER);
+        return System.nanoTime() - builtAtNanos < ttl;
+    }
+
+    /** 현재 적용 중인 TTL (ms) — 화면·테스트 확인용 */
+    public long effectiveTtlMillis() {
+        return Math.max(refreshNanos, lastBuildNanos * BUILD_COST_MULTIPLIER) / 1_000_000;
     }
 
     /** 초기화 직후처럼 즉시 반영이 필요할 때 (무결성도 다시 검증) */
@@ -109,6 +130,7 @@ public class DashboardStatsCache {
         stats.put("outboxPending", outbox.pending());
         stats.put("outboxDead", outbox.dead());
         stats.put("tick", simulationEngine.getTickCount());
+        stats.put("statsTtlMs", effectiveTtlMillis());
         return stats;
     }
 }

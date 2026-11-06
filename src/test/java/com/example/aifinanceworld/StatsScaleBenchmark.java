@@ -108,10 +108,12 @@ class StatsScaleBenchmark {
             double cachedMs = avgMillis(2_000, () -> statsCache.snapshot());
             // 0.6초 폴링 × 탭 5개 = 초당 8.3회 요청일 때 DB 가 /stats 에 쓰는 시간 비율
             double oldLoad = Math.min(100, oldMs * (5 / 0.6) / 10);
-            double newLoad = Math.min(100, coldMs * 1 / 10);   // 1초에 한 번만 집계
+            // 적응형 TTL: max(1초, 생성 소요 × 5) 동안 재사용 → DB 점유율 = 생성 소요 / TTL
+            double ttlMs = Math.max(1000, coldMs * 5);
+            double newLoad = Math.min(100, coldMs / ttlMs * 100);
 
-            String row = String.format("| %,d | %,d | %.1f | %.1f | %.4f | %.0f%% | %.0f%% |",
-                    transfers, entries, oldMs, coldMs, cachedMs, oldLoad, newLoad);
+            String row = String.format("| %,d | %,d | %.1f | %.1f | %.4f | %.0f%% | %.0f%% (TTL %.1fs) |",
+                    transfers, entries, oldMs, coldMs, cachedMs, oldLoad, newLoad, ttlMs / 1000);
             rows.add(row);
             System.out.println("STATS-SCALE|" + dbLabel() + row);
         }
