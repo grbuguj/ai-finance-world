@@ -4,6 +4,7 @@ import com.aifinance.application.port.out.TransferPort;
 import com.aifinance.domain.transfer.TransactionType;
 import com.aifinance.domain.transfer.Transfer;
 import com.aifinance.domain.transfer.TransferRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -37,8 +38,11 @@ public class TransferJpaAdapter implements TransferPort {
     }
 
     @Override
-    public List<Transfer> findAll() {
-        return transferRepository.findAll();
+    public List<Transfer> findPage(Long beforeId, int limit) {
+        PageRequest page = PageRequest.of(0, limit);
+        return beforeId == null
+                ? transferRepository.findAllByOrderByIdDesc(page)
+                : transferRepository.findByIdLessThanOrderByIdDesc(beforeId, page);
     }
 
     @Override

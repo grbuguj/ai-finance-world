@@ -24,8 +24,8 @@ repositories {
 //   ./gradlew mysqlTest
 sourceSets {
     mysqlTest {
-        java.srcDir 'src/mysqlTest/java'
-        resources.srcDir 'src/mysqlTest/resources'
+        // src/mysqlTest/java, src/mysqlTest/resources 는 소스셋 이름으로 자동 등록된다
+        // (srcDir 로 한 번 더 추가하면 Gradle 9 에서 리소스 중복 오류)
         compileClasspath += sourceSets.main.output + sourceSets.test.output
         runtimeClasspath += sourceSets.main.output + sourceSets.test.output
     }
@@ -40,6 +40,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.1'   // 헥사고날 의존 규칙 테스트
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -59,10 +60,28 @@ dependencies {
     mysqlTestImplementation 'org.springframework.boot:spring-boot-testcontainers'
     mysqlTestImplementation 'org.testcontainers:testcontainers-junit-jupiter'
     mysqlTestImplementation 'org.testcontainers:testcontainers-mysql'
+    mysqlTestImplementation 'org.testcontainers:testcontainers-kafka'   // 실제 Kafka 브로커로 Outbox 전 구간 검증
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'benchmark'
+    }
+    testLogging { events 'failed'; exceptionFormat 'full' }
+}
+
+// ── 락 전략 비교 실험 (오래 걸리므로 일반 테스트에서 분리) ──────────────
+//   ./gradlew benchmark        (H2)
+//   ./gradlew mysqlBenchmark   (Testcontainers MySQL 8, Docker 필요) → build/benchmark/*.md
+tasks.register('benchmark', Test) {
+    description = '락 전략 비교 실험 (H2)'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform { includeTags 'benchmark' }
+    testLogging { showStandardStreams = true }
+    outputs.upToDateWhen { false }
+    maxHeapSize = '2g'
 }
 
 tasks.register('mysqlTest', Test) {
@@ -70,6 +89,18 @@ tasks.register('mysqlTest', Test) {
     group = 'verification'
     testClassesDirs = sourceSets.mysqlTest.output.classesDirs
     classpath = sourceSets.mysqlTest.runtimeClasspath
-    useJUnitPlatform()
+    useJUnitPlatform { excludeTags 'benchmark' }
     shouldRunAfter tasks.named('test')
+    testLogging { events 'failed'; exceptionFormat 'full' }
+}
+
+tasks.register('mysqlBenchmark', Test) {
+    description = '락 전략 비교 실험 (Testcontainers MySQL, Docker 필요)'
+    group = 'verification'
+    testClassesDirs = sourceSets.mysqlTest.output.classesDirs
+    classpath = sourceSets.mysqlTest.runtimeClasspath
+    useJUnitPlatform { includeTags 'benchmark' }
+    testLogging { showStandardStreams = true }
+    outputs.upToDateWhen { false }
+    maxHeapSize = '2g'
 }

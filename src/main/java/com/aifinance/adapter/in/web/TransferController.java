@@ -51,9 +51,19 @@ public class TransferController {
         this.investUseCase = investUseCase;
     }
 
+    static final int MAX_PAGE_SIZE = 200;
+
+    /**
+     * 거래 이력 (최신순, 키셋 페이지네이션). 예전에는 원장 전체를 한 번에 돌려줘서
+     * 거래가 쌓일수록 응답 크기와 메모리가 끝없이 커졌다. 다음 페이지는 응답의 마지막 id 를 beforeId 로 넘긴다.
+     */
     @GetMapping("/transfers")
-    public List<FeedItem> getTransfers() {
-        return transferPort.findAll().stream().map(FeedItem::from).toList();
+    public List<FeedItem> getTransfers(@RequestParam(defaultValue = "50") int limit,
+                                       @RequestParam(required = false) Long beforeId) {
+        if (limit < 1 || limit > MAX_PAGE_SIZE) {
+            throw new IllegalArgumentException("limit 은 1~" + MAX_PAGE_SIZE + " 사이여야 합니다");
+        }
+        return transferPort.findPage(beforeId, limit).stream().map(FeedItem::from).toList();
     }
 
     @GetMapping("/accounts")

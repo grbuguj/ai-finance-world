@@ -23,7 +23,12 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 
 @Entity
-@Table(name = "transfers")
+@Table(name = "transfers", indexes = {
+        // 대사(기간 조회)·통계용. 없으면 일마감 대사가 transfers 전체를 스캔한다
+        @Index(name = "idx_transfers_created_at", columnList = "created_at"),
+        // 환불 대상 조회: sender + 유형 + 환불여부 (findTop5BySenderIdAndTxTypeAndRefundedFalse...)
+        @Index(name = "idx_transfers_sender_type_refunded", columnList = "sender_id, tx_type, refunded")
+})
 
 public class Transfer {
     @Id

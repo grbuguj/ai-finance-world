@@ -3,11 +3,13 @@ package com.aifinance.application.service;
 import com.aifinance.application.event.TransactionPostedEvent;
 import com.aifinance.application.port.out.AccountPort;
 import com.aifinance.application.port.out.LedgerPort;
+import com.aifinance.application.port.out.OutboxPort;
 import com.aifinance.application.port.out.PostingMetricsPort;
 import com.aifinance.application.port.out.TransferPort;
 import com.aifinance.domain.account.Account;
 import com.aifinance.domain.ledger.EntryType;
 import com.aifinance.domain.ledger.LedgerEntry;
+import com.aifinance.domain.outbox.OutboxEvent;
 import com.aifinance.domain.transfer.TransactionType;
 import com.aifinance.domain.transfer.Transfer;
 import com.aifinance.domain.transfer.TransferStatus;
@@ -25,7 +27,8 @@ import java.time.LocalDateTime;
  * 1) 계좌 ID 오름차순으로 비관적 락(SELECT ... FOR UPDATE) 획득 → 데드락 방지
  * 2) 잔액 변경 (에이전트 계좌는 잔액 초과 출금 불가)
  * 3) 거래(Transfer) 1건 + 원장 DEBIT 1건 + CREDIT 1건을 같은 트랜잭션에 기록
- * 4) 커밋 후 외부 전달용 이벤트 발행
+ * 4) 외부 전달용 이벤트를 Outbox 테이블에 같은 트랜잭션으로 기록 (커밋되면 반드시 언젠가 발행된다)
+ * 5) 커밋 후 잔액 캐시 갱신용 애플리케이션 이벤트 발행
  *
  * 반드시 호출자가 연 트랜잭션 안에서 실행되어야 한다 (MANDATORY).
  */
@@ -37,14 +40,17 @@ public class LedgerPostingService {
     private final TransferPort transferPort;
     private final ApplicationEventPublisher eventPublisher;
     private final PostingMetricsPort metrics;
+    private final OutboxPort outboxPort;
 
     public LedgerPostingService(AccountPort accountPort, LedgerPort ledgerPort, TransferPort transferPort,
-                                ApplicationEventPublisher eventPublisher, PostingMetricsPort metrics) {
+                                ApplicationEventPublisher eventPublisher, PostingMetricsPort metrics,
+                                OutboxPort outboxPort) {
         this.accountPort = accountPort;
         this.ledgerPort = ledgerPort;
         this.transferPort = transferPort;
         this.eventPublisher = eventPublisher;
         this.metrics = metrics;
+        this.outboxPort = outboxPort;
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -72,6 +78,11 @@ public class LedgerPostingService {
         // 1. 입력 검증
         if (amount == null || amount.signum() <= 0) {
             throw new IllegalArgumentException("거래 금액은 0보다 커야 합니다");
+        }
+        // 원화는 소수가 없다. 소수 금액을 받으면 잔액(계산 후 저장 시 반올림)과 분개(금액 자체 반올림)가
+        // 따로 반올림되어 원장이 어긋난다 (0.005원 × 3회 → 잔액 그대로, 원장 -0.03원 — AmountPrecisionTest 로 재현)
+        if (amount.stripTrailingZeros().scale() > 0) {
+            throw new IllegalArgumentException("거래 금액은 원 단위 정수여야 합니다: " + amount.toPlainString());
         }
         if (fromAccountId.equals(toAccountId)) {
             throw new IllegalArgumentException("같은 계좌로 송금 불가");
@@ -120,8 +131,10 @@ public class LedgerPostingService {
                 .amount(amount)
                 .build());
 
-        // 6. 커밋 후 외부(Kafka / 캐시)로 전달될 이벤트
-        eventPublisher.publishEvent(new TransactionPostedEvent(
+        // 6. 외부(정산 시스템)로 나갈 이벤트를 Outbox 에 기록 — 거래와 같은 트랜잭션
+        //    여기서 바로 Kafka 로 보내지 않는다: 커밋 전에 보내면 롤백된 거래가 나가고,
+        //    커밋 후에 보내면 그 사이 장애로 유실된다. Outbox 는 둘 다 막는다.
+        TransactionPostedEvent event = new TransactionPostedEvent(
                 transfer.getId(),
                 txType.name(),
                 fromAccount.getId(), fromAccount.getName(),
@@ -131,7 +144,13 @@ public class LedgerPostingService {
                 toAccount.getBalance(),
                 description,
                 transfer.getCreatedAt() != null ? transfer.getCreatedAt() : LocalDateTime.now()
-        ));
+        );
+        outboxPort.save(OutboxEvent.pending(
+                "TRANSFER", transfer.getId(), "TRANSACTION_POSTED",
+                String.valueOf(fromAccount.getId()), event.toJson(), LocalDateTime.now()));
+
+        // 7. 커밋 후 잔액 캐시 갱신 (보조 수단 — 실패해도 DB 가 진실)
+        eventPublisher.publishEvent(event);
 
         return transfer;
     }
