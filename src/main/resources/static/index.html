@@ -859,7 +859,8 @@ function renderStats(stats, nowTs){
     val.textContent = "✗ 불일치";
     card.className = "stat bad";
   }
-  sub.textContent = "차변 " + fmtMoney(stats.totalDebit) + " = 대변 " + fmtMoney(stats.totalCredit);
+  sub.textContent = "차변 " + fmtMoney(stats.totalDebit) + " = 대변 " + fmtMoney(stats.totalCredit)
+    + (stats.integrityCheckMs != null ? " · 검증 " + stats.integrityCheckMs + "ms" : "");
 }
 
 function drawSpark(){

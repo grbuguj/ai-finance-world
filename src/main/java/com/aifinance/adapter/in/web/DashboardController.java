@@ -8,14 +8,10 @@ import com.aifinance.application.usecase.AgentUseCase;
 import com.aifinance.application.usecase.IntegrityUseCase;
 import com.aifinance.application.usecase.IntegrityUseCase.IntegrityReport;
 import com.aifinance.application.usecase.InvestUseCase;
-import com.aifinance.domain.agent.Agent;
-import com.aifinance.domain.transfer.TransactionType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.math.BigDecimal;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +19,7 @@ import java.util.Map;
  * 대시보드 화면을 위한 조회 전용 API.
  *  - GET /feed/stream : SSE 실시간 거래 피드
  *  - GET /feed        : 최신 거래 20건
- *  - GET /stats       : 통계 + 복식부기 무결성 요약
+ *  - GET /stats       : 통계 + 복식부기 무결성 요약 (1초 스냅샷, 무결성은 최대 5초 전 검증 결과)
  *  - GET /integrity   : 무결성 검증 상세 리포트
  */
 @RestController
@@ -36,11 +32,12 @@ public class DashboardController {
     private final OutboxRelayService outboxRelayService;
     private final SimulationEngine simulationEngine;
     private final FeedSseService feedSseService;
+    private final DashboardStatsCache statsCache;
 
     public DashboardController(TransferPort transferPort, AgentUseCase agentUseCase,
                                IntegrityUseCase integrityUseCase, InvestUseCase investUseCase,
                                OutboxRelayService outboxRelayService, SimulationEngine simulationEngine,
-                               FeedSseService feedSseService) {
+                               FeedSseService feedSseService, DashboardStatsCache statsCache) {
         this.transferPort = transferPort;
         this.agentUseCase = agentUseCase;
         this.integrityUseCase = integrityUseCase;
@@ -48,6 +45,7 @@ public class DashboardController {
         this.outboxRelayService = outboxRelayService;
         this.simulationEngine = simulationEngine;
         this.feedSseService = feedSseService;
+        this.statsCache = statsCache;
     }
 
     @GetMapping("/feed/stream")
@@ -60,36 +58,10 @@ public class DashboardController {
         return transferPort.findRecent().stream().map(FeedItem::from).toList();
     }
 
+    /** 1초 TTL 스냅샷 — 요청 수와 무관하게 집계는 1초에 한 번 (DashboardStatsCache 참고) */
     @GetMapping("/stats")
     public Map<String, Object> stats() {
-        List<Agent> agents = agentUseCase.findAll();
-        BigDecimal totalBalance = agents.stream()
-                .map(a -> a.getAccount().getBalance())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        IntegrityReport report = integrityUseCase.check();
-
-        Map<String, Long> byType = new LinkedHashMap<>();
-        transferPort.countByType().forEach((type, count) -> byType.put(type.name(), count));
-        byType.remove(TransactionType.OPENING.name());
-
-        Map<String, Object> stats = new LinkedHashMap<>();
-        stats.put("totalTransfers", transferPort.count());
-        stats.put("totalMoved", transferPort.sumAmount());
-        stats.put("totalBalance", totalBalance);
-        stats.put("agentCount", agents.size());
-        stats.put("totalDebit", report.totalDebit());
-        stats.put("totalCredit", report.totalCredit());
-        stats.put("balanced", report.balanced());
-        stats.put("mismatchedAccounts", report.mismatchedAccountCount());
-        stats.put("countByType", byType);
-        stats.put("openInvestments", investUseCase.openCount());
-        OutboxRelayService.OutboxStats outbox = outboxRelayService.stats();
-        stats.put("eventsPublished", outbox.published());
-        stats.put("outboxPending", outbox.pending());
-        stats.put("outboxDead", outbox.dead());
-        stats.put("tick", simulationEngine.getTickCount());
-        return stats;
+        return statsCache.snapshot();
     }
 
     @GetMapping("/integrity")

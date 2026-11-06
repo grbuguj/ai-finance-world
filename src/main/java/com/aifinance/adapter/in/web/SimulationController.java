@@ -10,9 +10,11 @@ import java.util.Map;
 public class SimulationController {
 
     private final SimulationEngine simulationEngine;
+    private final DashboardStatsCache statsCache;
 
-    public SimulationController(SimulationEngine simulationEngine) {
+    public SimulationController(SimulationEngine simulationEngine, DashboardStatsCache statsCache) {
         this.simulationEngine = simulationEngine;
+        this.statsCache = statsCache;
     }
 
     @GetMapping("/status")
@@ -44,6 +46,7 @@ public class SimulationController {
     @PostMapping("/reset")
     public Map<String, Object> reset() {
         simulationEngine.reset();
+        statsCache.invalidate(); // 초기화 결과는 1초 스냅샷을 기다리지 않고 바로 보이게
         return Map.of("state", simulationEngine.getState().name());
     }
 
