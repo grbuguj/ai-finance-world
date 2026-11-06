@@ -39,8 +39,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(OptimisticLockingFailureException.class)
     public ResponseEntity<Map<String, String>> concurrentModification(OptimisticLockingFailureException e) {
         log.warn("동시 수정 충돌로 요청 거절: {}", e.getMessage());
+        Throwable root = e;
+        while (root.getCause() != null && root.getCause() != root) root = root.getCause();
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("error", "다른 거래와 동시에 처리되어 거절되었습니다. 다시 시도해 주세요."));
+                .body(Map.of("error", "다른 거래와 동시에 처리되어 거절되었습니다. 다시 시도해 주세요.",
+                        "detail", root.getClass().getSimpleName() + ": " + String.valueOf(root.getMessage())));
     }
 
     @ExceptionHandler(IllegalStateException.class)

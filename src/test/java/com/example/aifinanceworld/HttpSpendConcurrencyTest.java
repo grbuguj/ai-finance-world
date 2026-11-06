@@ -5,6 +5,7 @@ import com.aifinance.adapter.in.scheduler.SimulationEngine;
 import com.aifinance.application.usecase.AgentUseCase;
 import com.aifinance.application.usecase.IntegrityUseCase;
 import com.aifinance.application.usecase.SpendUseCase;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,5 +77,31 @@ class HttpSpendConcurrencyTest {
 
         assertEquals(400, ok.get(), "실패 응답: " + failures);
         assertTrue(integrityUseCase.check().balanced(), "원장 무결성: " + integrityUseCase.check());
+    }
+
+    @Test
+    void 대조군_서비스_직접_호출로_같은_가맹점_동시_결제_400건() throws Exception {
+        List<Long> agents = agentUseCase.findAll().stream().map(a -> a.getAccount().getId()).toList();
+        long merchant = spendUseCase.merchants().get(0).getId();
+        AtomicInteger ok = new AtomicInteger();
+        Map<String, Integer> failures = new ConcurrentHashMap<>();
+        ExecutorService pool = Executors.newFixedThreadPool(16);
+        for (int i = 0; i < 400; i++) {
+            long from = agents.get(i % agents.size());
+            pool.submit(() -> {
+                try {
+                    spendUseCase.spend(from, merchant, BigDecimal.valueOf(100), "직접 호출");
+                    ok.incrementAndGet();
+                } catch (Exception e) {
+                    Throwable root = e;
+                    while (root.getCause() != null) root = root.getCause();
+                    failures.merge(root.getClass().getSimpleName() + ": " + String.valueOf(root.getMessage()), 1, Integer::sum);
+                }
+            });
+        }
+        pool.shutdown();
+        assertTrue(pool.awaitTermination(2, TimeUnit.MINUTES));
+        assertEquals(400, ok.get(), "실패: " + failures);
+        assertTrue(integrityUseCase.check().balanced());
     }
 }
