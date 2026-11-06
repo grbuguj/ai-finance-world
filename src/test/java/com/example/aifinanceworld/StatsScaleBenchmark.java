@@ -50,8 +50,9 @@ class StatsScaleBenchmark {
         return "h2";
     }
 
+    /** H2 는 DB 전체가 JVM 힙에 올라가므로 10만 건까지만 (큰 규모는 MySQL 변형에서) */
     long[] sizes() {
-        return new long[]{10_000, 100_000, 400_000};
+        return new long[]{10_000, 100_000};
     }
 
     /** 수정 전 /stats 가 요청마다 하던 일 */

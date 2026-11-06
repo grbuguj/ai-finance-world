@@ -81,6 +81,7 @@ tasks.register('benchmark', Test) {
     useJUnitPlatform { includeTags 'benchmark' }
     testLogging { showStandardStreams = true }
     outputs.upToDateWhen { false }
+    maxHeapSize = '2g'
 }
 
 tasks.register('mysqlTest', Test) {
@@ -101,4 +102,5 @@ tasks.register('mysqlBenchmark', Test) {
     useJUnitPlatform { includeTags 'benchmark' }
     testLogging { showStandardStreams = true }
     outputs.upToDateWhen { false }
+    maxHeapSize = '2g'
 }
