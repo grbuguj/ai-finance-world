@@ -14,6 +14,11 @@ class MySqlLockStrategyBenchmark extends LockStrategyBenchmark {
     }
 
     @Override
+    boolean auditSupported() {
+        return true;
+    }
+
+    @Override
     String dbLabel() {
         return "mysql";
     }

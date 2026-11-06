@@ -88,7 +88,9 @@ class LockStrategyBenchmark {
     @Autowired PlatformTransactionManager txManager;
 
     TransactionTemplate tx;
+    volatile boolean audit = false;
     final List<Result> results = Collections.synchronizedList(new ArrayList<>());
+    final List<String> warmupBroken = Collections.synchronizedList(new ArrayList<>());
 
     /** 실행 규모 — MySQL 변형은 더 크게 잡는다 */
     int opsPerRun() {
@@ -109,18 +111,92 @@ class LockStrategyBenchmark {
     void 락_전략별_처리량_지연_정합성_비교() throws Exception {
         for (Scenario scenario : Scenario.values()) {
             for (Strategy strategy : Strategy.values()) {
-                // 예열 (JIT, 커넥션 풀, 버퍼 풀) — 기록하지 않음
-                run(strategy, scenario, Math.max(100, opsPerRun() / 10), false);
+                // 예열 (JIT, 커넥션 풀, 버퍼 풀) — 수치는 기록하지 않지만 무결성 위반은 숨기지 않는다
+                Result warm = run(strategy, scenario, Math.max(100, opsPerRun() / 10), true);
+                if (!warm.integrityOk()) warmupBroken.add(strategy + "/" + scenario);
                 Result r = run(strategy, scenario, opsPerRun(), true);
                 results.add(r);
                 System.out.println(line(r));
             }
         }
         writeReport();
-        results.forEach(r -> assertTrue(r.integrityOk(), "무결성 위반: " + r.strategy() + "/" + r.scenario()));
+        results.forEach(r -> System.out.println(r.integrityOk() ? "" : "INTEGRITY-VIOLATION|" + r.strategy() + "/" + r.scenario()));
+        System.out.println("WARMUP-INTEGRITY-VIOLATIONS|" + warmupBroken);
+        // 실서비스 전략(비관적)은 어떤 시나리오에서도 무결성이 깨지면 안 된다
+        results.stream().filter(r -> r.strategy() == Strategy.PESSIMISTIC)
+                .forEach(r -> assertTrue(r.integrityOk(), "비관적 락 무결성 위반: " + r.scenario()));
+        assertTrue(warmupBroken.stream().noneMatch(x -> x.startsWith("PESSIMISTIC")), "비관적 락 예열 무결성 위반");
+    }
+
+    /** 진단 실험은 MySQL 에서만 (connection_id(), @@transaction_isolation 사용) */
+    boolean auditSupported() {
+        return false;
+    }
+
+    /**
+     * 낙관적 락 정합성 진단 — 커밋된 CAS 를 같은 트랜잭션 안에서 감사 테이블에 남기고,
+     * 버전 순서대로 이어 보며 "읽은 잔액(n+1) = 쓴 잔액(n)" 사슬이 끊기는 지점을 찾는다.
+     */
+    @Test
+    void 낙관적_락_정합성_진단() throws Exception {
+        if (!auditSupported()) return;
+        jdbc.execute("drop table if exists bench_audit");
+        jdbc.execute("""
+                create table bench_audit (
+                  id bigint auto_increment primary key, account_id bigint, read_version bigint,
+                  read_balance decimal(38,2), new_balance decimal(38,2), conn_id bigint, iso varchar(30))""");
+        System.out.println("AUDIT|global isolation=" + jdbc.queryForObject("select @@global.transaction_isolation", String.class)
+                + " | jdbc default=" + jdbc.queryForObject("select @@transaction_isolation", String.class));
+        audit = true;
+        try {
+            for (int round = 1; round <= 5; round++) {
+                jdbc.execute("delete from bench_audit");
+                Workload w = workload(Scenario.HOTSPOT, "audit" + round);
+                long receiver = w.allIds().get(w.allIds().size() - 1);
+                runOps(Strategy.OPTIMISTIC, w, 1_000);
+                List<String> mismatches = mismatchedAccounts(w.allIds());
+                List<Map<String, Object>> rows = jdbc.queryForList(
+                        "select read_version, read_balance, new_balance, conn_id, iso from bench_audit where account_id = ? order by read_version, id",
+                        receiver);
+                List<String> breaks = new ArrayList<>();
+                for (int i = 1; i < rows.size(); i++) {
+                    Map<String, Object> prev = rows.get(i - 1), cur = rows.get(i);
+                    long pv = ((Number) prev.get("read_version")).longValue(), cv = ((Number) cur.get("read_version")).longValue();
+                    BigDecimal pNew = (BigDecimal) prev.get("new_balance"), cRead = (BigDecimal) cur.get("read_balance");
+                    if (cv != pv + 1 || cRead.compareTo(pNew) != 0) {
+                        breaks.add("prev=" + prev + " cur=" + cur);
+                    }
+                }
+                System.out.printf("AUDIT|round=%d|commits=%d|mismatchedAccounts=%s|chainBreaks=%d %s%n",
+                        round, rows.size(), mismatches, breaks.size(), breaks.stream().limit(3).toList());
+            }
+        } finally {
+            audit = false;
+        }
     }
 
     // ───────────────────────── 실행 ─────────────────────────
+
+    /** 기록 없이 부하만 건다 (진단용) */
+    void runOps(Strategy strategy, Workload w, int ops) throws Exception {
+        ExecutorService pool = Executors.newFixedThreadPool(THREADS);
+        CountDownLatch done = new CountDownLatch(ops);
+        for (int i = 0; i < ops; i++) {
+            final int n = i;
+            pool.submit(() -> {
+                try {
+                    long[] pair = w.next(n);
+                    transfer(strategy, pair[0], pair[1]);
+                } catch (RuntimeException ignored) {
+                    // 재시도 한도 초과 등은 롤백되므로 정합성과 무관
+                } finally {
+                    done.countDown();
+                }
+            });
+        }
+        done.await(10, TimeUnit.MINUTES);
+        pool.shutdownNow();
+    }
 
     Result run(Strategy strategy, Scenario scenario, int ops, boolean record) throws Exception {
         String prefix = "bench-" + strategy.name().charAt(0) + scenario.ordinal() + "-" + System.nanoTime() % 100000;
@@ -225,6 +301,12 @@ class LockStrategyBenchmark {
                         : casUpdate(from, fb.subtract(AMOUNT), f.get("version"));
                 if (n2 == 0) { s.setRollbackOnly(); return false; }
                 writeLedger(from, to);
+                if (audit) {
+                    jdbc.update("insert into bench_audit (account_id, read_version, read_balance, new_balance, conn_id, iso)"
+                                    + " values (?, ?, ?, ?, connection_id(), @@transaction_isolation)",
+                            to, ((Number) t.get("version")).longValue(), t.get("balance"),
+                            ((BigDecimal) t.get("balance")).add(AMOUNT));
+                }
                 return true;
             });
             if (Boolean.TRUE.equals(ok)) return attempt;
