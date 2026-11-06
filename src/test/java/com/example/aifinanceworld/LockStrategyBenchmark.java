@@ -105,6 +105,13 @@ class LockStrategyBenchmark {
     void init() {
         tx = new TransactionTemplate(txManager);
         engine.reset();
+        if (auditSupported()) {
+            jdbc.execute("drop table if exists bench_audit");
+            jdbc.execute("create table bench_audit (id bigint auto_increment primary key, account_id bigint,"
+                    + " read_version bigint, read_balance decimal(38,2), new_balance decimal(38,2), conn_id bigint, iso varchar(30),"
+                    + " side varchar(4), index idx_audit_acc (account_id, read_version))");
+            audit = true;
+        }
     }
 
     @Test
@@ -140,14 +147,8 @@ class LockStrategyBenchmark {
     @Test
     void 낙관적_락_정합성_진단() throws Exception {
         if (!auditSupported()) return;
-        jdbc.execute("drop table if exists bench_audit");
-        jdbc.execute("""
-                create table bench_audit (
-                  id bigint auto_increment primary key, account_id bigint, read_version bigint,
-                  read_balance decimal(38,2), new_balance decimal(38,2), conn_id bigint, iso varchar(30))""");
         System.out.println("AUDIT|global isolation=" + jdbc.queryForObject("select @@global.transaction_isolation", String.class)
                 + " | jdbc default=" + jdbc.queryForObject("select @@transaction_isolation", String.class));
-        audit = true;
         try {
             for (int round = 1; round <= 5; round++) {
                 jdbc.execute("delete from bench_audit");
@@ -155,23 +156,12 @@ class LockStrategyBenchmark {
                 long receiver = w.allIds().get(w.allIds().size() - 1);
                 runOps(Strategy.OPTIMISTIC, w, 1_000);
                 List<String> mismatches = mismatchedAccounts(w.allIds());
-                List<Map<String, Object>> rows = jdbc.queryForList(
-                        "select read_version, read_balance, new_balance, conn_id, iso from bench_audit where account_id = ? order by read_version, id",
-                        receiver);
-                List<String> breaks = new ArrayList<>();
-                for (int i = 1; i < rows.size(); i++) {
-                    Map<String, Object> prev = rows.get(i - 1), cur = rows.get(i);
-                    long pv = ((Number) prev.get("read_version")).longValue(), cv = ((Number) cur.get("read_version")).longValue();
-                    BigDecimal pNew = (BigDecimal) prev.get("new_balance"), cRead = (BigDecimal) cur.get("read_balance");
-                    if (cv != pv + 1 || cRead.compareTo(pNew) != 0) {
-                        breaks.add("prev=" + prev + " cur=" + cur);
-                    }
-                }
-                System.out.printf("AUDIT|round=%d|commits=%d|mismatchedAccounts=%s|chainBreaks=%d %s%n",
-                        round, rows.size(), mismatches, breaks.size(), breaks.stream().limit(3).toList());
+                List<String> breaks = chainBreaks(receiver);
+                System.out.printf("AUDIT|round=%d|mismatchedAccounts=%s|chain=%s%n",
+                        round, mismatches, breaks.stream().limit(4).toList());
             }
         } finally {
-            audit = false;
+            // 감사 플래그는 init 에서 켠 상태 유지
         }
     }
 
@@ -253,6 +243,12 @@ class LockStrategyBenchmark {
         if (!integrityOk) {
             System.out.printf("BENCH-DIAG|%s|%s|total %s -> %s|mismatched=%s%n",
                     scenario, strategy, totalBefore, totalAfter, mismatches);
+            if (audit && strategy == Strategy.OPTIMISTIC) {
+                for (String m : mismatches) {
+                    long id = Long.parseLong(m.substring(3, m.indexOf(' ')));
+                    System.out.println("BENCH-CHAIN|" + id + "|" + chainBreaks(id));
+                }
+            }
         }
 
         if (!record) return null;
@@ -302,10 +298,8 @@ class LockStrategyBenchmark {
                 if (n2 == 0) { s.setRollbackOnly(); return false; }
                 writeLedger(from, to);
                 if (audit) {
-                    jdbc.update("insert into bench_audit (account_id, read_version, read_balance, new_balance, conn_id, iso)"
-                                    + " values (?, ?, ?, ?, connection_id(), @@transaction_isolation)",
-                            to, ((Number) t.get("version")).longValue(), t.get("balance"),
-                            ((BigDecimal) t.get("balance")).add(AMOUNT));
+                    auditCas(from, f, AMOUNT.negate(), "FROM");
+                    auditCas(to, t, AMOUNT, "TO");
                 }
                 return true;
             });
@@ -313,6 +307,32 @@ class LockStrategyBenchmark {
             backoff(attempt);
         }
         throw new IllegalStateException("낙관적 락 재시도 한도 초과");
+    }
+
+    void auditCas(long accountId, Map<String, Object> read, BigDecimal delta, String side) {
+        BigDecimal readBalance = (BigDecimal) read.get("balance");
+        jdbc.update("insert into bench_audit (account_id, read_version, read_balance, new_balance, conn_id, iso, side)"
+                        + " values (?, ?, ?, ?, connection_id(), @@transaction_isolation, ?)",
+                accountId, ((Number) read.get("version")).longValue(), readBalance, readBalance.add(delta), side);
+    }
+
+    /** 감사 기록으로 계좌의 커밋 사슬을 검사: 읽은 버전이 1씩 증가하고, 읽은 잔액(n+1) = 쓴 잔액(n) 이어야 한다 */
+    List<String> chainBreaks(long accountId) {
+        List<Map<String, Object>> rows = jdbc.queryForList(
+                "select id, read_version, read_balance, new_balance, conn_id, iso, side from bench_audit where account_id = ? order by read_version, id",
+                accountId);
+        List<String> breaks = new ArrayList<>();
+        for (int i = 1; i < rows.size(); i++) {
+            Map<String, Object> prev = rows.get(i - 1), cur = rows.get(i);
+            long pv = ((Number) prev.get("read_version")).longValue(), cv = ((Number) cur.get("read_version")).longValue();
+            if (cv != pv + 1 || ((BigDecimal) cur.get("read_balance")).compareTo((BigDecimal) prev.get("new_balance")) != 0) {
+                breaks.add("prev=" + prev + " cur=" + cur);
+            }
+        }
+        if (!rows.isEmpty()) {
+            breaks.add(0, "commits=" + rows.size() + " first=" + rows.get(0) + " last=" + rows.get(rows.size() - 1));
+        }
+        return breaks;
     }
 
     int casUpdate(long id, BigDecimal newBalance, Object version) {
