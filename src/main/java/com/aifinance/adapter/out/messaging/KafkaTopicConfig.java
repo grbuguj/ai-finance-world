@@ -1,6 +1,7 @@
 package com.aifinance.adapter.out.messaging;
 
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,10 @@ public class KafkaTopicConfig {
     /** Spring Boot 가 이 빈을 @KafkaListener 컨테이너 팩토리에 자동으로 연결한다 */
     @Bean
     DefaultErrorHandler kafkaErrorHandler(KafkaTemplate<String, String> template) {
-        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(template);
+        // 목적지를 명시한다: 기본 이름 규칙은 Spring Kafka 버전마다 다르다(이 버전은 "-dlt").
+        // 기본값에 맡기면 미리 만든 DLT 가 아니라 브로커가 자동 생성한 다른 토픽(파티션 1개)으로 간다 — CI 통합 테스트로 확인.
+        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(template,
+                (record, ex) -> new TopicPartition(record.topic() + ".DLT", record.partition()));
         DefaultErrorHandler handler = new DefaultErrorHandler((record, ex) -> {
             log.error("[외부 정산] 처리 실패 메시지를 DLT 로 이동 (partition {}, offset {}): {}",
                     record.partition(), record.offset(), ex.getMessage());
