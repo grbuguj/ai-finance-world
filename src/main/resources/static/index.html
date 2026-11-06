@@ -234,6 +234,41 @@
 
   .agent-node{ cursor:pointer; }
 
+
+  /* ── 신뢰성 컨트롤 룸 (Outbox · 장애 주입 · 대사) ── */
+  .reliab{ display:grid; grid-template-columns:1.1fr 1fr 1.3fr; gap:14px; margin-bottom:16px; }
+  .rcard{ background:linear-gradient(160deg, rgba(36,40,54,0.85), rgba(20,23,32,0.85));
+    border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:14px 16px; }
+  .rcard h3{ font-size:13px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .rcard h3 .hint{ margin-left:auto; color:var(--muted); font-weight:400; font-size:11px; }
+  .ob-row{ display:flex; gap:14px; align-items:flex-end; }
+  .ob-big{ font-size:30px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1; }
+  .ob-big.warn{ color:var(--amber); text-shadow:0 0 16px rgba(245,158,11,0.45); }
+  .ob-big.okc{ color:var(--green); }
+  .ob-meta{ font-size:11.5px; color:var(--muted); line-height:1.6; font-variant-numeric:tabular-nums; }
+  .ob-meta b{ color:var(--text); font-weight:700; }
+  .ob-bar{ height:6px; background:#2a2f3d; border-radius:4px; margin-top:10px; overflow:hidden; }
+  .ob-bar > div{ height:100%; width:0; background:var(--amber); transition:width .4s; }
+  .chaos-state{ font-size:12px; font-weight:700; padding:3px 9px; border-radius:10px; }
+  .chaos-state.up{ background:rgba(34,197,94,0.15); color:#4ade80; }
+  .chaos-state.down{ background:rgba(239,68,68,0.18); color:#f87171; animation:blink 1.1s infinite; }
+  .rbtns{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .rbtn{ font-size:12px; font-weight:700; padding:7px 11px; border-radius:9px; cursor:pointer; color:var(--text);
+    background:rgba(255,255,255,0.05); border:1px solid var(--border); }
+  .rbtn:hover:not(:disabled){ background:rgba(255,255,255,0.1); }
+  .rbtn:disabled{ opacity:0.4; cursor:not-allowed; }
+  .rbtn.danger{ border-color:rgba(239,68,68,0.45); color:#f87171; }
+  .rbtn.good{ border-color:rgba(34,197,94,0.45); color:#4ade80; }
+  .rbtn.primary{ border-color:rgba(79,142,247,0.5); color:#93b8ff; }
+  .recon-badge{ font-size:12px; font-weight:800; padding:3px 9px; border-radius:10px; background:#2a2f3d; color:var(--muted); }
+  .recon-badge.MATCHED{ background:rgba(34,197,94,0.15); color:#4ade80; }
+  .recon-badge.PENDING_IN_FLIGHT{ background:rgba(245,158,11,0.15); color:#fbbf24; }
+  .recon-badge.UNMATCHED{ background:rgba(239,68,68,0.18); color:#f87171; }
+  .recon-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:10px; }
+  .recon-grid div{ background:rgba(255,255,255,0.03); border-radius:8px; padding:6px 8px; font-size:11px; color:var(--muted); }
+  .recon-grid b{ display:block; font-size:16px; color:var(--text); font-variant-numeric:tabular-nums; }
+  .recon-grid .bad b{ color:#f87171; }
+  @media(max-width:980px){ .reliab{grid-template-columns:1fr;} }
   @media(max-width:1100px){ .stats{grid-template-columns:repeat(3,1fr);} .predict{grid-template-columns:repeat(2,1fr);} }
   @media(max-width:980px){ .main{grid-template-columns:1fr;} .stats{grid-template-columns:repeat(2,1fr);} .bottom{grid-template-columns:1fr;} .predict{grid-template-columns:1fr;} }
 </style>
@@ -294,6 +329,48 @@
       <div class="label">복식부기 무결성</div>
       <div class="value" id="s-integrity">검증 중…</div>
       <div class="substat" id="s-integrity-sub">차변 = 대변</div>
+    </div>
+  </div>
+
+
+  <!-- 신뢰성 컨트롤 룸: 이벤트 유실 방지(Outbox) · 장애 주입 · 일마감 대사 -->
+  <div class="reliab">
+    <div class="rcard">
+      <h3>📤 Outbox 이벤트 발행 <span class="hint">외부 정산 시스템으로</span></h3>
+      <div class="ob-row">
+        <div>
+          <div class="ob-big okc" id="ob-pending">—</div>
+          <div class="ob-meta">발행 대기</div>
+        </div>
+        <div class="ob-meta">
+          발행 완료 <b id="ob-published">—</b><br>
+          격리(DEAD) <b id="ob-dead">—</b><br>
+          가장 오래 기다린 이벤트 <b id="ob-age">—</b>
+        </div>
+      </div>
+      <div class="ob-bar"><div id="ob-bar"></div></div>
+    </div>
+
+    <div class="rcard">
+      <h3>💥 장애 주입 <span class="chaos-state up" id="chaos-state">브로커 정상</span></h3>
+      <div class="ob-meta" id="chaos-desc">브로커를 멈춰도 거래는 계속 성공하고, 이벤트는 Outbox 에 쌓였다가 복구 후 순서대로 전달됩니다.</div>
+      <div class="rbtns">
+        <button class="rbtn danger" id="btn-broker-down" onclick="chaos('/chaos/broker/down')">브로커 장애</button>
+        <button class="rbtn good" id="btn-broker-up" onclick="chaos('/chaos/broker/up')">복구</button>
+        <button class="rbtn" id="btn-ack-loss" onclick="chaos('/chaos/broker/ack-loss?n=3')">ACK 유실 ×3</button>
+      </div>
+    </div>
+
+    <div class="rcard">
+      <h3>📒 일마감 대사 <span class="recon-badge" id="recon-badge">미실행</span>
+        <button class="rbtn primary" style="margin-left:auto;padding:4px 10px;" onclick="runRecon()">지금 대사</button></h3>
+      <div class="ob-meta" id="recon-summary">은행 원장과 외부 정산 장부를 거래 단위로 맞춰 봅니다.</div>
+      <div class="recon-grid">
+        <div id="rc-missing-box">누락<b id="rc-missing">—</b></div>
+        <div>전달 중<b id="rc-inflight">—</b></div>
+        <div id="rc-unexpected-box">불명<b id="rc-unexpected">—</b></div>
+        <div id="rc-mismatch-box">금액 불일치<b id="rc-mismatch">—</b></div>
+      </div>
     </div>
   </div>
 
@@ -863,6 +940,93 @@ fetch("/feed").then(r=>r.json()).then(items=>{
     box.appendChild(makeFeedItem(it, false));
   });
 }).catch(()=>{}).finally(()=>{ initFeedStream(); });
+
+
+// ── 신뢰성 컨트롤 룸 ───────────────────────────────────────
+let chaosAvailable = true;
+function fmtAge(ms){
+  if(!ms) return "0초";
+  if(ms < 1000) return ms + "ms";
+  const s = Math.round(ms/1000);
+  return s < 60 ? s + "초" : Math.floor(s/60) + "분 " + (s%60) + "초";
+}
+async function refreshReliability(){
+  try{
+    const ob = await fetch("/ops/outbox").then(r=>r.json());
+    const pendingEl = document.getElementById("ob-pending");
+    pendingEl.textContent = Number(ob.pending).toLocaleString();
+    // 대기 건수 자체보다 "얼마나 오래 못 나가고 있나"가 장애 신호 (정상이면 100ms 주기로 비워짐)
+    const stuck = ob.dead > 0 || ob.oldestPendingAgeMillis > 2000;
+    pendingEl.className = "ob-big " + (stuck ? "warn" : "okc");
+    document.getElementById("ob-published").textContent = Number(ob.published).toLocaleString();
+    document.getElementById("ob-dead").textContent = Number(ob.dead).toLocaleString();
+    document.getElementById("ob-age").textContent = fmtAge(ob.oldestPendingAgeMillis);
+    const total = ob.pending + ob.published;
+    document.getElementById("ob-bar").style.width = total ? Math.min(100, ob.pending / total * 100 * 5) + "%" : "0%";
+  }catch(e){ /* 서버 재시작 중 */ }
+  if(!chaosAvailable) return;
+  try{
+    const res = await fetch("/chaos");
+    if(res.status === 404){ disableChaos(); return; }
+    renderChaos(await res.json());
+  }catch(e){}
+}
+function renderChaos(c){
+  const st = document.getElementById("chaos-state");
+  if(c.brokerDown){ st.textContent = "브로커 장애 중"; st.className = "chaos-state down"; }
+  else{ st.textContent = c.remainingAckLosses > 0 ? "ACK 유실 대기 " + c.remainingAckLosses + "건" : "브로커 정상"; st.className = "chaos-state up"; }
+}
+function disableChaos(){
+  chaosAvailable = false;
+  ["btn-broker-down","btn-broker-up","btn-ack-loss"].forEach(id => document.getElementById(id).disabled = true);
+  document.getElementById("chaos-desc").textContent = "장애 주입 API 가 꺼져 있습니다 (app.chaos.enabled=true, local 프로필에서 켜짐).";
+}
+async function chaos(path){
+  try{
+    const res = await fetch(path, {method:"POST"});
+    if(res.status === 404){ disableChaos(); return; }
+    renderChaos(await res.json());
+    pushSystemLog(path.includes("down") ? "💥 브로커 장애 주입 — 이벤트는 Outbox 에 대기합니다"
+                : path.includes("up") ? "✅ 브로커 복구 — 대기 이벤트를 순서대로 발행합니다"
+                : "📭 ACK 유실 3건 주입 — 재발행된 중복은 정산 시스템이 걸러냅니다");
+  }catch(e){}
+}
+async function runRecon(){
+  const badge = document.getElementById("recon-badge");
+  badge.textContent = "대사 중…"; badge.className = "recon-badge";
+  try{
+    const r = await fetch("/ops/reconciliation", {method:"POST"}).then(x=>x.json());
+    renderRecon(r);
+  }catch(e){ badge.textContent = "실패"; }
+}
+const RECON_LABEL = { MATCHED:"일치", PENDING_IN_FLIGHT:"전달 중", UNMATCHED:"불일치" };
+function renderRecon(r){
+  if(!r) return;
+  const badge = document.getElementById("recon-badge");
+  badge.textContent = RECON_LABEL[r.status] || r.status; badge.className = "recon-badge " + r.status;
+  document.getElementById("recon-summary").innerHTML =
+    "은행 <b>" + fmtInt(r.bankCount) + "</b>건 / 정산 <b>" + fmtInt(r.settlementCount) + "</b>건 · 중복 수신 제거 <b>" +
+    fmtInt(r.duplicateDeliveries) + "</b>건 · 원장 무결성 " + (r.ledgerBalanced ? "✓" : "✗") + " · " + r.durationMs + "ms";
+  const set = (id, v, bad) => {
+    document.getElementById(id).textContent = fmtInt(v);
+    const box = document.getElementById(id + "-box");
+    if(box) box.className = bad && v > 0 ? "bad" : "";
+  };
+  set("rc-missing", r.missingCount, true);
+  set("rc-inflight", r.inFlightCount, false);
+  set("rc-unexpected", r.unexpectedCount, true);
+  set("rc-mismatch", r.mismatchCount, true);
+}
+function pushSystemLog(msg){
+  const box = document.getElementById("logbox");
+  if(!box) return;
+  const line = document.createElement("div");
+  line.className = "logline";
+  line.textContent = "[" + new Date().toLocaleTimeString() + "] " + msg;
+  box.prepend(line);
+}
+fetch("/ops/reconciliation/latest").then(r => r.status === 200 ? r.json() : null).then(renderRecon).catch(()=>{});
+setInterval(refreshReliability, 1000); refreshReliability();
 
 function updateClock(){
   const now = new Date();
