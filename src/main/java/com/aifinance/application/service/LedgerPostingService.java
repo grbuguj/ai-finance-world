@@ -79,6 +79,11 @@ public class LedgerPostingService {
         if (amount == null || amount.signum() <= 0) {
             throw new IllegalArgumentException("거래 금액은 0보다 커야 합니다");
         }
+        // 원화는 소수가 없다. 소수 금액을 받으면 잔액(계산 후 저장 시 반올림)과 분개(금액 자체 반올림)가
+        // 따로 반올림되어 원장이 어긋난다 (0.005원 × 3회 → 잔액 그대로, 원장 -0.03원 — AmountPrecisionTest 로 재현)
+        if (amount.stripTrailingZeros().scale() > 0) {
+            throw new IllegalArgumentException("거래 금액은 원 단위 정수여야 합니다: " + amount.toPlainString());
+        }
         if (fromAccountId.equals(toAccountId)) {
             throw new IllegalArgumentException("같은 계좌로 송금 불가");
         }

@@ -13,7 +13,7 @@ public class InfraContainersConfig {
     @Bean
     @ServiceConnection
     KafkaContainer kafkaContainer() {
-        return new KafkaContainer("apache/kafka-native:3.8.0");
+        return new KafkaContainer("apache/kafka:3.8.0")  // native 이미지는 CI 에서 간헐적 기동 실패(exit 126);
     }
 
     @Bean
