@@ -170,7 +170,14 @@ class LockStrategyBenchmark {
         int ok = (int) idx.get();
         long[] lat = Arrays.copyOf(latencies, ok);
         Arrays.sort(lat);
-        boolean integrityOk = integrity.check().balanced() && totalOf(w.allIds()).compareTo(totalBefore) == 0;
+        // 이번 실행에 쓴 계좌만 검증 (이전 실행의 결과와 섞이지 않게) — 잔액 = 원장, 총액 보존
+        List<String> mismatches = mismatchedAccounts(w.allIds());
+        BigDecimal totalAfter = totalOf(w.allIds());
+        boolean integrityOk = mismatches.isEmpty() && totalAfter.compareTo(totalBefore) == 0;
+        if (!integrityOk) {
+            System.out.printf("BENCH-DIAG|%s|%s|total %s -> %s|mismatched=%s%n",
+                    scenario, strategy, totalBefore, totalAfter, mismatches);
+        }
 
         if (!record) return null;
         return new Result(strategy, scenario, ops, ok, failed.sum(), retries.sum(), deadlocks.sum(),
@@ -344,6 +351,30 @@ class LockStrategyBenchmark {
             sum = sum.add(part);
         }
         return sum;
+    }
+
+    /** 잔액 필드와 원장 재계산 값(∑CREDIT - ∑DEBIT)이 다른 계좌 (최대 5개) */
+    List<String> mismatchedAccounts(List<Long> ids) {
+        List<String> out = new ArrayList<>();
+        for (int i = 0; i < ids.size() && out.size() < 5; i += 500) {
+            List<Long> chunk = ids.subList(i, Math.min(ids.size(), i + 500));
+            String in = String.join(",", Collections.nCopies(chunk.size(), "?"));
+            jdbc.query("""
+                    select a.id, a.balance, a.version,
+                           coalesce(sum(case when l.type = 'CREDIT' then l.amount else -l.amount end), 0) as ledger,
+                           count(l.id) as entries
+                    from accounts a left join ledger_entries l on l.account_id = a.id
+                    where a.id in (""" + in + """)
+                    group by a.id, a.balance, a.version
+                    having a.balance <> coalesce(sum(case when l.type = 'CREDIT' then l.amount else -l.amount end), 0)
+                    """, rs -> {
+                if (out.size() < 5) {
+                    out.add("id=" + rs.getLong(1) + " balance=" + rs.getBigDecimal(2) + " version=" + rs.getLong(3)
+                            + " ledger=" + rs.getBigDecimal(4) + " entries=" + rs.getLong(5));
+                }
+            }, chunk.toArray());
+        }
+        return out;
     }
 
     static double pct(long[] sorted, int p) {
