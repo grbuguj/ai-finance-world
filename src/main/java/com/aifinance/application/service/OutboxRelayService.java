@@ -43,8 +43,9 @@ public class OutboxRelayService {
     private static final Logger log = LoggerFactory.getLogger(OutboxRelayService.class);
     private static final String RELAY_LOCK_KEY = "lock:outbox-relay";
 
-    public record RelayResult(int published, int failed, int dead) {
-        public static final RelayResult SKIPPED = new RelayResult(0, 0, 0);
+    /** @param skipped 다른 릴레이가 실행 중이라 이번 호출은 아무것도 하지 않음 */
+    public record RelayResult(int published, int failed, int dead, boolean skipped) {
+        public static final RelayResult SKIPPED = new RelayResult(0, 0, 0, true);
     }
 
     public record OutboxStats(long pending, long published, long dead, long oldestPendingAgeMillis) {}
@@ -92,24 +93,39 @@ public class OutboxRelayService {
         }
     }
 
-    /** 대기 중인 이벤트가 없어질 때까지 반복 (테스트/복구 시 사용). 진전이 없으면 멈춘다. */
+    /**
+     * 발행 가능한 이벤트가 없어질 때까지 반복한다 (EOD 마감 전·테스트·복구 시 사용).
+     * 다른 릴레이가 돌고 있어 건너뛰었으면 잠깐 기다렸다 다시 시도하고, 발행 실패가 나면(브로커 장애) 멈춘다.
+     */
     public int drain(int maxRounds) {
         int total = 0;
         for (int i = 0; i < maxRounds; i++) {
             RelayResult r = relayOnce();
+            if (r.skipped()) {
+                sleepQuietly(20);
+                continue;
+            }
             total += r.published();
-            if (r.published() == 0) {
+            if (r.failed() > 0 || (r.published() == 0 && r.dead() == 0)) {
                 break;
             }
         }
         return total;
     }
 
+    private static void sleepQuietly(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     private RelayResult doRelay() {
         LocalDateTime now = LocalDateTime.now();
         List<OutboxEvent> batch = tx.execute(status -> outboxPort.findPublishable(now, batchSize));
         if (batch == null || batch.isEmpty()) {
-            return new RelayResult(0, 0, 0);
+            return new RelayResult(0, 0, 0, false);
         }
 
         List<OutboxEvent> changed = new ArrayList<>(batch.size());
@@ -140,7 +156,7 @@ public class OutboxRelayService {
             }
         }
         tx.executeWithoutResult(status -> outboxPort.saveAll(changed));
-        return new RelayResult(published, failed, dead);
+        return new RelayResult(published, failed, dead, false);
     }
 
     public OutboxStats stats() {
