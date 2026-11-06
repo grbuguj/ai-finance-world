@@ -89,6 +89,7 @@ class LockStrategyBenchmark {
     @Autowired PlatformTransactionManager txManager;
 
     TransactionTemplate tx;
+    TransactionTemplate txReadCommitted;
     volatile boolean audit = false;
     final List<Result> results = Collections.synchronizedList(new ArrayList<>());
     final List<String> warmupBroken = Collections.synchronizedList(new ArrayList<>());
@@ -105,6 +106,8 @@ class LockStrategyBenchmark {
     @BeforeAll
     void init() {
         tx = new TransactionTemplate(txManager);
+        txReadCommitted = new TransactionTemplate(txManager);
+        txReadCommitted.setIsolationLevel(org.springframework.transaction.TransactionDefinition.ISOLATION_READ_COMMITTED);
         engine.reset();
         if (auditSupported()) {
             jdbc.execute("drop table if exists bench_audit");
@@ -152,13 +155,19 @@ class LockStrategyBenchmark {
                 + " | version=" + jdbc.queryForObject("select version()", String.class));
         audit = true;
         try {
-            for (Strategy strategy : List.of(Strategy.OPTIMISTIC, Strategy.OPTIMISTIC_DELTA)) {
+            // 변형: 절대값(RR) / 상대값(RR) / 절대값(READ COMMITTED)
+            Map<String, java.util.function.BiConsumer<Long, Long>> variants = new java.util.LinkedHashMap<>();
+            variants.put("OPTIMISTIC(RR)", (f, t) -> optimistic(tx, f, t));
+            variants.put("OPTIMISTIC_DELTA(RR)", (f, t) -> optimisticDelta(f, t));
+            variants.put("OPTIMISTIC(RC)", (f, t) -> optimistic(txReadCommitted, f, t));
+            for (Map.Entry<String, java.util.function.BiConsumer<Long, Long>> variant : variants.entrySet()) {
+                String strategy = variant.getKey();
                 long commits = 0, lostAccounts = 0, chainBreakCount = 0;
                 for (int round = 1; round <= 6; round++) {
                     for (Scenario scenario : List.of(Scenario.HOTSPOT, Scenario.HOTSPOT_SHARD)) {
                         jdbc.execute("delete from bench_audit");
-                        Workload w = workload(scenario, "audit-" + strategy.ordinal() + "-" + round);
-                        runOps(strategy, w, 2_000);
+                        Workload w = workload(scenario, "audit-" + strategy.hashCode() % 1000 + "-" + round);
+                        runOps(variant.getValue(), w, 2_000);
                         List<String> mismatches = mismatchedAccounts(w.allIds());
                         lostAccounts += mismatches.size();
                         commits += jdbc.queryForObject("select count(*) from bench_audit where side = 'TO'", Long.class);
@@ -186,6 +195,10 @@ class LockStrategyBenchmark {
 
     /** 기록 없이 부하만 건다 (진단용) */
     void runOps(Strategy strategy, Workload w, int ops) throws Exception {
+        runOps((f, t) -> transfer(strategy, f, t), w, ops);
+    }
+
+    void runOps(java.util.function.BiConsumer<Long, Long> op, Workload w, int ops) throws Exception {
         ExecutorService pool = Executors.newFixedThreadPool(THREADS);
         CountDownLatch done = new CountDownLatch(ops);
         for (int i = 0; i < ops; i++) {
@@ -193,7 +206,7 @@ class LockStrategyBenchmark {
             pool.submit(() -> {
                 try {
                     long[] pair = w.next(n);
-                    transfer(strategy, pair[0], pair[1]);
+                    op.accept(pair[0], pair[1]);
                 } catch (RuntimeException ignored) {
                     // 재시도 한도 초과 등은 롤백되므로 정합성과 무관
                 } finally {
@@ -300,6 +313,10 @@ class LockStrategyBenchmark {
     }
 
     long optimistic(long from, long to) {
+        return optimistic(tx, from, to);
+    }
+
+    long optimistic(TransactionTemplate tx, long from, long to) {
         for (int attempt = 0; attempt <= MAX_OPTIMISTIC_RETRIES; attempt++) {
             Boolean ok = tx.execute(s -> {
                 Map<String, Object> f = jdbc.queryForMap("select balance, version from accounts where id = ?", from);
