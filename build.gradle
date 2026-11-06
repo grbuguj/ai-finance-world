@@ -24,8 +24,8 @@ repositories {
 //   ./gradlew mysqlTest
 sourceSets {
     mysqlTest {
-        java.srcDir 'src/mysqlTest/java'
-        resources.srcDir 'src/mysqlTest/resources'
+        // src/mysqlTest/java, src/mysqlTest/resources 는 소스셋 이름으로 자동 등록된다
+        // (srcDir 로 한 번 더 추가하면 Gradle 9 에서 리소스 중복 오류)
         compileClasspath += sourceSets.main.output + sourceSets.test.output
         runtimeClasspath += sourceSets.main.output + sourceSets.test.output
     }
