@@ -15,6 +15,8 @@ jobs:
   capture:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      APP_PROFILES: infra,loadtest
     steps:
       - uses: actions/checkout@v4
 
@@ -44,6 +46,7 @@ jobs:
           curl -fs -X POST "localhost:8080/simulation/speed?ms=100"
           curl -fs -X POST localhost:8080/simulation/start || true
           mkdir -p loadtest/results docs/screenshots && chmod 777 loadtest/results
+          docker pull -q grafana/k6:0.54.0
           docker run --rm --network ai-finance-world_default -v "$PWD":/work -w /work grafana/k6:0.54.0 \
             run --no-color -e BASE_URL=http://app:8080 -e VUS=30 -e DURATION=30s -e LABEL=capture loadtest/k6/mixed.js \
             2>&1 | tee docs/screenshots/k6-mixed.txt
