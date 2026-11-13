@@ -1,0 +1,111 @@
+name: Screenshots
+
+# 발표 자료용 실제 화면 캡처: 전체 스택을 띄워 시뮬레이션·k6 부하·장애 주입을 실제로 돌리고 화면을 찍어
+# capture/screenshots 브랜치의 docs/screenshots 에 커밋한다.
+on:
+  workflow_dispatch:
+  push:
+    branches: [capture/screenshots]
+    paths: [".github/workflows/screenshots.yml", "tools/capture/**"]
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright (Chromium + Korean fonts)
+        run: |
+          cd tools/capture && npm init -y >/dev/null && npm i playwright@1.48.2
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk >/dev/null
+
+      - name: Start stack
+        run: docker compose --profile app up -d --build
+
+      - name: Wait for app health
+        run: |
+          for i in $(seq 1 90); do
+            curl -fs localhost:8080/actuator/health | grep -q '"UP"' && exit 0
+            sleep 2
+          done
+          docker compose logs app | tail -100; exit 1
+
+      - name: Run simulation and k6 load
+        run: |
+          curl -fs -X POST "localhost:8080/simulation/speed?ms=100"
+          curl -fs -X POST localhost:8080/simulation/start || true
+          mkdir -p loadtest/results docs/screenshots && chmod 777 loadtest/results
+          docker run --rm --network ai-finance-world_default -v "$PWD":/work -w /work grafana/k6:0.54.0 \
+            run --no-color -e BASE_URL=http://app:8080 -e VUS=30 -e DURATION=30s -e LABEL=capture loadtest/k6/mixed.js \
+            2>&1 | tee docs/screenshots/k6-mixed.txt
+          curl -fs localhost:8080/integrity | tee docs/screenshots/integrity.json; echo
+
+      - name: Capture dashboard
+        working-directory: tools/capture
+        env: { OUT: ../../docs/screenshots }
+        run: node capture.mjs dashboard
+
+      - name: Broker down → capture
+        working-directory: tools/capture
+        env: { OUT: ../../docs/screenshots }
+        run: |
+          curl -fs -X POST localhost:8080/chaos/broker/down; echo
+          sleep 8
+          curl -fs localhost:8080/ops/outbox | tee ../../docs/screenshots/outbox-down.json; echo
+          node capture.mjs chaos-down
+
+      - name: Broker up → reconcile → capture
+        working-directory: tools/capture
+        env: { OUT: ../../docs/screenshots }
+        run: |
+          curl -fs -X POST localhost:8080/chaos/broker/up; echo
+          for i in $(seq 1 60); do
+            curl -fs localhost:8080/ops/outbox > ../../docs/screenshots/outbox-up.json
+            grep -q '"pending":0' ../../docs/screenshots/outbox-up.json && break; sleep 2
+          done
+          cat ../../docs/screenshots/outbox-up.json; echo
+          for i in $(seq 1 30); do
+            curl -fs -X POST localhost:8080/ops/reconciliation > ../../docs/screenshots/recon.json
+            grep -q '"status":"MATCHED"' ../../docs/screenshots/recon.json && break; sleep 2
+          done
+          cat ../../docs/screenshots/recon.json; echo
+          node capture.mjs chaos-up
+
+      - name: Capture Grafana
+        working-directory: tools/capture
+        env: { OUT: ../../docs/screenshots }
+        run: node capture.mjs grafana
+
+      - name: Capture k6 output and GitHub pages
+        working-directory: tools/capture
+        env: { OUT: ../../docs/screenshots }
+        run: |
+          node capture.mjs terminal ../../docs/screenshots/k6-mixed.txt k6-mixed
+          node capture.mjs github '{
+            "gh-actions-run": "https://github.com/grbuguj/ai-finance-world/actions/runs/42181352839",
+            "gh-junit-report": "https://github.com/grbuguj/ai-finance-world/runs/127772023687",
+            "gh-mysql-report": "https://github.com/grbuguj/ai-finance-world/runs/127773299225",
+            "gh-pr": "https://github.com/grbuguj/ai-finance-world/pull/4"
+          }'
+
+      - name: Commit screenshots
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f docs/screenshots
+          git commit -m "docs: 발표용 실제 화면 캡처 [skip ci]" || exit 0
+          git push origin HEAD:capture/screenshots
+
+      - name: Stop stack
+        if: always()
+        run: docker compose --profile app down -v
