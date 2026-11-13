@@ -28,12 +28,15 @@ public class AccountLockExecutor {
     private final TransactionTemplate transactionTemplate;
     private final Duration waitTime;
     private final Duration leaseTime;
+    private final boolean distributedEnabled;
 
     public AccountLockExecutor(DistributedLockPort lockPort,
                                PlatformTransactionManager transactionManager,
                                @Value("${app.lock.wait-ms:3000}") long waitMs,
-                               @Value("${app.lock.lease-ms:5000}") long leaseMs) {
+                               @Value("${app.lock.lease-ms:5000}") long leaseMs,
+                               @Value("${app.lock.distributed.enabled:false}") boolean distributedEnabled) {
         this.lockPort = lockPort;
+        this.distributedEnabled = distributedEnabled;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.waitTime = Duration.ofMillis(waitMs);
         this.leaseTime = Duration.ofMillis(leaseMs);
@@ -42,7 +45,8 @@ public class AccountLockExecutor {
     public <T> T execute(List<Long> accountIds, Supplier<T> work) {
         Deque<String[]> acquired = new ArrayDeque<>();
         try {
-            for (Long id : new TreeSet<>(accountIds)) {
+            // 분산 락을 끄면 DB 비관적 락(SELECT ... FOR UPDATE)만으로 정합성을 지킨다 (단일 DB 이므로 충분)
+            for (Long id : distributedEnabled ? new TreeSet<>(accountIds) : new TreeSet<Long>()) {
                 String key = "lock:account:" + id;
                 Optional<String> token = lockPort.tryLock(key, waitTime, leaseTime);
                 if (token.isEmpty()) {

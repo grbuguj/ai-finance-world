@@ -12,7 +12,8 @@ public interface TransferPort {
     Transfer save(Transfer transfer);
     Optional<Transfer> findById(Long id);
     Optional<Transfer> findByIdWithLock(Long id);
-    List<Transfer> findAll();
+    /** 최신순 키셋 페이지. beforeId 가 null 이면 첫 페이지. */
+    List<Transfer> findPage(Long beforeId, int limit);
     List<Transfer> findRecent();
     List<Transfer> findUndescribed();
     List<Transfer> findRefundableSpends(Long accountId);

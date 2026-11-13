@@ -36,6 +36,14 @@ public class Account {
     @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;
 
+    /**
+     * 낙관적 락 버전. 실서비스 경로는 비관적 락(SELECT ... FOR UPDATE)을 쓰지만,
+     * 버전 컬럼이 있으면 락을 우회한 갱신(버그·배치 등)이 다른 갱신을 덮어쓰는 순간 예외로 드러난다 (Lost Update 이중 방어).
+     * 락 전략 비교 실험(LockStrategyBenchmark)의 낙관적 락 전략도 이 컬럼을 쓴다.
+     */
+    @Version
+    private Long version;
+
     @CreatedDate
     private LocalDateTime createTime;
 
