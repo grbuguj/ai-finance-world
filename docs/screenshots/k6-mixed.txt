@@ -1,0 +1,34 @@
+Unable to find image 'grafana/k6:0.54.0' locally
+0.54.0: Pulling from grafana/k6
+4f4fb700ef54: Pulling fs layer
+707af19e45d8: Pulling fs layer
+2961e627175d: Pulling fs layer
+4f4fb700ef54: Already exists
+707af19e45d8: Download complete
+707af19e45d8: Pull complete
+220862cf6e3f: Download complete
+2961e627175d: Download complete
+4f4fb700ef54: Pull complete
+2961e627175d: Pull complete
+Digest: sha256:1f40432b1cbe7234e977f96c362c9bc550a2d2b583d014dd8669fe40d3e9e755
+Status: Downloaded newer image for grafana/k6:0.54.0
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+     execution: local
+        script: loadtest/k6/mixed.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 30 max VUs, 1m0s max duration (incl. graceful stop):
+              * main: 30 looping VUs for 30s (gracefulStop: 30s)
+
+
+[mixed / capture] TPS=27.3  avg=32.1ms  p95=32.1ms  p99=32.1ms  실패율=100.00%
+
+Run    [ 100% ] setup()
+main   [   0% ]
+time="2026-11-13T04:25:22Z" level=error msg="Error: setup 실패 (404) — 앱을 loadtest 프로필로 실행했는지 확인: {\"timestamp\":\"2026-11-13T04:25:22.891Z\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/loadtest/setup\"}\n\tat prepare (file:///work/loadtest/k6/common.js:28:11(39))\n\tat setup (file:///work/loadtest/k6/mixed.js:7:41(3))\n" hint="script exception"
