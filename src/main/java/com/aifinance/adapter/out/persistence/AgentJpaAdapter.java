@@ -18,7 +18,7 @@ public class AgentJpaAdapter implements AgentPort {
     }
 
     @Override
-    public Optional<Agent> findByIdWithLock (Long id) {
+    public Optional<Agent> findByIdWithLock(Long id) {
         return agentRepository.findByIdWithLock(id);
     }
 
@@ -30,6 +30,11 @@ public class AgentJpaAdapter implements AgentPort {
     @Override
     public List<Agent> findAll() {
         return agentRepository.findAll();
+    }
+
+    @Override
+    public long count() {
+        return agentRepository.count();
     }
 
 }

@@ -1,23 +1,36 @@
 package com.aifinance.adapter.in.scheduler;
 
 import com.aifinance.adapter.in.web.FeedSseService;
-import com.aifinance.application.port.out.AccountPort;
-import com.aifinance.application.port.out.AgentPort;
-import com.aifinance.application.port.out.LedgerPort;
-import com.aifinance.application.port.out.TransferPort;
+import com.aifinance.adapter.in.web.dto.FeedItem;
+import com.aifinance.application.usecase.AgentUseCase;
+import com.aifinance.application.usecase.InvestUseCase;
+import com.aifinance.application.usecase.RefundUseCase;
+import com.aifinance.application.usecase.SimulationSetupUseCase;
+import com.aifinance.application.usecase.SpendUseCase;
 import com.aifinance.application.usecase.TransferUseCase;
+import com.aifinance.domain.account.Account;
 import com.aifinance.domain.agent.Agent;
 import com.aifinance.domain.transfer.Transfer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * 멀티에이전트 시뮬레이션 틱 엔진.
+ *
+ * 매 틱마다 에이전트별로 4가지 행동의 발생 여부를 독립적인 베르누이 시행으로 결정한다.
+ *   소비(chanceSpend) / 송금(chancePay) / 투자(chanceInvest) / 환불(chanceRefund)
+ * 그리고 만기 도래 투자를 정산하고, payday 주기마다 급여를 지급한다.
+ *
+ * 엔진은 "부하를 만드는 클라이언트"일 뿐, 돈의 이동은 전부 UseCase(은행 백엔드)가 처리한다.
+ */
 @Component
 public class SimulationEngine {
 
@@ -41,75 +54,61 @@ public class SimulationEngine {
             "월급날 기념", "시험 끝난 기념", "헤어진 기념", "재회 기념",
             "그냥 보고싶어서", "너 생각나서", "빚진 기분이 들어서", "내 양심이 허락하지 않아"
     );
-    private static final Random RANDOM = new Random();
+
+    // 가맹점별 결제 품목
+    private static final Map<String, List<String>> ITEMS = Map.of(
+            "쿠팡", List.of("생필품 로켓배송", "생수 2L x 12", "휴지 30롤", "무선 이어폰", "캠핑 의자"),
+            "무신사", List.of("후드티", "청바지", "운동화", "패딩 조끼", "양말 5족 세트"),
+            "배달의민족", List.of("치킨 한 마리", "떡볶이 세트", "마라탕", "족발 중(中)", "새벽 피자"),
+            "넷플릭스", List.of("프리미엄 요금제", "스탠다드 요금제"),
+            "KT 통신", List.of("휴대폰 요금", "인터넷 요금", "데이터 추가 충전")
+    );
 
     private final TransferUseCase transferUseCase;
-    private final AgentPort agentPort;
-    private final AccountPort accountPort;
-    private final TransferPort transferPort;
-    private final LedgerPort ledgerPort;
+    private final SpendUseCase spendUseCase;
+    private final InvestUseCase investUseCase;
+    private final RefundUseCase refundUseCase;
+    private final AgentUseCase agentUseCase;
+    private final SimulationSetupUseCase setupUseCase;
     private final FeedSseService feedSseService;
 
     private final AtomicLong tickIntervalMs = new AtomicLong(1000);
+    private final AtomicLong tickCount = new AtomicLong(0);
+    private final long paydayIntervalTicks;
     private volatile long lastTickAt = 0;
-    private volatile State state = State.RUNNING;
+    private volatile State state;
 
-    public SimulationEngine(TransferUseCase transferUseCase, AgentPort agentPort,
-                            AccountPort accountPort, TransferPort transferPort,
-                            LedgerPort ledgerPort, FeedSseService feedSseService) {
+    public SimulationEngine(TransferUseCase transferUseCase, SpendUseCase spendUseCase,
+                            InvestUseCase investUseCase, RefundUseCase refundUseCase,
+                            AgentUseCase agentUseCase, SimulationSetupUseCase setupUseCase,
+                            FeedSseService feedSseService,
+                            @Value("${app.simulation.auto-start:true}") boolean autoStart,
+                            @Value("${app.simulation.payday-interval-ticks:10}") long paydayIntervalTicks) {
         this.transferUseCase = transferUseCase;
-        this.agentPort = agentPort;
-        this.accountPort = accountPort;
-        this.transferPort = transferPort;
-        this.ledgerPort = ledgerPort;
+        this.spendUseCase = spendUseCase;
+        this.investUseCase = investUseCase;
+        this.refundUseCase = refundUseCase;
+        this.agentUseCase = agentUseCase;
+        this.setupUseCase = setupUseCase;
         this.feedSseService = feedSseService;
+        this.paydayIntervalTicks = Math.max(1, paydayIntervalTicks);
+        this.state = autoStart ? State.RUNNING : State.STOPPED;
     }
 
     public void setTickIntervalMs(long ms) { tickIntervalMs.set(Math.max(1, Math.min(5000, ms))); }
     public long getTickIntervalMs()        { return tickIntervalMs.get(); }
     public State getState()                { return state; }
+    public long getTickCount()             { return tickCount.get(); }
 
     public void start()  { state = State.RUNNING; }
     public void pause()  { state = State.PAUSED; }
     public void stop()   { state = State.STOPPED; }
 
-    @Transactional
-    public void reset() {
+    /** 정지 → 진행 중인 틱이 끝나길 기다린 뒤(synchronized) 거래/원장 초기화 */
+    public synchronized void reset() {
         state = State.STOPPED;
-        // 1. 거래 내역 + 원장 전부 삭제 (FK 순서 주의: ledger → transfer)
-        ledgerPort.deleteAll();
-        transferPort.deleteAll();
-        // 2. 모든 에이전트 계좌를 salary(초기 잔액)로 복원
-        agentPort.findAll().forEach(a -> {
-            a.getAccount().getBalance(); // lazy load 방지
-            BigDecimal initial = BigDecimal.valueOf(a.getSalary());
-            // balance 필드를 초기값으로 직접 세팅하기 위해 deposit/withdraw 사용
-            BigDecimal current = a.getAccount().getBalance();
-            BigDecimal diff = initial.subtract(current);
-            if (diff.compareTo(BigDecimal.ZERO) > 0) {
-                a.getAccount().deposit(diff);
-            } else if (diff.compareTo(BigDecimal.ZERO) < 0) {
-                a.getAccount().withdraw(diff.abs());
-            }
-            accountPort.save(a.getAccount());
-        });
-    }
-
-    private static String toJson(Transfer t, String senderName, String receiverName) {
-        return "{" +
-                "\"id\":" + t.getId() + "," +
-                "\"senderName\":\"" + esc(senderName) + "\"," +
-                "\"receiverName\":\"" + esc(receiverName) + "\"," +
-                "\"amount\":" + t.getAmount().toPlainString() + "," +
-                "\"type\":\"" + t.getType().name() + "\"," +
-                "\"description\":\"" + esc(t.getDescription()) + "\"," +
-                "\"createdAt\":\"" + t.getCreatedAt() + "\"" +
-                "}";
-    }
-
-    private static String esc(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\").replace("\"", "\\\"");
+        setupUseCase.reset();
+        tickCount.set(0);
     }
 
     // 5ms 마다 기반 틱 — 실제 간격은 tickIntervalMs 로 조절 (최대 1ms까지 지원)
@@ -119,35 +118,104 @@ public class SimulationEngine {
         long now = System.currentTimeMillis();
         if (now - lastTickAt < tickIntervalMs.get()) return;
         lastTickAt = now;
+        runTick();
+    }
 
-        List<Agent> agents = agentPort.findAll();
+    /** 틱 1회 실행 (테스트에서 직접 호출 가능) */
+    public synchronized void runTick() {
+        long tick = tickCount.incrementAndGet();
+        List<Agent> agents = agentUseCase.findAll();
+        if (agents.size() < 2) return;
+        List<Account> merchants = spendUseCase.merchants();
+        ThreadLocalRandom rnd = ThreadLocalRandom.current();
+
         for (Agent agent : agents) {
-            if (Math.random() < agent.getChancePay()) {
-
-                List<Agent> others = agents.stream()
-                        .filter(a -> !a.getId().equals(agent.getId()))
-                        .toList();
-                Agent target = others.get((int) (Math.random() * others.size()));
-
-                BigDecimal balance = agent.getAccount().getBalance();
-                double ratio = 0.03 + Math.random() * 0.17;
-                BigDecimal amount = balance.multiply(BigDecimal.valueOf(ratio))
-                        .setScale(-4, RoundingMode.DOWN);
-
-                if (amount.signum() <= 0) continue;
-
-                String reason = REASONS.get(RANDOM.nextInt(REASONS.size()));
-                try {
-                    Transfer saved = transferUseCase.transfer(
-                            agent.getAccount().getId(),
-                            target.getAccount().getId(),
-                            amount,
-                            reason);
-                    feedSseService.publish(toJson(saved, agent.getName(), target.getName()));
-                } catch (Exception e) {
-                    // 잔액 부족 등 정상 실패 — 무시
-                }
+            if (rnd.nextDouble() < agent.getChanceSpend() && !merchants.isEmpty()) {
+                doSpend(agent, merchants, rnd);
+            }
+            if (rnd.nextDouble() < agent.getChancePay()) {
+                doTransfer(agent, agents, rnd);
+            }
+            if (rnd.nextDouble() < agent.getChanceInvest()) {
+                doInvest(agent, tick, rnd);
+            }
+            if (rnd.nextDouble() < agent.getChanceRefund()) {
+                doRefund(agent);
             }
         }
+
+        // 만기 도래 투자 정산
+        investUseCase.settleMatured(tick).forEach(this::publish);
+
+        // 월급날
+        if (tick % paydayIntervalTicks == 0) {
+            try {
+                agentUseCase.paySalary().forEach(this::publish);
+            } catch (RuntimeException ignored) {
+            }
+        }
+    }
+
+    private void doSpend(Agent agent, List<Account> merchants, ThreadLocalRandom rnd) {
+        Account merchant = merchants.get(rnd.nextInt(merchants.size()));
+        // 잔액의 1~3%, 100원 단위, 최소 1,000원
+        BigDecimal amount = ratioOf(currentBalance(agent), 0.01 + rnd.nextDouble() * 0.02, -2);
+        if (amount.compareTo(BigDecimal.valueOf(1000)) < 0) return;
+        List<String> items = ITEMS.getOrDefault(merchant.getName(), List.of("결제"));
+        String description = merchant.getName() + " · " + items.get(rnd.nextInt(items.size()));
+        try {
+            publish(spendUseCase.spend(agent.getAccount().getId(), merchant.getId(), amount, description));
+        } catch (RuntimeException ignored) {
+            // 잔액 부족 등 정상 실패
+        }
+        
+    }
+
+    private void doTransfer(Agent agent, List<Agent> agents, ThreadLocalRandom rnd) {
+        List<Agent> others = agents.stream().filter(a -> !a.getId().equals(agent.getId())).toList();
+        Agent target = others.get(rnd.nextInt(others.size()));
+        // 잔액의 3~20%, 만원 단위
+        BigDecimal amount = ratioOf(currentBalance(agent), 0.03 + rnd.nextDouble() * 0.17, -4);
+        if (amount.signum() <= 0) return;
+        String reason = REASONS.get(rnd.nextInt(REASONS.size()));
+        try {
+            publish(transferUseCase.transfer(agent.getAccount().getId(), target.getAccount().getId(), amount, reason));
+        } catch (RuntimeException ignored) {
+        }
+    }
+
+    private void doInvest(Agent agent, long tick, ThreadLocalRandom rnd) {
+        // 잔액의 5~15%, 만원 단위, 만기 5~15틱
+        BigDecimal amount = ratioOf(currentBalance(agent), 0.05 + rnd.nextDouble() * 0.10, -4);
+        if (amount.signum() <= 0) return;
+        long hold = 5 + rnd.nextInt(11);
+        try {
+            publish(investUseCase.invest(agent.getAccount().getId(), amount, tick, hold).transfer());
+        } catch (RuntimeException ignored) {
+        }
+    }
+
+    private void doRefund(Agent agent) {
+        try {
+            Transfer refund = refundUseCase.refundLatest(agent.getAccount().getId());
+            if (refund != null) publish(refund);
+        } catch (RuntimeException ignored) {
+        }
+    }
+
+    /** 틱 시작 시 읽은 잔액은 같은 틱의 앞선 거래로 바뀌었을 수 있으므로 계좌 엔티티 기준 근사치로 사용 (최종 검증은 UseCase가 락 안에서 한다) */
+    private BigDecimal currentBalance(Agent agent) {
+        return agent.getAccount().getBalance();
+    }
+
+    private static BigDecimal ratioOf(BigDecimal balance, double ratio, int scale) {
+        return balance.multiply(BigDecimal.valueOf(ratio))
+                .setScale(scale, RoundingMode.DOWN)
+                .setScale(0, RoundingMode.DOWN);
+    }
+
+    private void publish(Transfer t) {
+        if (t == null) return;
+        feedSseService.publish(FeedItem.from(t).toJson());
     }
 }
