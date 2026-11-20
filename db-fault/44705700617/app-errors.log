@@ -1,0 +1,300 @@
+ai-finance-app  | 2026-11-20T17:51:43.240+09:00  WARN 1 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "alter table agents drop foreign key FK9clm06rfnwdg1gfuxiktdrxd9" via JDBC [Table 'ai_finance.agents' doesn't exist]
+ai-finance-app  | org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table agents drop foreign key FK9clm06rfnwdg1gfuxiktdrxd9" via JDBC [Table 'ai_finance.agents' doesn't exist]
+ai-finance-app  | Caused by: java.sql.SQLSyntaxErrorException: Table 'ai_finance.agents' doesn't exist
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:112) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:51:43.247+09:00  WARN 1 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "alter table ledger_entries drop foreign key FKccr7q587j5bf49xqb0fqieefp" via JDBC [Table 'ai_finance.ledger_entries' doesn't exist]
+ai-finance-app  | org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table ledger_entries drop foreign key FKccr7q587j5bf49xqb0fqieefp" via JDBC [Table 'ai_finance.ledger_entries' doesn't exist]
+ai-finance-app  | Caused by: java.sql.SQLSyntaxErrorException: Table 'ai_finance.ledger_entries' doesn't exist
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:112) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:51:43.251+09:00  WARN 1 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "alter table ledger_entries drop foreign key FKa1gf47wp0vd2uc03ilhgeagy4" via JDBC [Table 'ai_finance.ledger_entries' doesn't exist]
+ai-finance-app  | org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table ledger_entries drop foreign key FKa1gf47wp0vd2uc03ilhgeagy4" via JDBC [Table 'ai_finance.ledger_entries' doesn't exist]
+ai-finance-app  | Caused by: java.sql.SQLSyntaxErrorException: Table 'ai_finance.ledger_entries' doesn't exist
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:112) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:51:43.253+09:00  WARN 1 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "alter table reconciliation_breaks drop foreign key FKtrj8lu33jyp6y9i81u1wpdri" via JDBC [Table 'ai_finance.reconciliation_breaks' doesn't exist]
+ai-finance-app  | org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table reconciliation_breaks drop foreign key FKtrj8lu33jyp6y9i81u1wpdri" via JDBC [Table 'ai_finance.reconciliation_breaks' doesn't exist]
+ai-finance-app  | Caused by: java.sql.SQLSyntaxErrorException: Table 'ai_finance.reconciliation_breaks' doesn't exist
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:112) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:51:43.255+09:00  WARN 1 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "alter table transfers drop foreign key FKfinhqvjnb5exn5xe634mdyax6" via JDBC [Table 'ai_finance.transfers' doesn't exist]
+ai-finance-app  | org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table transfers drop foreign key FKfinhqvjnb5exn5xe634mdyax6" via JDBC [Table 'ai_finance.transfers' doesn't exist]
+ai-finance-app  | Caused by: java.sql.SQLSyntaxErrorException: Table 'ai_finance.transfers' doesn't exist
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:112) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:51:43.256+09:00  WARN 1 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "alter table transfers drop foreign key FKgmhdj016w0jkj8ei6w9ls7m15" via JDBC [Table 'ai_finance.transfers' doesn't exist]
+ai-finance-app  | org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "alter table transfers drop foreign key FKgmhdj016w0jkj8ei6w9ls7m15" via JDBC [Table 'ai_finance.transfers' doesn't exist]
+ai-finance-app  | Caused by: java.sql.SQLSyntaxErrorException: Table 'ai_finance.transfers' doesn't exist
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:112) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	retry.backoff.max.ms = 1000
+ai-finance-app  | 	retry.backoff.ms = 100
+ai-finance-app  | 	sasl.login.retry.backoff.max.ms = 10000
+ai-finance-app  | 	sasl.login.retry.backoff.ms = 100
+ai-finance-app  | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+ai-finance-app  | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+ai-finance-app  | 	retry.backoff.max.ms = 1000
+ai-finance-app  | 	retry.backoff.ms = 100
+ai-finance-app  | 	sasl.login.retry.backoff.max.ms = 10000
+ai-finance-app  | 	sasl.login.retry.backoff.ms = 100
+ai-finance-app  | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+ai-finance-app  | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+ai-finance-app  | 2026-11-20T17:51:47.552+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Request joining group due to: rebalance failed due to 'This is not the correct coordinator.' (NotCoordinatorException)
+ai-finance-app  | 2026-11-20T17:51:47.563+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Request joining group due to: rebalance failed due to 'This is not the correct coordinator.' (NotCoordinatorException)
+ai-finance-app  | 2026-11-20T17:51:47.800+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Request joining group due to: rebalance failed due to 'This is not the correct coordinator.' (NotCoordinatorException)
+ai-finance-app  | 	retry.backoff.max.ms = 1000
+ai-finance-app  | 	retry.backoff.ms = 100
+ai-finance-app  | 	sasl.login.retry.backoff.max.ms = 10000
+ai-finance-app  | 	sasl.login.retry.backoff.ms = 100
+ai-finance-app  | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+ai-finance-app  | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+ai-finance-app  | java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: java.io.EOFException: Can not read response from server. Expected to read 4 bytes, read 0 bytes before connection was unexpectedly lost.
+ai-finance-app  | com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: java.io.EOFException: Can not read response from server. Expected to read 4 bytes, read 0 bytes before connection was unexpectedly lost.
+ai-finance-app  | com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: java.io.EOFException: Can not read response from server. Expected to read 4 bytes, read 0 bytes before connection was unexpectedly lost.
+ai-finance-app  | com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: java.io.EOFException: Can not read response from server. Expected to read 4 bytes, read 0 bytes before connection was unexpectedly lost.
+ai-finance-app  | 2026-11-20T17:52:07.378+09:00 ERROR 1 --- [   scheduling-2] o.s.t.support.TransactionTemplate        : Application exception overridden by rollback exception
+ai-finance-app  | org.springframework.dao.DataAccessResourceFailureException: JDBC exception executing SQL [Server shutdown in progress] [select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.attempts,oe1_0.created_at,oe1_0.event_id,oe1_0.event_type,oe1_0.last_error,oe1_0.message_key,oe1_0.next_attempt_at,oe1_0.payload,oe1_0.published_at,oe1_0.status from outbox_events oe1_0 where oe1_0.id=?]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:153) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: JDBC exception executing SQL [Server shutdown in progress] [select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.attempts,oe1_0.created_at,oe1_0.event_id,oe1_0.event_type,oe1_0.last_error,oe1_0.message_key,oe1_0.next_attempt_at,oe1_0.payload,oe1_0.published_at,oe1_0.status from outbox_events oe1_0 where oe1_0.id=?]
+ai-finance-app  | 	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:52:07.378+09:00 ERROR 1 --- [nio-8080-exec-3] o.s.t.support.TransactionTemplate        : Application exception overridden by rollback exception
+ai-finance-app  | org.springframework.dao.DataAccessResourceFailureException: JDBC exception executing SQL [Communications link failure
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:153) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: JDBC exception executing SQL [Communications link failure
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: java.io.EOFException: Can not read response from server. Expected to read 4 bytes, read 0 bytes before connection was unexpectedly lost.
+ai-finance-app  | 2026-11-20T17:52:07.383+09:00 ERROR 1 --- [io-8080-exec-16] o.s.t.support.TransactionTemplate        : Application exception overridden by rollback exception
+ai-finance-app  | org.springframework.dao.DataAccessResourceFailureException: JDBC exception executing SQL [Server shutdown in progress] [select a1_0.id,a1_0.account_type,a1_0.balance,a1_0.create_time,a1_0.name,a1_0.updated_at,a1_0.version from accounts a1_0 where a1_0.id=? for update of a1_0]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:153) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: JDBC exception executing SQL [Server shutdown in progress] [select a1_0.id,a1_0.account_type,a1_0.balance,a1_0.create_time,a1_0.name,a1_0.updated_at,a1_0.version from accounts a1_0 where a1_0.id=? for update of a1_0]
+ai-finance-app  | 	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:52:07.382+09:00 ERROR 1 --- [io-8080-exec-19] o.s.t.support.TransactionTemplate        : Application exception overridden by rollback exception
+ai-finance-app  | org.springframework.dao.DataAccessResourceFailureException: JDBC exception executing SQL [Server shutdown in progress] [select a1_0.id,a1_0.account_type,a1_0.balance,a1_0.create_time,a1_0.name,a1_0.updated_at,a1_0.version from accounts a1_0 where a1_0.id=? for update of a1_0]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:153) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: JDBC exception executing SQL [Server shutdown in progress] [select a1_0.id,a1_0.account_type,a1_0.balance,a1_0.create_time,a1_0.name,a1_0.updated_at,a1_0.version from accounts a1_0 where a1_0.id=? for update of a1_0]
+ai-finance-app  | 	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:52:07.378+09:00 ERROR 1 --- [io-8080-exec-14] o.s.t.support.TransactionTemplate        : Application exception overridden by rollback exception
+ai-finance-app  | org.springframework.dao.DataAccessResourceFailureException: could not execute statement [Server shutdown in progress] [insert into ledger_entries (account_id,amount,created_at,transfer_id,type) values (?,?,?,?,?)]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:153) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: could not execute statement [Server shutdown in progress] [insert into ledger_entries (account_id,amount,created_at,transfer_id,type) values (?,?,?,?,?)]
+ai-finance-app  | 	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:52:07.385+09:00 ERROR 1 --- [nio-8080-exec-2] o.s.t.support.TransactionTemplate        : Application exception overridden by rollback exception
+ai-finance-app  | org.springframework.dao.DataAccessResourceFailureException: JDBC exception executing SQL [Communications link failure
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:153) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: JDBC exception executing SQL [Communications link failure
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | Caused by: java.io.EOFException: Can not read response from server. Expected to read 4 bytes, read 0 bytes before connection was unexpectedly lost.
+ai-finance-app  | 2026-11-20T17:52:07.392+09:00 ERROR 1 --- [io-8080-exec-20] o.s.t.support.TransactionTemplate        : Application exception overridden by rollback exception
+ai-finance-app  | org.springframework.dao.DataAccessResourceFailureException: could not execute statement [Server shutdown in progress] [insert into outbox_events (aggregate_id,aggregate_type,attempts,created_at,event_id,event_type,last_error,message_key,next_attempt_at,payload,published_at,status) values (?,?,?,?,?,?,?,?,?,?,?,?)]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:153) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: could not execute statement [Server shutdown in progress] [insert into outbox_events (aggregate_id,aggregate_type,attempts,created_at,event_id,event_type,last_error,message_key,next_attempt_at,payload,published_at,status) values (?,?,?,?,?,?,?,?,?,?,?,?)]
+ai-finance-app  | 	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: java.sql.SQLNonTransientConnectionException: Server shutdown in progress
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:102) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 2026-11-20T17:52:07.399+09:00 ERROR 1 --- [nio-8080-exec-2] c.a.adapter.in.web.ApiExceptionHandler   : 예상하지 못한 오류 [org.springframework.orm.jpa.JpaSystemException]
+ai-finance-app  | org.springframework.orm.jpa.JpaSystemException: Unable to rollback against JDBC Connection
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.TransactionTemplate.rollbackOnException(TransactionTemplate.java:165) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+ai-finance-app  | Caused by: java.sql.SQLException: Connection is closed
+ai-finance-app  | 2026-11-20T17:52:07.407+09:00 ERROR 1 --- [io-8080-exec-20] c.a.adapter.in.web.ApiExceptionHandler   : 예상하지 못한 오류 [org.springframework.orm.jpa.JpaSystemException]
+ai-finance-app  | org.springframework.orm.jpa.JpaSystemException: Unable to rollback against JDBC Connection
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.TransactionTemplate.rollbackOnException(TransactionTemplate.java:165) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+ai-finance-app  | Caused by: java.sql.SQLException: Connection is closed
+ai-finance-app  | 2026-11-20T17:52:07.413+09:00  WARN 1 --- [io-8080-exec-24] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: DataAccessResourceFailureException
+ai-finance-app  | 2026-11-20T17:52:07.408+09:00 ERROR 1 --- [io-8080-exec-19] c.a.adapter.in.web.ApiExceptionHandler   : 예상하지 못한 오류 [org.springframework.orm.jpa.JpaSystemException]
+ai-finance-app  | org.springframework.orm.jpa.JpaSystemException: Unable to rollback against JDBC Connection
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.TransactionTemplate.rollbackOnException(TransactionTemplate.java:165) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+ai-finance-app  | Caused by: java.sql.SQLException: Connection is closed
+ai-finance-app  | 2026-11-20T17:52:07.423+09:00 ERROR 1 --- [   scheduling-2] o.s.s.s.TaskUtils$LoggingErrorHandler    : Unexpected error occurred in scheduled task
+ai-finance-app  | org.springframework.orm.jpa.JpaSystemException: Unable to rollback against JDBC Connection
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.TransactionTemplate.rollbackOnException(TransactionTemplate.java:165) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+ai-finance-app  | Caused by: java.sql.SQLException: Connection is closed
+ai-finance-app  | 2026-11-20T17:52:07.426+09:00 ERROR 1 --- [io-8080-exec-16] c.a.adapter.in.web.ApiExceptionHandler   : 예상하지 못한 오류 [org.springframework.orm.jpa.JpaSystemException]
+ai-finance-app  | org.springframework.orm.jpa.JpaSystemException: Unable to rollback against JDBC Connection
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.TransactionTemplate.rollbackOnException(TransactionTemplate.java:165) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+ai-finance-app  | Caused by: java.sql.SQLException: Connection is closed
+ai-finance-app  | 2026-11-20T17:52:07.420+09:00 ERROR 1 --- [nio-8080-exec-3] c.a.adapter.in.web.ApiExceptionHandler   : 예상하지 못한 오류 [org.springframework.orm.jpa.JpaSystemException]
+ai-finance-app  | org.springframework.orm.jpa.JpaSystemException: Unable to rollback against JDBC Connection
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.TransactionTemplate.rollbackOnException(TransactionTemplate.java:165) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | Caused by: org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+ai-finance-app  | Caused by: java.sql.SQLException: Connection is closed
+ai-finance-app  | 2026-11-20T17:52:07.419+09:00 ERROR 1 --- [io-8080-exec-14] c.a.adapter.in.web.ApiExceptionHandler   : 예상하지 못한 오류 [org.springframework.orm.jpa.JpaSystemException]
+ai-finance-app  | org.springframework.orm.jpa.JpaSystemException: Unable to rollback against JDBC Connection
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:223) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131) ~[spring-orm-7.0.7.jar!/:7.0.7]
