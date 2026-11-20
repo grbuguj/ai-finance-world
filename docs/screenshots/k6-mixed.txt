@@ -13,133 +13,97 @@
               * main: 30 looping VUs for 30s (gracefulStop: 30s)
 
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m01.0s), 30/30 VUs, 0 complete and 0 interrupted iterations
+main   [   0% ] 30 VUs  00.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m02.0s), 30/30 VUs, 231 complete and 0 interrupted iterations
+main   [   4% ] 30 VUs  01.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m03.0s), 30/30 VUs, 487 complete and 0 interrupted iterations
+main   [   7% ] 30 VUs  02.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m04.0s), 30/30 VUs, 713 complete and 0 interrupted iterations
+main   [  10% ] 30 VUs  03.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m05.0s), 30/30 VUs, 958 complete and 0 interrupted iterations
+main   [  14% ] 30 VUs  04.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m06.0s), 30/30 VUs, 1214 complete and 0 interrupted iterations
+main   [  17% ] 30 VUs  05.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m07.0s), 30/30 VUs, 1572 complete and 0 interrupted iterations
+main   [  20% ] 30 VUs  06.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m08.0s), 30/30 VUs, 1946 complete and 0 interrupted iterations
+main   [  24% ] 30 VUs  07.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m09.0s), 30/30 VUs, 2314 complete and 0 interrupted iterations
+main   [  27% ] 30 VUs  08.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m10.0s), 30/30 VUs, 2600 complete and 0 interrupted iterations
+main   [  30% ] 30 VUs  09.1s/30s
 
-Run    [ 100% ] setup()
-main   [   0% ]
+running (0m11.0s), 30/30 VUs, 2931 complete and 0 interrupted iterations
+main   [  34% ] 30 VUs  10.1s/30s
 
-running (0m11.9s), 30/30 VUs, 14 complete and 0 interrupted iterations
-main   [   2% ] 30 VUs  00.7s/30s
+running (0m12.0s), 30/30 VUs, 3206 complete and 0 interrupted iterations
+main   [  37% ] 30 VUs  11.1s/30s
 
-running (0m12.9s), 30/30 VUs, 45 complete and 0 interrupted iterations
-main   [   6% ] 30 VUs  01.7s/30s
+running (0m13.0s), 30/30 VUs, 3470 complete and 0 interrupted iterations
+main   [  40% ] 30 VUs  12.1s/30s
 
-running (0m13.9s), 30/30 VUs, 76 complete and 0 interrupted iterations
-main   [   9% ] 30 VUs  02.7s/30s
+running (0m14.0s), 30/30 VUs, 3743 complete and 0 interrupted iterations
+main   [  44% ] 30 VUs  13.1s/30s
 
-running (0m14.9s), 30/30 VUs, 105 complete and 0 interrupted iterations
-main   [  12% ] 30 VUs  03.7s/30s
+running (0m15.0s), 30/30 VUs, 4050 complete and 0 interrupted iterations
+main   [  47% ] 30 VUs  14.1s/30s
 
-running (0m15.9s), 30/30 VUs, 127 complete and 0 interrupted iterations
-main   [  16% ] 30 VUs  04.7s/30s
+running (0m16.0s), 30/30 VUs, 4470 complete and 0 interrupted iterations
+main   [  50% ] 30 VUs  15.1s/30s
 
-running (0m16.9s), 30/30 VUs, 153 complete and 0 interrupted iterations
-main   [  19% ] 30 VUs  05.7s/30s
+running (0m17.0s), 30/30 VUs, 4834 complete and 0 interrupted iterations
+main   [  54% ] 30 VUs  16.1s/30s
 
-running (0m17.9s), 30/30 VUs, 181 complete and 0 interrupted iterations
-main   [  22% ] 30 VUs  06.7s/30s
+running (0m18.0s), 30/30 VUs, 5236 complete and 0 interrupted iterations
+main   [  57% ] 30 VUs  17.1s/30s
 
-running (0m18.9s), 30/30 VUs, 199 complete and 0 interrupted iterations
-main   [  26% ] 30 VUs  07.7s/30s
+running (0m19.0s), 30/30 VUs, 5631 complete and 0 interrupted iterations
+main   [  60% ] 30 VUs  18.1s/30s
 
-running (0m19.9s), 30/30 VUs, 217 complete and 0 interrupted iterations
-main   [  29% ] 30 VUs  08.7s/30s
+running (0m20.0s), 30/30 VUs, 6037 complete and 0 interrupted iterations
+main   [  64% ] 30 VUs  19.1s/30s
 
-running (0m20.9s), 30/30 VUs, 240 complete and 0 interrupted iterations
-main   [  32% ] 30 VUs  09.7s/30s
+running (0m21.0s), 30/30 VUs, 6362 complete and 0 interrupted iterations
+main   [  67% ] 30 VUs  20.1s/30s
 
-running (0m21.9s), 30/30 VUs, 262 complete and 0 interrupted iterations
-main   [  36% ] 30 VUs  10.7s/30s
+running (0m22.0s), 30/30 VUs, 6631 complete and 0 interrupted iterations
+main   [  70% ] 30 VUs  21.1s/30s
 
-running (0m22.9s), 30/30 VUs, 279 complete and 0 interrupted iterations
-main   [  39% ] 30 VUs  11.7s/30s
+running (0m23.0s), 30/30 VUs, 6958 complete and 0 interrupted iterations
+main   [  74% ] 30 VUs  22.1s/30s
 
-running (0m23.9s), 30/30 VUs, 296 complete and 0 interrupted iterations
-main   [  42% ] 30 VUs  12.7s/30s
+running (0m24.0s), 30/30 VUs, 7367 complete and 0 interrupted iterations
+main   [  77% ] 30 VUs  23.1s/30s
 
-running (0m24.9s), 30/30 VUs, 313 complete and 0 interrupted iterations
-main   [  46% ] 30 VUs  13.7s/30s
+running (0m25.0s), 30/30 VUs, 7812 complete and 0 interrupted iterations
+main   [  80% ] 30 VUs  24.1s/30s
 
-running (0m25.9s), 30/30 VUs, 338 complete and 0 interrupted iterations
-main   [  49% ] 30 VUs  14.7s/30s
+running (0m26.0s), 30/30 VUs, 8306 complete and 0 interrupted iterations
+main   [  84% ] 30 VUs  25.1s/30s
 
-running (0m26.9s), 30/30 VUs, 365 complete and 0 interrupted iterations
-main   [  52% ] 30 VUs  15.7s/30s
+running (0m27.0s), 30/30 VUs, 8877 complete and 0 interrupted iterations
+main   [  87% ] 30 VUs  26.1s/30s
 
-running (0m27.9s), 30/30 VUs, 403 complete and 0 interrupted iterations
-main   [  56% ] 30 VUs  16.7s/30s
+running (0m28.0s), 30/30 VUs, 9381 complete and 0 interrupted iterations
+main   [  90% ] 30 VUs  27.1s/30s
 
-running (0m28.9s), 30/30 VUs, 432 complete and 0 interrupted iterations
-main   [  59% ] 30 VUs  17.7s/30s
+running (0m29.0s), 30/30 VUs, 9863 complete and 0 interrupted iterations
+main   [  94% ] 30 VUs  28.1s/30s
 
-running (0m29.9s), 30/30 VUs, 455 complete and 0 interrupted iterations
-main   [  62% ] 30 VUs  18.7s/30s
+running (0m30.0s), 30/30 VUs, 10178 complete and 0 interrupted iterations
+main   [  97% ] 30 VUs  29.1s/30s
 
-running (0m30.9s), 30/30 VUs, 486 complete and 0 interrupted iterations
-main   [  66% ] 30 VUs  19.7s/30s
+[mixed / capture] TPS=342.3  avg=85.0ms  p95=185.5ms  p99=255.5ms  실패율=0.00%
 
-running (0m31.9s), 30/30 VUs, 510 complete and 0 interrupted iterations
-main   [  69% ] 30 VUs  20.7s/30s
-
-running (0m32.9s), 30/30 VUs, 535 complete and 0 interrupted iterations
-main   [  72% ] 30 VUs  21.7s/30s
-
-running (0m33.9s), 30/30 VUs, 556 complete and 0 interrupted iterations
-main   [  76% ] 30 VUs  22.7s/30s
-
-running (0m34.9s), 30/30 VUs, 579 complete and 0 interrupted iterations
-main   [  79% ] 30 VUs  23.7s/30s
-
-running (0m35.9s), 30/30 VUs, 600 complete and 0 interrupted iterations
-main   [  82% ] 30 VUs  24.7s/30s
-
-running (0m36.9s), 30/30 VUs, 620 complete and 0 interrupted iterations
-main   [  86% ] 30 VUs  25.7s/30s
-
-running (0m37.9s), 30/30 VUs, 643 complete and 0 interrupted iterations
-main   [  89% ] 30 VUs  26.7s/30s
-
-running (0m38.9s), 30/30 VUs, 663 complete and 0 interrupted iterations
-main   [  92% ] 30 VUs  27.7s/30s
-
-running (0m39.9s), 30/30 VUs, 687 complete and 0 interrupted iterations
-main   [  96% ] 30 VUs  28.7s/30s
-
-running (0m40.9s), 30/30 VUs, 708 complete and 0 interrupted iterations
-main   [  99% ] 30 VUs  29.7s/30s
-
-running (0m41.9s), 13/30 VUs, 737 complete and 0 interrupted iterations
-main ↓ [ 100% ] 30 VUs  30s
-
-[mixed / capture] TPS=17.7  avg=1236.3ms  p95=2333.7ms  p99=3022.6ms  실패율=0.00%
-
-running (0m42.4s), 00/30 VUs, 750 complete and 0 interrupted iterations
+running (0m30.9s), 00/30 VUs, 10580 complete and 0 interrupted iterations
 main ✓ [ 100% ] 30 VUs  30s
