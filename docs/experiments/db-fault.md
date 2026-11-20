@@ -117,5 +117,6 @@ DB 가 멈추면 요청이 풀에서 커넥션을 기다리며 30초씩 매달�
 
 **500 의 원인은 `JpaSystemException`** 으로 확인됐다(`app-errors.log` 6건). 이번에는 장애 직전 구간에도 3건이 있었다 — 연결이 끊기는 순간 커밋/조회가
 `JpaSystemException`(Hibernate 가 연결 오류를 감싼 것)으로 나와 503 매핑을 비껴갔다.
-**아직 고치지 않았다**: `JpaSystemException` 은 연결 오류 외의 영속성 오류도 감싸므로, 원인 체인에 연결 오류(SQLState 08xx, Communications 계열)가 있을 때만 503 으로
-매핑해야 한다. 지금은 500 + 클래스명 로그로만 남는다.
+**수정함**: `ApiExceptionHandler.jpaSystem` — 원인 체인에 연결 오류(SQLState 08xx, Communications/JDBCConnection 계열)가 있을 때만 503 + `Retry-After`,
+그 밖의 `JpaSystemException` 은 500 + 클래스명 로그. 단위 테스트 `ApiExceptionHandlerTest`(연결 오류 → 503, 그 밖 → 500).
+이 수정 후의 실제 컨테이너 재실행(500 이 0건이 되는지)은 이 문서 작성 시점에 하지 않았다 — 필요하면 `db-fault.yml` 을 다시 실행해 `app-errors.log` 와 구간별 응답 코드를 확인한다.

@@ -8,6 +8,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.dao.QueryTimeoutException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.http.HttpStatus;
@@ -65,6 +66,26 @@ public class ApiExceptionHandler {
         log.warn("DB 연결 불가로 요청 거절: {}", e.getClass().getSimpleName());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Retry-After", "2")
                 .body(Map.of("error", "데이터베이스에 일시적으로 연결할 수 없습니다. 잠시 후 다시 시도해 주세요."));
+    }
+
+    /**
+     * JpaSystemException 은 Hibernate 가 연결 오류(커밋·조회 중 연결 끊김)를 감싼 것일 수도, 다른 영속성 오류일 수도 있다.
+     * 원인 체인에 연결 오류(SQLState 08xx, Communications/JDBCConnection 계열)가 있을 때만 503 으로, 아니면 500 으로 둔다
+     * (db-fault 실험에서 MySQL 이 종료되는 순간의 500 이 모두 이 경우였다).
+     */
+    @ExceptionHandler(JpaSystemException.class)
+    public ResponseEntity<Map<String, String>> jpaSystem(JpaSystemException e) {
+        return isConnectionFailure(e) ? databaseUnavailable(e) : unexpected(e);
+    }
+
+    static boolean isConnectionFailure(Throwable t) {
+        for (Throwable c = t; c != null; c = (c.getCause() == c ? null : c.getCause())) {
+            if (c instanceof java.sql.SQLException s && s.getSQLState() != null && s.getSQLState().startsWith("08")) return true;
+            if (c instanceof java.sql.SQLTransientConnectionException || c instanceof java.sql.SQLNonTransientConnectionException) return true;
+            String n = c.getClass().getName();
+            if (n.contains("CommunicationsException") || n.contains("JDBCConnectionException")) return true;
+        }
+        return false;
     }
 
     /** 위에서 처리하지 않은 예외: 500 으로 응답하되 원인 클래스를 로그에 남긴다 (db-fault 실험의 500 원인 추적용) */
