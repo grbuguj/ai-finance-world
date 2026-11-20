@@ -34,7 +34,12 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class SimulationEngine {
 
-    public enum State { RUNNING, PAUSED, STOPPED }
+    /**
+     * SETUP: 월드 미생성, 사용자가 에이전트 수를 고르길 대기 (setup() 호출 전).
+     * RUNNING/PAUSED: 월드가 있고 틱이 돌거나 일시정지됨.
+     * ENDED: 정지(= 종료). 더 이상 틱이 돌지 않으며, 종료 요약만 조회 가능. "새 시뮬레이션"으로만 SETUP 복귀.
+     */
+    public enum State { SETUP, RUNNING, PAUSED, ENDED }
 
     private static final List<String> REASONS = List.of(
             "어제 먹은 삼겹살 값", "지난주 치킨 값", "새벽 라면 끓여줘서", "떡볶이 먹은 거 계산",
@@ -74,6 +79,8 @@ public class SimulationEngine {
 
     private final AtomicLong tickIntervalMs = new AtomicLong(1000);
     private final AtomicLong tickCount = new AtomicLong(0);
+    // 완료된 가상 하루(일마감 대사 통과) 수 — B단계(가상 시간)에서 증가시킨다
+    private final AtomicLong virtualDaysElapsed = new AtomicLong(0);
     private final long paydayIntervalTicks;
     private volatile long lastTickAt = 0;
     private volatile State state;
@@ -83,6 +90,7 @@ public class SimulationEngine {
                             AgentUseCase agentUseCase, SimulationSetupUseCase setupUseCase,
                             FeedSseService feedSseService,
                             @Value("${app.simulation.auto-start:true}") boolean autoStart,
+                            @Value("${app.simulation.bootstrap:false}") boolean bootstrap,
                             @Value("${app.simulation.payday-interval-ticks:10}") long paydayIntervalTicks) {
         this.transferUseCase = transferUseCase;
         this.spendUseCase = spendUseCase;
@@ -92,23 +100,67 @@ public class SimulationEngine {
         this.setupUseCase = setupUseCase;
         this.feedSseService = feedSseService;
         this.paydayIntervalTicks = Math.max(1, paydayIntervalTicks);
-        this.state = autoStart ? State.RUNNING : State.STOPPED;
+        // bootstrap=false (기본, 대시보드) → 월드가 아직 없으므로 SETUP 에서 대기.
+        // bootstrap=true (테스트/부하테스트) → DataInitializer 가 기동 시 이미 월드를 만들었다는 전제로 기존처럼 동작.
+        this.state = !bootstrap ? State.SETUP : (autoStart ? State.RUNNING : State.PAUSED);
     }
 
     public void setTickIntervalMs(long ms) { tickIntervalMs.set(Math.max(1, Math.min(5000, ms))); }
     public long getTickIntervalMs()        { return tickIntervalMs.get(); }
     public State getState()                { return state; }
     public long getTickCount()             { return tickCount.get(); }
+    public long getVirtualDaysElapsed()    { return virtualDaysElapsed.get(); }
 
-    public void start()  { state = State.RUNNING; }
-    public void pause()  { state = State.PAUSED; }
-    public void stop()   { state = State.STOPPED; }
+    /** 설정 화면 → "시작": 고른 에이전트 수로 월드를 만들고 바로 RUNNING 으로 전환 */
+    public synchronized void setup(int agentCount) {
+        if (state != State.SETUP) {
+            throw new IllegalStateException("이미 설정이 끝났습니다 (현재 상태: " + state + ")");
+        }
+        setupUseCase.initialize(agentCount);
+        tickCount.set(0);
+        state = State.RUNNING;
+    }
 
-    /** 정지 → 진행 중인 틱이 끝나길 기다린 뒤(synchronized) 거래/원장 초기화 */
-    public synchronized void reset() {
-        state = State.STOPPED;
+    public synchronized void start() {
+        if (state == State.PAUSED) { state = State.RUNNING; return; }
+        if (state == State.RUNNING) return; // 이미 실행 중 — 멱등
+        throw new IllegalStateException(state == State.SETUP
+                ? "먼저 /simulation/setup 으로 에이전트 수를 정해 주세요"
+                : "종료된 시뮬레이션입니다. 새 시뮬레이션을 시작해 주세요");
+    }
+
+    public synchronized void pause() {
+        if (state == State.RUNNING) state = State.PAUSED;
+        else if (state != State.PAUSED) {
+            throw new IllegalStateException("실행 중일 때만 일시정지할 수 있습니다 (현재 상태: " + state + ")");
+        }
+    }
+
+    /** 정지 = 종료. 더 이상 틱이 돌지 않는다 (상태만 바꾼다 — 데이터는 /simulation/summary 조회를 위해 남긴다) */
+    public synchronized void stop() {
+        if (state == State.RUNNING || state == State.PAUSED) state = State.ENDED;
+        else if (state != State.ENDED) {
+            throw new IllegalStateException("설정 단계에서는 정지할 것이 없습니다");
+        }
+    }
+
+    /** ENDED → "새 시뮬레이션": 거래/원장 초기화 후 SETUP 으로 복귀 (다시 /simulation/setup 호출 가능) */
+    public synchronized void newSimulation() {
+        if (state != State.ENDED) {
+            throw new IllegalStateException("종료(ENDED) 상태에서만 새 시뮬레이션을 시작할 수 있습니다 (현재 상태: " + state + ")");
+        }
         setupUseCase.reset();
         tickCount.set(0);
+        virtualDaysElapsed.set(0);
+        state = State.SETUP;
+    }
+
+    /** 거래/원장 초기화 (에이전트는 유지) — 테스트가 깨끗한 상태에서 직접 틱을 돌리기 위해 상태와 무관하게 호출한다 */
+    public synchronized void reset() {
+        state = State.PAUSED;
+        setupUseCase.reset();
+        tickCount.set(0);
+        virtualDaysElapsed.set(0);
     }
 
     // 5ms 마다 기반 틱 — 실제 간격은 tickIntervalMs 로 조절 (최대 1ms까지 지원)

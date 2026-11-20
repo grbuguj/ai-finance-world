@@ -15,7 +15,6 @@ import com.aifinance.domain.account.Account;
 import com.aifinance.domain.account.AccountType;
 import com.aifinance.domain.agent.Agent;
 import com.aifinance.domain.transfer.TransactionType;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,7 @@ public class SimulationSetupUseCase {
     public static final List<String> MERCHANT_NAMES = List.of("쿠팡", "무신사", "배달의민족", "넷플릭스", "KT 통신");
 
     // name, 초기잔액, chanceSpend, chancePay, chanceInvest, chanceRefund
-    private record Persona(String name, long initial, double spend, double pay, double invest, double refund) {}
+    public record Persona(String name, long initial, double spend, double pay, double invest, double refund) {}
 
     private static final List<Persona> PERSONAS = List.of(
             new Persona("일론머스크", 2_900_000, 0.80, 0.40, 0.10, 0.20),
@@ -62,14 +61,12 @@ public class SimulationSetupUseCase {
     private final OutboxPort outboxPort;
     private final SettlementLedgerPort settlementLedgerPort;
     private final ReconciliationPort reconciliationPort;
-    private final int agentCount;
 
     public SimulationSetupUseCase(AccountPort accountPort, AgentPort agentPort, LedgerPort ledgerPort,
                                   TransferPort transferPort, InvestmentPort investmentPort,
                                   BalanceCachePort balanceCachePort, IdempotencyPort idempotencyPort,
                                   LedgerPostingService postingService, OutboxPort outboxPort,
-                                  SettlementLedgerPort settlementLedgerPort, ReconciliationPort reconciliationPort,
-                                  @Value("${app.simulation.agent-count:10}") int agentCount) {
+                                  SettlementLedgerPort settlementLedgerPort, ReconciliationPort reconciliationPort) {
         this.accountPort = accountPort;
         this.agentPort = agentPort;
         this.ledgerPort = ledgerPort;
@@ -81,19 +78,19 @@ public class SimulationSetupUseCase {
         this.outboxPort = outboxPort;
         this.settlementLedgerPort = settlementLedgerPort;
         this.reconciliationPort = reconciliationPort;
-        this.agentCount = Math.max(1, agentCount);
     }
 
     /**
      * 시스템 계좌 + 에이전트 생성 후 초기 자본금 지급.
-     * 에이전트 수는 app.simulation.agent-count (기본 10). 처음 10명은 고정 페르소나이고,
-     * 그 이후는 번호별 고정 시드의 난수로 확률을 정하므로 같은 설정이면 항상 같은 에이전트가 만들어진다.
+     * 처음 10명은 고정 페르소나이고, 그 이후는 번호별 고정 시드의 난수로 확률을 정하므로
+     * 같은 설정(agentCount)이면 항상 같은 에이전트가 만들어진다 (재현성).
      * 이미 만들어진 세계에서 설정 수가 더 크면 부족한 만큼만 추가한다 (기존 에이전트와 거래는 그대로).
      */
     @Transactional
-    public void initialize() {
+    public void initialize(int agentCount) {
+        int targetCount = Math.max(1, agentCount);
         long existing = agentPort.count();
-        if (existing >= agentCount) {
+        if (existing >= targetCount) {
             return;
         }
         if (existing == 0) {
@@ -104,7 +101,7 @@ public class SimulationSetupUseCase {
             }
         }
         Long capitalId = accountPort.findByType(AccountType.CAPITAL).get(0).getId();
-        for (int i = (int) existing; i < agentCount; i++) {
+        for (int i = (int) existing; i < targetCount; i++) {
             Persona p = personaOf(i);
             Account account = accountPort.save(Account.builder().name(p.name()).accountType(AccountType.AGENT).build());
             Agent agent = agentPort.save(Agent.builder()
@@ -122,7 +119,7 @@ public class SimulationSetupUseCase {
     }
 
     /** i번째(0부터) 에이전트의 페르소나. 앞 10명은 고정, 이후는 번호를 시드로 한 난수. */
-    static Persona personaOf(int i) {
+    public static Persona personaOf(int i) {
         if (i < PERSONAS.size()) {
             return PERSONAS.get(i);
         }
