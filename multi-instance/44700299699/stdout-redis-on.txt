@@ -1,0 +1,118 @@
+scenario1 {"load": {"requests": 4101, "ok": 4101, "other": 0}, "drain_s": 12.9, "delta": {"transfers": 4101, "outbox_published": 4101, "outbox_pending": 0, "outbox_dead": 0, "settlement_records": 4101, "duplicate_deliveries": 0, "order_violations_per_key": 0}, "reconciliation": {"id": 1, "businessDate": "2026-01-01", "windowFrom": "2026-01-01T00:00:00", "windowTo": "2026-01-01T00:00:01", "status": "MATCHED", "bankCount": 4211, "bankAmount": 10033201000.0, "settlementCount": 4211, "settlementAmount": 10033201000.0, "missingCount": 0, "inFlightCount": 0, "unexpectedCount": 0, "mismatchCount": 0, "duplicateDeliveries": 0, "ledgerBalanced": true, "executedAt": "2026-11-20T17:12:03.758976387", "durationMs": 67}}
+scenario2 {"load": {"requests": 9230, "ok": 9230, "other": 0}, "pending_at_end_of_outage": 9230, "oldest_pending_age_ms": 0, "drain_s_after_up": 16.5, "delta": {"transfers": 9230, "outbox_published": 9230, "outbox_pending": 0, "outbox_dead": 0, "settlement_records": 9230, "duplicate_deliveries": 0, "order_violations_per_key": 50}, "reconciliation": {"id": 2, "businessDate": "2026-01-01", "windowFrom": "2026-01-01T00:00:00", "windowTo": "2026-01-01T00:00:01", "status": "MATCHED", "bankCount": 13441, "bankAmount": 10042431000.0, "settlementCount": 13441, "settlementAmount": 10042431000.0, "missingCount": 0, "inFlightCount": 0, "unexpectedCount": 0, "mismatchCount": 0, "duplicateDeliveries": 0, "ledgerBalanced": true, "executedAt": "2026-11-20T17:12:46.757723719", "durationMs": 121}}
+scenario3 {"lock_holder_token_seen": true, "pttl_ms_right_after_kill": "29188", "takeover_s_after_kill": 30.11, "killed_container": "ai-finance-app", "drain_s_after_takeover": 99.5, "reconciliation_after": {"id": 3, "businessDate": "2026-01-01", "windowFrom": "2026-01-01T00:00:00", "windowTo": "2026-01-01T00:00:01", "status": "MATCHED", "bankCount": 45352, "bankAmount": 10074342000.0, "settlementCount": 45352, "settlementAmount": 10074342000.0, "missingCount": 0, "inFlightCount": 0, "unexpectedCount": 0, "mismatchCount": 0, "duplicateDeliveries": 0, "ledgerBalanced": true, "executedAt": "2026-11-20T17:14:56.618068013", "durationMs": 451}, "integrity_balanced": true}
+{
+  "mode": "redis-on",
+  "apps": [
+    "http://localhost:8080",
+    "http://localhost:8081"
+  ],
+  "threads": 20,
+  "load_s": 25.0,
+  "engine_states": [
+    "ENDED",
+    "PAUSED"
+  ],
+  "scenario1_split_load": {
+    "load": {
+      "requests": 4101,
+      "ok": 4101,
+      "other": 0
+    },
+    "drain_s": 12.9,
+    "delta": {
+      "transfers": 4101,
+      "outbox_published": 4101,
+      "outbox_pending": 0,
+      "outbox_dead": 0,
+      "settlement_records": 4101,
+      "duplicate_deliveries": 0,
+      "order_violations_per_key": 0
+    },
+    "reconciliation": {
+      "id": 1,
+      "businessDate": "2026-01-01",
+      "windowFrom": "2026-01-01T00:00:00",
+      "windowTo": "2026-01-01T00:00:01",
+      "status": "MATCHED",
+      "bankCount": 4211,
+      "bankAmount": 10033201000.0,
+      "settlementCount": 4211,
+      "settlementAmount": 10033201000.0,
+      "missingCount": 0,
+      "inFlightCount": 0,
+      "unexpectedCount": 0,
+      "mismatchCount": 0,
+      "duplicateDeliveries": 0,
+      "ledgerBalanced": true,
+      "executedAt": "2026-11-20T17:12:03.758976387",
+      "durationMs": 67
+    }
+  },
+  "scenario2_broker_outage": {
+    "load": {
+      "requests": 9230,
+      "ok": 9230,
+      "other": 0
+    },
+    "pending_at_end_of_outage": 9230,
+    "oldest_pending_age_ms": 0,
+    "drain_s_after_up": 16.5,
+    "delta": {
+      "transfers": 9230,
+      "outbox_published": 9230,
+      "outbox_pending": 0,
+      "outbox_dead": 0,
+      "settlement_records": 9230,
+      "duplicate_deliveries": 0,
+      "order_violations_per_key": 50
+    },
+    "reconciliation": {
+      "id": 2,
+      "businessDate": "2026-01-01",
+      "windowFrom": "2026-01-01T00:00:00",
+      "windowTo": "2026-01-01T00:00:01",
+      "status": "MATCHED",
+      "bankCount": 13441,
+      "bankAmount": 10042431000.0,
+      "settlementCount": 13441,
+      "settlementAmount": 10042431000.0,
+      "missingCount": 0,
+      "inFlightCount": 0,
+      "unexpectedCount": 0,
+      "mismatchCount": 0,
+      "duplicateDeliveries": 0,
+      "ledgerBalanced": true,
+      "executedAt": "2026-11-20T17:12:46.757723719",
+      "durationMs": 121
+    }
+  },
+  "scenario3_relay_holder_killed": {
+    "lock_holder_token_seen": true,
+    "pttl_ms_right_after_kill": "29188",
+    "takeover_s_after_kill": 30.11,
+    "killed_container": "ai-finance-app",
+    "drain_s_after_takeover": 99.5,
+    "reconciliation_after": {
+      "id": 3,
+      "businessDate": "2026-01-01",
+      "windowFrom": "2026-01-01T00:00:00",
+      "windowTo": "2026-01-01T00:00:01",
+      "status": "MATCHED",
+      "bankCount": 45352,
+      "bankAmount": 10074342000.0,
+      "settlementCount": 45352,
+      "settlementAmount": 10074342000.0,
+      "missingCount": 0,
+      "inFlightCount": 0,
+      "unexpectedCount": 0,
+      "mismatchCount": 0,
+      "duplicateDeliveries": 0,
+      "ledgerBalanced": true,
+      "executedAt": "2026-11-20T17:14:56.618068013",
+      "durationMs": 451
+    },
+    "integrity_balanced": true
+  },
+  "integrity_balanced_final": true
+}

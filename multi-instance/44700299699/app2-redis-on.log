@@ -1,0 +1,200 @@
+ai-finance-app2  | 	sasl.login.refresh.buffer.seconds = 300
+ai-finance-app2  | 	sasl.login.refresh.min.period.seconds = 60
+ai-finance-app2  | 	sasl.login.refresh.window.factor = 0.8
+ai-finance-app2  | 	sasl.login.refresh.window.jitter = 0.05
+ai-finance-app2  | 	sasl.login.retry.backoff.max.ms = 10000
+ai-finance-app2  | 	sasl.login.retry.backoff.ms = 100
+ai-finance-app2  | 	sasl.mechanism = GSSAPI
+ai-finance-app2  | 	sasl.oauthbearer.assertion.algorithm = RS256
+ai-finance-app2  | 	sasl.oauthbearer.assertion.claim.aud = null
+ai-finance-app2  | 	sasl.oauthbearer.assertion.claim.exp.seconds = 300
+ai-finance-app2  | 	sasl.oauthbearer.assertion.claim.iss = null
+ai-finance-app2  | 	sasl.oauthbearer.assertion.claim.jti.include = false
+ai-finance-app2  | 	sasl.oauthbearer.assertion.claim.nbf.seconds = 60
+ai-finance-app2  | 	sasl.oauthbearer.assertion.claim.sub = null
+ai-finance-app2  | 	sasl.oauthbearer.assertion.file = null
+ai-finance-app2  | 	sasl.oauthbearer.assertion.private.key.file = null
+ai-finance-app2  | 	sasl.oauthbearer.assertion.private.key.passphrase = null
+ai-finance-app2  | 	sasl.oauthbearer.assertion.template.file = null
+ai-finance-app2  | 	sasl.oauthbearer.client.credentials.client.id = null
+ai-finance-app2  | 	sasl.oauthbearer.client.credentials.client.secret = null
+ai-finance-app2  | 	sasl.oauthbearer.clock.skew.seconds = 30
+ai-finance-app2  | 	sasl.oauthbearer.expected.audience = null
+ai-finance-app2  | 	sasl.oauthbearer.expected.issuer = null
+ai-finance-app2  | 	sasl.oauthbearer.header.urlencode = false
+ai-finance-app2  | 	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+ai-finance-app2  | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+ai-finance-app2  | 	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+ai-finance-app2  | 	sasl.oauthbearer.jwks.endpoint.url = null
+ai-finance-app2  | 	sasl.oauthbearer.jwt.retriever.class = class org.apache.kafka.common.security.oauthbearer.DefaultJwtRetriever
+ai-finance-app2  | 	sasl.oauthbearer.jwt.validator.class = class org.apache.kafka.common.security.oauthbearer.DefaultJwtValidator
+ai-finance-app2  | 	sasl.oauthbearer.scope = null
+ai-finance-app2  | 	sasl.oauthbearer.scope.claim.name = scope
+ai-finance-app2  | 	sasl.oauthbearer.sub.claim.name = sub
+ai-finance-app2  | 	sasl.oauthbearer.token.endpoint.url = null
+ai-finance-app2  | 	security.protocol = PLAINTEXT
+ai-finance-app2  | 	security.providers = null
+ai-finance-app2  | 	send.buffer.bytes = 131072
+ai-finance-app2  | 	socket.connection.setup.timeout.max.ms = 30000
+ai-finance-app2  | 	socket.connection.setup.timeout.ms = 10000
+ai-finance-app2  | 	ssl.cipher.suites = null
+ai-finance-app2  | 	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+ai-finance-app2  | 	ssl.endpoint.identification.algorithm = https
+ai-finance-app2  | 	ssl.engine.factory.class = null
+ai-finance-app2  | 	ssl.key.password = null
+ai-finance-app2  | 	ssl.keymanager.algorithm = SunX509
+ai-finance-app2  | 	ssl.keystore.certificate.chain = null
+ai-finance-app2  | 	ssl.keystore.key = null
+ai-finance-app2  | 	ssl.keystore.location = null
+ai-finance-app2  | 	ssl.keystore.password = null
+ai-finance-app2  | 	ssl.keystore.type = JKS
+ai-finance-app2  | 	ssl.protocol = TLSv1.3
+ai-finance-app2  | 	ssl.provider = null
+ai-finance-app2  | 	ssl.secure.random.implementation = null
+ai-finance-app2  | 	ssl.trustmanager.algorithm = PKIX
+ai-finance-app2  | 	ssl.truststore.certificates = null
+ai-finance-app2  | 	ssl.truststore.location = null
+ai-finance-app2  | 	ssl.truststore.password = null
+ai-finance-app2  | 	ssl.truststore.type = JKS
+ai-finance-app2  | 	transaction.timeout.ms = 60000
+ai-finance-app2  | 	transaction.two.phase.commit.enable = false
+ai-finance-app2  | 	transactional.id = null
+ai-finance-app2  | 	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+ai-finance-app2  | 
+ai-finance-app2  | 2026-11-20T17:11:25.870+09:00  INFO 1 --- [   scheduling-1] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+ai-finance-app2  | 2026-11-20T17:11:25.984+09:00  INFO 1 --- [   scheduling-1] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=producer-1] Instantiated an idempotent producer.
+ai-finance-app2  | 2026-11-20T17:11:26.108+09:00  INFO 1 --- [   scheduling-1] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 4.1.2
+ai-finance-app2  | 2026-11-20T17:11:26.108+09:00  INFO 1 --- [   scheduling-1] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: c82fd9b934b4c1e6
+ai-finance-app2  | 2026-11-20T17:11:26.108+09:00  INFO 1 --- [   scheduling-1] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1795162286108
+ai-finance-app2  | 2026-11-20T17:11:26.166+09:00  INFO 1 --- [ad | producer-1] org.apache.kafka.clients.Metadata        : [Producer clientId=producer-1] Cluster ID: 5L6g3nShT-eMCtK--X86sw
+ai-finance-app2  | 2026-11-20T17:11:26.217+09:00  INFO 1 --- [ad | producer-1] o.a.k.c.p.internals.TransactionManager   : [Producer clientId=producer-1] ProducerId set to 1 with epoch 0
+ai-finance-app2  | 2026-11-20T17:12:04.427+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 4243d7b3-dfac-456c-8f95-a6f52c722d17, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:04.606+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event f6939548-bf05-4757-9fa9-7e665ef7cdba, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:04.743+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event ef526786-40fc-4c27-9596-0a200c327f42, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:04.899+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event b0b2208e-4411-4844-93e8-2dd8c1bd5809, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:05.064+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 4243d7b3-dfac-456c-8f95-a6f52c722d17, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:05.329+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event f6939548-bf05-4757-9fa9-7e665ef7cdba, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:05.575+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event ef526786-40fc-4c27-9596-0a200c327f42, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:05.737+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event b0b2208e-4411-4844-93e8-2dd8c1bd5809, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:05.976+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event bd3eb83f-1d85-4f71-85c2-6a63e22e5827, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:06.211+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 4243d7b3-dfac-456c-8f95-a6f52c722d17, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:06.371+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c38a35b6-9914-40d9-b945-05c661da15e1, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:06.748+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event d7bc5f57-509c-4748-8346-ad44c4dd8fc7, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:07.028+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event e8ee4729-1ed9-4382-b1df-e553cef7f815, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:07.212+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 45b1949b-fb2c-4e25-9f6f-d915193e7d40, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:07.371+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c38a35b6-9914-40d9-b945-05c661da15e1, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:07.525+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 624b2c6d-583e-4503-9da4-4120301236a4, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:07.773+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c6fefe13-bc16-49e4-bb2f-a39195b9a929, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:07.907+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 8d87a53b-d274-4529-b4be-7a2665f60667, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:08.188+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 797e1a76-c941-400e-8aa0-b5b07e2d4073, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:08.458+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event e1e75096-1542-4ceb-a1a7-28bb107965d4, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:08.730+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 45b1949b-fb2c-4e25-9f6f-d915193e7d40, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:08.930+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event bd3eb83f-1d85-4f71-85c2-6a63e22e5827, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:09.208+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event e8ee4729-1ed9-4382-b1df-e553cef7f815, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:09.382+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c38a35b6-9914-40d9-b945-05c661da15e1, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:09.637+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 624b2c6d-583e-4503-9da4-4120301236a4, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:09.945+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c6fefe13-bc16-49e4-bb2f-a39195b9a929, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:10.227+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 8d87a53b-d274-4529-b4be-7a2665f60667, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:10.432+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 91ef791e-76d5-4444-9efa-95bc3842b500, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:10.703+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 624b2c6d-583e-4503-9da4-4120301236a4, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:10.843+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event ad311535-3bf6-46db-abe7-7627bd31888e, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:11.313+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c6fefe13-bc16-49e4-bb2f-a39195b9a929, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:11.589+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 397f92e0-2a50-45d2-9201-9f37af1eb9f5, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:11.739+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 8d87a53b-d274-4529-b4be-7a2665f60667, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:11.986+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event d386890a-9ee9-4eb0-8577-6c59792860ff, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:12.144+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event dca79b5c-e659-43ff-85fb-7663adb6eb68, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:12.341+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 44f78d1b-e18f-4289-9fc4-b39dbb563146, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:12.552+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event e1e75096-1542-4ceb-a1a7-28bb107965d4, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:12.808+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 624b2c6d-583e-4503-9da4-4120301236a4, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:13.098+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event ad311535-3bf6-46db-abe7-7627bd31888e, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:13.236+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event e8ee4729-1ed9-4382-b1df-e553cef7f815, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:13.472+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c6fefe13-bc16-49e4-bb2f-a39195b9a929, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:13.754+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 3b58e873-0dfe-4d90-b5a5-67ee42269819, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:13.906+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event d40ff689-3ad5-47a5-ba0e-fbdd1ebf5ccb, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:14.084+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event d386890a-9ee9-4eb0-8577-6c59792860ff, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:14.358+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c362ee43-e562-4f29-86ae-2f1b3dd42664, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:14.534+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 2c1b0ef9-5c75-4e1e-9d3a-61ad1bf36664, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:14.686+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event a9982587-5e35-41cc-9d51-11ca281488fe, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:14.886+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 45b1949b-fb2c-4e25-9f6f-d915193e7d40, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:15.032+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event dca79b5c-e659-43ff-85fb-7663adb6eb68, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:15.184+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event bd3eb83f-1d85-4f71-85c2-6a63e22e5827, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:15.407+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 2c1b0ef9-5c75-4e1e-9d3a-61ad1bf36664, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:15.657+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 397f92e0-2a50-45d2-9201-9f37af1eb9f5, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:15.932+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 3c5d5ef9-22a7-4d50-b784-70aee0104ed4, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:16.183+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c362ee43-e562-4f29-86ae-2f1b3dd42664, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:16.428+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 2c1b0ef9-5c75-4e1e-9d3a-61ad1bf36664, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:16.596+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 23e97164-54b2-464a-a260-f3beffa727a4, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:16.760+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 1776339f-08af-483d-91c4-8f292a282163, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:16.908+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 3b99b929-e97c-4e5f-ad1b-36947d60c024, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:17.063+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event dca79b5c-e659-43ff-85fb-7663adb6eb68, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:17.214+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 625717db-3566-465a-b548-c1634ab93cef, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:17.494+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 44f78d1b-e18f-4289-9fc4-b39dbb563146, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:17.671+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event a9982587-5e35-41cc-9d51-11ca281488fe, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:17.830+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 3b58e873-0dfe-4d90-b5a5-67ee42269819, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:18.108+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 3b99b929-e97c-4e5f-ad1b-36947d60c024, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:18.368+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c362ee43-e562-4f29-86ae-2f1b3dd42664, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:18.744+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 2c1b0ef9-5c75-4e1e-9d3a-61ad1bf36664, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:19.198+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 3c5d5ef9-22a7-4d50-b784-70aee0104ed4, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:19.478+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 3b99b929-e97c-4e5f-ad1b-36947d60c024, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:19.704+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event a9982587-5e35-41cc-9d51-11ca281488fe, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:19.951+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 91ef791e-76d5-4444-9efa-95bc3842b500, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:20.193+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event d40ff689-3ad5-47a5-ba0e-fbdd1ebf5ccb, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:20.457+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 4243d7b3-dfac-456c-8f95-a6f52c722d17, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:20.711+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event e1e75096-1542-4ceb-a1a7-28bb107965d4, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:20.985+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 625717db-3566-465a-b548-c1634ab93cef, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:21.155+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event dca79b5c-e659-43ff-85fb-7663adb6eb68, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:21.397+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event ef526786-40fc-4c27-9596-0a200c327f42, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:21.776+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event b0b2208e-4411-4844-93e8-2dd8c1bd5809, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:22.014+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 1776339f-08af-483d-91c4-8f292a282163, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:22.155+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 63051c0e-dd38-40c0-b58b-7e51a9138d95, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:22.372+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c67e19d1-4790-427a-a007-858fc569649d, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:22.507+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 7674fc86-e845-4a07-b6c3-c7deb8c1a0dd, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:22.645+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 3de0c122-a6fb-418f-b6e3-6c759ce6639b, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:23.026+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 45b1949b-fb2c-4e25-9f6f-d915193e7d40, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:23.266+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event bd3eb83f-1d85-4f71-85c2-6a63e22e5827, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:23.516+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event b3303705-309f-44ec-be05-1cf272920a30, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:23.654+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c38a35b6-9914-40d9-b945-05c661da15e1, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:23.789+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event a9982587-5e35-41cc-9d51-11ca281488fe, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:24.010+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 5cf5e6c6-d2a5-4efe-838d-292a71fb155a, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:24.261+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 63051c0e-dd38-40c0-b58b-7e51a9138d95, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:24.517+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 59d4a6a4-5bd2-4eb1-b549-9164d3e1ee46, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:24.786+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 7674fc86-e845-4a07-b6c3-c7deb8c1a0dd, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:24.945+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c6fc3a6f-738c-49b8-871c-60bd8b8053ec, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:25.084+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 5cf5e6c6-d2a5-4efe-838d-292a71fb155a, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:25.217+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event ad311535-3bf6-46db-abe7-7627bd31888e, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:25.474+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event f67ec28a-4e76-4309-bbf5-0d1b18d87e4b, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:25.771+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event c6fefe13-bc16-49e4-bb2f-a39195b9a929, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:26.044+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 8d87a53b-d274-4529-b4be-7a2665f60667, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:26.224+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 3b99b929-e97c-4e5f-ad1b-36947d60c024, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:26.469+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 59d4a6a4-5bd2-4eb1-b549-9164d3e1ee46, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:26.632+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 1e264f61-b6c1-4798-bedc-06de2baf5c7b, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:26.919+09:00  WARN 1 --- [   scheduling-3] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event b3303705-309f-44ec-be05-1cf272920a30, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:27.120+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event ca230f0f-989a-437f-9c2f-ebc3dd451678, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:27.397+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event d5151d5f-fc66-40e4-9cdf-b5fbf524b3c9, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:27.673+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event f67ec28a-4e76-4309-bbf5-0d1b18d87e4b, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:27.935+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 144adb4f-25f0-4d04-89fe-175efb074810, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:28.190+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event f7bb88ea-2e42-49a9-a790-5c8b38b50e30, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:28.478+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 63051c0e-dd38-40c0-b58b-7e51a9138d95, 시도 5회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:28.745+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 59d4a6a4-5bd2-4eb1-b549-9164d3e1ee46, 시도 4회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:29.004+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 1e264f61-b6c1-4798-bedc-06de2baf5c7b, 시도 3회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:29.249+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event dca79b5c-e659-43ff-85fb-7663adb6eb68, 시도 6회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:29.395+09:00  WARN 1 --- [   scheduling-4] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event f7bb88ea-2e42-49a9-a790-5c8b38b50e30, 시도 2회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:29.504+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 63a55e76-2012-46dc-b5ad-72b81f821b88, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:29.612+09:00  WARN 1 --- [   scheduling-2] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 07241cc4-ac06-49bf-ac3c-f1fb99dd82b7, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:12:29.729+09:00  WARN 1 --- [   scheduling-1] c.a.a.service.OutboxRelayService         : Outbox 발행 실패, 재시도 예약 (event 24ddd9f6-23d9-4650-92a8-84fa5d9510c8, 시도 1회): 브로커 연결 실패 (장애 주입)
+ai-finance-app2  | 2026-11-20T17:13:33.826+09:00  INFO 1 --- [rnal-settlement] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Request joining group due to: group is already rebalancing
+ai-finance-app2  | 2026-11-20T17:13:36.838+09:00  INFO 1 --- [rnal-settlement] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Request joining group due to: group is already rebalancing
+ai-finance-app2  | 2026-11-20T17:13:39.858+09:00  INFO 1 --- [rnal-settlement] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Request joining group due to: group is already rebalancing
+ai-finance-app2  | 2026-11-20T17:13:40.319+09:00  INFO 1 --- [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Revoke previously assigned partitions [ai-finance.transactions-0, ai-finance.transactions-1]
+ai-finance-app2  | 2026-11-20T17:13:40.322+09:00  INFO 1 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : external-settlement: partitions revoked: [ai-finance.transactions-0, ai-finance.transactions-1]
+ai-finance-app2  | 2026-11-20T17:13:40.323+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] (Re-)joining group
+ai-finance-app2  | 2026-11-20T17:13:40.329+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Successfully joined group with generation Generation{generationId=3, memberId='consumer-external-settlement-1-1aecd8a8-503f-453e-a0b3-7f76d8357ebd', protocol='range'}
+ai-finance-app2  | 2026-11-20T17:13:40.354+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Finished assignment for group at generation 3: {consumer-external-settlement-1-1aecd8a8-503f-453e-a0b3-7f76d8357ebd=Assignment(partitions=[ai-finance.transactions-0, ai-finance.transactions-1, ai-finance.transactions-2])}
+ai-finance-app2  | 2026-11-20T17:13:40.358+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Successfully synced group in generation Generation{generationId=3, memberId='consumer-external-settlement-1-1aecd8a8-503f-453e-a0b3-7f76d8357ebd', protocol='range'}
+ai-finance-app2  | 2026-11-20T17:13:40.358+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Notifying assignor about the new Assignment(partitions=[ai-finance.transactions-0, ai-finance.transactions-1, ai-finance.transactions-2])
+ai-finance-app2  | 2026-11-20T17:13:40.358+09:00  INFO 1 --- [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Adding newly assigned partitions: [ai-finance.transactions-0, ai-finance.transactions-1, ai-finance.transactions-2]
+ai-finance-app2  | 2026-11-20T17:13:40.361+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition ai-finance.transactions-1 to the committed offset FetchPosition{offset=4749, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[kafka:29092 (id: 1 rack: null isFenced: false)], epoch=0}}
+ai-finance-app2  | 2026-11-20T17:13:40.361+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition ai-finance.transactions-0 to the committed offset FetchPosition{offset=6342, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[kafka:29092 (id: 1 rack: null isFenced: false)], epoch=0}}
+ai-finance-app2  | 2026-11-20T17:13:40.361+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition ai-finance.transactions-2 to the committed offset FetchPosition{offset=3482, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[kafka:29092 (id: 1 rack: null isFenced: false)], epoch=0}}
+ai-finance-app2  | 2026-11-20T17:13:40.362+09:00  INFO 1 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : external-settlement: partitions assigned: [ai-finance.transactions-0, ai-finance.transactions-1, ai-finance.transactions-2]
+ai-finance-app2  | 2026-11-20T17:14:57.077+09:00  INFO 1 --- [io-8080-exec-17] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 MATCHED — 은행 45352건 / 정산 45352건, 누락 0 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true

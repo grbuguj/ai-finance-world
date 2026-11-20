@@ -1,0 +1,89 @@
+{
+  "mode": "redis-off",
+  "apps": [
+    "http://localhost:8080",
+    "http://localhost:8081"
+  ],
+  "threads": 20,
+  "load_s": 25.0,
+  "engine_states": [
+    "ENDED",
+    "PAUSED"
+  ],
+  "scenario1_split_load": {
+    "load": {
+      "requests": 3697,
+      "ok": 3697,
+      "other": 0
+    },
+    "drain_s": 18.9,
+    "delta": {
+      "transfers": 3697,
+      "outbox_published": 3697,
+      "outbox_pending": 0,
+      "outbox_dead": 0,
+      "settlement_records": 3697,
+      "duplicate_deliveries": 2939,
+      "order_violations_per_key": 0
+    },
+    "reconciliation": {
+      "id": 1,
+      "businessDate": "2026-01-01",
+      "windowFrom": "2026-01-01T00:00:00",
+      "windowTo": "2026-01-01T00:00:01",
+      "status": "MATCHED",
+      "bankCount": 3807,
+      "bankAmount": 10032797000.0,
+      "settlementCount": 3807,
+      "settlementAmount": 10032797000.0,
+      "missingCount": 0,
+      "inFlightCount": 0,
+      "unexpectedCount": 0,
+      "mismatchCount": 0,
+      "duplicateDeliveries": 3039,
+      "ledgerBalanced": true,
+      "executedAt": "2026-11-20T17:16:24.538168883",
+      "durationMs": 56
+    }
+  },
+  "scenario2_broker_outage": {
+    "load": {
+      "requests": 8614,
+      "ok": 8614,
+      "other": 0
+    },
+    "pending_at_end_of_outage": 8614,
+    "oldest_pending_age_ms": 0,
+    "drain_s_after_up": 34.6,
+    "delta": {
+      "transfers": 8614,
+      "outbox_published": 8614,
+      "outbox_pending": 0,
+      "outbox_dead": 0,
+      "settlement_records": 8614,
+      "duplicate_deliveries": 7992,
+      "order_violations_per_key": 41
+    },
+    "reconciliation": {
+      "id": 2,
+      "businessDate": "2026-01-01",
+      "windowFrom": "2026-01-01T00:00:00",
+      "windowTo": "2026-01-01T00:00:01",
+      "status": "MATCHED",
+      "bankCount": 12421,
+      "bankAmount": 10041411000.0,
+      "settlementCount": 12421,
+      "settlementAmount": 10041411000.0,
+      "missingCount": 0,
+      "inFlightCount": 0,
+      "unexpectedCount": 0,
+      "mismatchCount": 0,
+      "duplicateDeliveries": 11031,
+      "ledgerBalanced": true,
+      "executedAt": "2026-11-20T17:17:25.539954307",
+      "durationMs": 111
+    }
+  },
+  "scenario3_relay_holder_killed": "생략: Redis 락이 꺼진 변형(redis-off)에서는 인계할 락 자체가 없다",
+  "integrity_balanced_final": true
+}
