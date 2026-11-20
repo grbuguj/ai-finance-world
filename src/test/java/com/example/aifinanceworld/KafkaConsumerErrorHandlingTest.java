@@ -13,7 +13,7 @@ class KafkaConsumerErrorHandlingTest {
 
     @Test
     void 백오프는_무제한이고_간격은_5초를_넘지_않는다() throws Exception {
-        Class<?> cfg = Class.forName("com.aifinance.adapter.out.messaging.SettlementConsumerErrorConfig");
+        Class<?> cfg = Class.forName("com.aifinance.adapter.out.messaging.KafkaTopicConfig");
         Method m = cfg.getDeclaredMethod("settlementBackOff");
         m.setAccessible(true);
         BackOffExecution exec = ((BackOff) m.invoke(null)).start();

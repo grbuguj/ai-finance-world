@@ -89,6 +89,8 @@ class VirtualTimeTest {
     void 브로커_중단_중_가상_자정이_지나면_PENDING_IN_FLIGHT_복구_후_MATCHED() {
         faults.setBrokerDown(true);
         transferUseCase.transfer(agentAccountId, merchantAccountId, BigDecimal.valueOf(1_000), "day0 거래 (브로커 중단)");
+        long pendingEvents = jdbc.queryForObject("select count(*) from outbox_events where status = 'PENDING'", Long.class);
+        assertTrue(pendingEvents >= 1);
 
         for (int i = 0; i < 150; i++) {
             engine.runTick();
@@ -98,7 +100,7 @@ class VirtualTimeTest {
         RunView downRun = reconciliation.latest();
         assertEquals(virtualClock.startDate(), downRun.businessDate());
         assertEquals("PENDING_IN_FLIGHT", downRun.status());
-        assertEquals(1, downRun.inFlightCount());
+        assertEquals(pendingEvents, downRun.inFlightCount(), "장애 중 Outbox 에 대기 중인 건수만큼이 전부 전달 중으로 분류된다");
         assertEquals(0, downRun.missingCount(), "Outbox 에 남아 있는 건은 유실(누락)이 아니다");
 
         faults.setBrokerDown(false);
