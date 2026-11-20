@@ -687,7 +687,7 @@ function buildGraph(agents){
     graph.appendChild(g);
   });
 
-  const cap = el("text",{x:147,y:535,"text-anchor":"middle"}); cap.setAttribute("class","caption"); cap.textContent="에이전트 10명"; graph.appendChild(cap);
+  const cap = el("text",{x:147,y:535,"text-anchor":"middle"}); cap.setAttribute("class","caption"); cap.textContent = agents.length > 10 ? "에이전트 "+agents.length+"명 (상위 10명 표시)" : "에이전트 "+agents.length+"명"; graph.appendChild(cap);
   built = true;
 }
 

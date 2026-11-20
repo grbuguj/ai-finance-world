@@ -15,11 +15,13 @@ import com.aifinance.domain.account.Account;
 import com.aifinance.domain.account.AccountType;
 import com.aifinance.domain.agent.Agent;
 import com.aifinance.domain.transfer.TransactionType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 시뮬레이션 세계 생성 / 초기화.
@@ -60,12 +62,14 @@ public class SimulationSetupUseCase {
     private final OutboxPort outboxPort;
     private final SettlementLedgerPort settlementLedgerPort;
     private final ReconciliationPort reconciliationPort;
+    private final int agentCount;
 
     public SimulationSetupUseCase(AccountPort accountPort, AgentPort agentPort, LedgerPort ledgerPort,
                                   TransferPort transferPort, InvestmentPort investmentPort,
                                   BalanceCachePort balanceCachePort, IdempotencyPort idempotencyPort,
                                   LedgerPostingService postingService, OutboxPort outboxPort,
-                                  SettlementLedgerPort settlementLedgerPort, ReconciliationPort reconciliationPort) {
+                                  SettlementLedgerPort settlementLedgerPort, ReconciliationPort reconciliationPort,
+                                  @Value("${app.simulation.agent-count:10}") int agentCount) {
         this.accountPort = accountPort;
         this.agentPort = agentPort;
         this.ledgerPort = ledgerPort;
@@ -77,22 +81,33 @@ public class SimulationSetupUseCase {
         this.outboxPort = outboxPort;
         this.settlementLedgerPort = settlementLedgerPort;
         this.reconciliationPort = reconciliationPort;
+        this.agentCount = Math.max(1, agentCount);
     }
 
-    /** 최초 1회: 시스템 계좌 + 에이전트 10명 생성 후 초기 자본금 지급 */
+    /**
+     * 시스템 계좌 + 에이전트 생성 후 초기 자본금 지급.
+     * 에이전트 수는 app.simulation.agent-count (기본 10). 처음 10명은 고정 페르소나이고,
+     * 그 이후는 번호별 고정 시드의 난수로 확률을 정하므로 같은 설정이면 항상 같은 에이전트가 만들어진다.
+     * 이미 만들어진 세계에서 설정 수가 더 크면 부족한 만큼만 추가한다 (기존 에이전트와 거래는 그대로).
+     */
     @Transactional
     public void initialize() {
-        if (agentPort.count() > 0) {
+        long existing = agentPort.count();
+        if (existing >= agentCount) {
             return;
         }
-        accountPort.save(Account.builder().name(CAPITAL_NAME).accountType(AccountType.CAPITAL).build());
-        accountPort.save(Account.builder().name(MARKET_NAME).accountType(AccountType.MARKET).build());
-        for (String merchant : MERCHANT_NAMES) {
-            accountPort.save(Account.builder().name(merchant).accountType(AccountType.MERCHANT).build());
+        if (existing == 0) {
+            accountPort.save(Account.builder().name(CAPITAL_NAME).accountType(AccountType.CAPITAL).build());
+            accountPort.save(Account.builder().name(MARKET_NAME).accountType(AccountType.MARKET).build());
+            for (String merchant : MERCHANT_NAMES) {
+                accountPort.save(Account.builder().name(merchant).accountType(AccountType.MERCHANT).build());
+            }
         }
-        for (Persona p : PERSONAS) {
+        Long capitalId = accountPort.findByType(AccountType.CAPITAL).get(0).getId();
+        for (int i = (int) existing; i < agentCount; i++) {
+            Persona p = personaOf(i);
             Account account = accountPort.save(Account.builder().name(p.name()).accountType(AccountType.AGENT).build());
-            agentPort.save(Agent.builder()
+            Agent agent = agentPort.save(Agent.builder()
                     .name(p.name())
                     .salary(p.initial())
                     .account(account)
@@ -101,8 +116,27 @@ public class SimulationSetupUseCase {
                     .chanceInvest(p.invest())
                     .chanceRefund(p.refund())
                     .build());
+            postingService.post(capitalId, agent.getAccount().getId(),
+                    BigDecimal.valueOf(agent.getSalary()), TransactionType.OPENING, "초기 자본금", null);
         }
-        fundOpeningBalances();
+    }
+
+    /** i번째(0부터) 에이전트의 페르소나. 앞 10명은 고정, 이후는 번호를 시드로 한 난수. */
+    static Persona personaOf(int i) {
+        if (i < PERSONAS.size()) {
+            return PERSONAS.get(i);
+        }
+        Random r = new Random(1_000_003L * (i + 1));
+        long initial = 1_000_000 + 100_000L * r.nextInt(36);       // 100만 ~ 460만원
+        return new Persona(String.format("에이전트-%03d", i + 1), initial,
+                round(0.30 + 0.65 * r.nextDouble()),   // 소비 0.30~0.95
+                round(0.20 + 0.60 * r.nextDouble()),   // 송금 0.20~0.80
+                round(0.50 * r.nextDouble()),          // 투자 0.00~0.50
+                round(0.05 + 0.25 * r.nextDouble()));  // 환불 0.05~0.30
+    }
+
+    private static double round(double v) {
+        return Math.round(v * 100) / 100.0;
     }
 
     /** 초기화: 거래/원장/투자/이벤트/정산/대사 삭제 → 모든 잔액 0 → 개설 거래로 초기 잔액 재지급 */
