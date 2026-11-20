@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 
@@ -39,6 +40,7 @@ class VirtualTimeTest {
     @Autowired OutboxRelayService relay;
     @Autowired ReconciliationUseCase reconciliation;
     @Autowired FaultInjectionPort faults;
+    @Autowired JdbcTemplate jdbc;
 
     Long agentAccountId;
     Long merchantAccountId;
@@ -51,6 +53,7 @@ class VirtualTimeTest {
 
         faults.setBrokerDown(false);
         faults.loseNextAcks(0);
+        relay.drain(100); // 월드 생성 시의 초기 자본금(OPENING) 이벤트는 장애 주입 전에 비워 둔다
 
         agentAccountId = agentUseCase.findAll().get(0).getAccount().getId();
         merchantAccountId = accountPort.findByType(AccountType.MERCHANT).get(0).getId();
@@ -98,6 +101,7 @@ class VirtualTimeTest {
         assertEquals(0, downRun.missingCount(), "Outbox 에 남아 있는 건은 유실(누락)이 아니다");
 
         faults.setBrokerDown(false);
+        jdbc.update("update outbox_events set next_attempt_at = created_at where status = 'PENDING'"); // 백오프 대기 해제
         relay.drain(100);
         RunView recovered = reconciliation.reconcileDay(virtualClock.startDate());
         assertEquals("MATCHED", recovered.status());

@@ -139,6 +139,28 @@ public class SimulationSetupUseCase {
     /** 초기화: 거래/원장/투자/이벤트/정산/대사 삭제 → 모든 잔액 0 → 개설 거래로 초기 잔액 재지급 */
     @Transactional
     public void reset() {
+        clearTransactions();
+        for (Account account : accountPort.findAll()) {
+            account.resetBalance();
+            accountPort.save(account);
+        }
+        balanceCachePort.evictAll();
+        fundOpeningBalances();
+    }
+
+    /**
+     * "새 시뮬레이션": 거래/원장뿐 아니라 에이전트와 모든 계좌까지 삭제한다.
+     * 그래야 다음 initialize(N) 이 N 을 그대로 지켜 새 월드를 만든다 (reset() 은 에이전트를 남긴다).
+     */
+    @Transactional
+    public void resetAll() {
+        clearTransactions();
+        agentPort.deleteAll();   // FK 순서: agent → account
+        accountPort.deleteAll();
+        balanceCachePort.evictAll();
+    }
+
+    private void clearTransactions() {
         reconciliationPort.deleteAll();
         outboxPort.deleteAll();
         settlementLedgerPort.deleteAll(); // 외부 정산 장부도 같은 세계의 일부이므로 함께 초기화
@@ -146,12 +168,6 @@ public class SimulationSetupUseCase {
         idempotencyPort.deleteAll(); // 원거래가 삭제되므로 키도 함께 정리
         ledgerPort.deleteAll();   // FK 순서: ledger → transfer
         transferPort.deleteAll();
-        for (Account account : accountPort.findAll()) {
-            account.resetBalance();
-            accountPort.save(account);
-        }
-        balanceCachePort.evictAll();
-        fundOpeningBalances();
     }
 
     /**

@@ -58,19 +58,20 @@ class SimulationStateTest {
         // 틱이 돌지 않는다 (SimulationController 와 동일하게 state != RUNNING 이면 스케줄 틱은 무시 — runTick 직접 호출은 테스트 전용 경로이므로 상태만 확인)
         assertEquals(State.ENDED, engine.getState());
 
-        // 새 시뮬레이션 → SETUP 복귀, 에이전트는 유지(초기화는 잔액/거래만), tick/virtualDays 리셋
+        // 새 시뮬레이션 → SETUP 복귀, 에이전트까지 모두 삭제, tick/virtualDays 리셋
         engine.newSimulation();
         assertEquals(State.SETUP, engine.getState());
         assertEquals(0, engine.getTickCount());
         assertEquals(0, engine.getVirtualDaysElapsed());
+        assertEquals(0, agentPort.count());
 
         // ENDED 가 아니면 새 시뮬레이션 거부
         assertThrows(IllegalStateException.class, engine::newSimulation);
 
-        // 다시 setup 가능 (기존 에이전트 7명 유지 + 부족분 추가로 10명)
-        engine.setup(10);
+        // 다시 setup 가능 — 이번에는 더 적은 수(3명)도 그대로 지켜진다
+        engine.setup(3);
         assertEquals(State.RUNNING, engine.getState());
-        assertEquals(10, agentPort.count());
+        assertEquals(3, agentPort.count());
         assertTrue(true);
     }
 }

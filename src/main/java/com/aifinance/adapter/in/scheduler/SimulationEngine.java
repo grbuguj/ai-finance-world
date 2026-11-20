@@ -170,12 +170,12 @@ public class SimulationEngine {
         }
     }
 
-    /** ENDED → "새 시뮬레이션": 거래/원장 초기화 후 SETUP 으로 복귀 (다시 /simulation/setup 호출 가능) */
+    /** ENDED → "새 시뮬레이션": 거래/원장/에이전트까지 모두 지우고 SETUP 으로 복귀 (다시 /simulation/setup 호출 가능) */
     public synchronized void newSimulation() {
         if (state != State.ENDED) {
             throw new IllegalStateException("종료(ENDED) 상태에서만 새 시뮬레이션을 시작할 수 있습니다 (현재 상태: " + state + ")");
         }
-        setupUseCase.reset();
+        setupUseCase.resetAll();
         virtualClock.reset();
         virtualDaysElapsed.set(0);
         lastEodBusinessDate = null;

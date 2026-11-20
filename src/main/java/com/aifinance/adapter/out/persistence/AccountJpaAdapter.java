@@ -44,4 +44,9 @@ public class AccountJpaAdapter implements AccountPort {
         return accountRepository.findByAccountTypeOrderByIdAsc(type);
     }
 
+    @Override
+    public void deleteAll() {
+        accountRepository.deleteAllInBatch();
+    }
+
 }
