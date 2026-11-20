@@ -71,6 +71,8 @@
   input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;background:var(--fg);transform:rotate(45deg);cursor:pointer;box-shadow:0 0 16px rgba(255,255,255,.6)}
   .chips{display:flex;gap:8px;margin-top:14px}
   .chips button{padding:5px 12px;letter-spacing:.06em}
+  #seed-in{flex:1;background:transparent;border:1px solid var(--line);color:var(--fg);font:300 14px var(--mono);padding:8px 12px;outline:none}
+  #seed-in:focus{border-color:var(--fg)} #seed-in::placeholder{color:var(--dim)}
   .info{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2)}
   .info div{background:rgba(0,0,0,.6);padding:10px 12px}
   .info b{display:block;font:300 18px var(--mono);margin-top:4px}
@@ -162,6 +164,7 @@
         <input type="range" id="agent-r" min="2" max="200" value="10"/>
       </div>
       <div class="chips" id="agent-chips"><button data-n="10">10</button><button data-n="30">30</button><button data-n="50">50</button><button data-n="100">100</button><button data-n="200">200</button></div>
+      <div class="setup-row" style="margin-top:14px"><span class="lb" style="min-width:60px">시드</span><input type="text" id="seed-in" inputmode="numeric" placeholder="선택 · 비워 두면 무작위 (같은 시드 = 같은 거래열)" autocomplete="off"/></div>
       <div class="info">
         <div><span class="lb">가상 시간</span><b id="inf-mpt">10분 / 틱</b></div>
         <div><span class="lb">가상 하루</span><b id="inf-day">144 틱</b></div>
@@ -220,6 +223,7 @@
   <div class="endwrap">
     <div class="lb">Simulation ended</div>
     <h1>종료 요약</h1>
+    <div class="lb mono" id="e-seed" style="margin-top:10px;text-transform:none;letter-spacing:.06em"></div>
     <div class="grid">
       <div class="panel"><div class="lb">총 거래 수</div><div class="v" id="e-total">—</div></div>
       <div class="panel"><div class="lb">가상 경과 일수</div><div class="v" id="e-days">—</div></div>
@@ -238,7 +242,10 @@
         <div class="meta" id="e-rtext" style="font-size:12px;color:var(--mute);margin-top:8px;line-height:1.7;font-family:var(--mono)">—</div>
       </div>
     </div>
-    <button class="solid launch" id="btn-new" style="margin-top:18px">새 시뮬레이션</button>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="solid launch" id="btn-new" style="margin-top:0;flex:1">새 시뮬레이션</button>
+      <button class="launch" id="btn-again" style="margin-top:0;flex:1">같은 시드로 다시</button>
+    </div>
   </div>
 </section>
 <div id="tip"></div>
@@ -466,8 +473,10 @@ speedBind('speed-seg'); speedBind('speed-seg-setup');
 $('btn-launch').onclick = async () => {
   const n = +nIn.value; const err = $('setup-err'); err.textContent = '';
   if(!Number.isInteger(n) || n < 2 || n > 200){ err.textContent = '에이전트 수는 2 ~ 200 사이 정수로 입력하세요'; return; }
+  const sv = $('seed-in').value.trim();
+  if(sv !== '' && !/^-?\d{1,18}$/.test(sv)){ err.textContent = '시드는 정수로 입력하세요 (비우면 무작위)'; return; }
   $('btn-launch').disabled = true;
-  const r = await fetch('/simulation/setup?agentCount=' + n, {method:'POST'}); const d = await r.json().catch(() => ({}));
+  const r = await fetch('/simulation/setup?agentCount=' + n + (sv !== '' ? '&seed=' + sv : ''), {method:'POST'}); const d = await r.json().catch(() => ({}));
   $('btn-launch').disabled = false;
   if(!r.ok){ err.textContent = d.error || '시작하지 못했습니다'; return; }
   resetWorld(); lastTotal = null; ob = null; poll();
@@ -477,6 +486,12 @@ $('btn-launch').onclick = async () => {
 $('btn-pause').onclick = async () => { const run = status.state === 'RUNNING'; await fetch('/simulation/' + (run ? 'pause' : 'start'), {method:'POST'}); poll(); };
 $('btn-stop').onclick = async () => { if(!confirm('종료하면 다시 이어서 실행할 수 없고, 요약 화면으로 이동합니다. 종료할까요?')) return; await fetch('/simulation/stop', {method:'POST'}); poll(); };
 $('btn-new').onclick = async () => { await fetch('/simulation/reset', {method:'POST'}); $('feed').innerHTML = ''; poll(); };
+let lastRun = null;
+$('btn-again').onclick = async () => {
+  if(!lastRun || lastRun.seed == null) return;
+  await fetch('/simulation/reset', {method:'POST'}); $('feed').innerHTML = ''; resetWorld();
+  await fetch('/simulation/setup?agentCount=' + lastRun.n + '&seed=' + lastRun.seed, {method:'POST'}); lastTotal = null; poll();
+};
 
 /* ── 폴링 / 렌더 ──────────────────────────────── */
 let lastTotal = null, lastT = 0, tpsEma = 0; const tpsHist = [];
@@ -597,6 +612,9 @@ fetch('/feed').then(r => r.json()).then(items => { items.slice().reverse().forEa
 async function loadSummary(){
   try{
     const [s, st] = await Promise.all([getJson('/simulation/summary'), getJson('/stats')]);
+    lastRun = {n: st.agentCount, seed: s.seed};
+    $('e-seed').textContent = s.seed != null ? '시드 ' + s.seed + ' · 에이전트 ' + st.agentCount + '명 — 같은 시드와 같은 수로 다시 돌리면 거래열이 같습니다' : '시드 없음 (무작위 실행)';
+    $('btn-again').disabled = s.seed == null;
     countTo($('e-total'), s.totalTransfers, fmt); $('e-days').textContent = s.virtualDaysElapsed + ' 일'; $('e-agents').textContent = fmt(st.agentCount || 0);
     $('e-bal').textContent = s.integrityBalanced ? '정상' : '불일치'; $('e-bal').style.color = s.integrityBalanced ? 'var(--gr)' : 'var(--red)';
     const set = (id, ok) => $(id).className = 'ck ' + (ok ? 'ok' : 'bad');

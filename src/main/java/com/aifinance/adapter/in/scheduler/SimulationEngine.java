@@ -26,7 +26,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
+import java.util.SplittableRandom;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.random.RandomGenerator;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -99,6 +101,9 @@ public class SimulationEngine {
     private volatile State state;
     // 자동 일마감이 이미 처리한 마지막 영업일 — 같은 날 중복 실행 방지
     private volatile LocalDate lastEodBusinessDate = null;
+    private final Long configuredSeed;
+    // null 이면 완전 무작위(ThreadLocalRandom). 값이 있으면 틱마다 (seed, tick) 으로 만든 생성기를 써서 같은 입력 → 같은 거래열
+    private volatile Long seed;
 
     public SimulationEngine(TransferUseCase transferUseCase, SpendUseCase spendUseCase,
                             InvestUseCase investUseCase, RefundUseCase refundUseCase,
@@ -107,7 +112,8 @@ public class SimulationEngine {
                             EndOfDayService endOfDayService,
                             @Value("${app.simulation.auto-start:true}") boolean autoStart,
                             @Value("${app.simulation.bootstrap:false}") boolean bootstrap,
-                            @Value("${app.simulation.payday-interval-ticks:10}") long paydayIntervalTicks) {
+                            @Value("${app.simulation.payday-interval-ticks:10}") long paydayIntervalTicks,
+                            @Value("${app.simulation.seed:}") String seedConfig) {
         this.transferUseCase = transferUseCase;
         this.spendUseCase = spendUseCase;
         this.investUseCase = investUseCase;
@@ -118,6 +124,8 @@ public class SimulationEngine {
         this.virtualClock = virtualClock;
         this.endOfDayService = endOfDayService;
         this.paydayIntervalTicks = Math.max(1, paydayIntervalTicks);
+        this.configuredSeed = (seedConfig == null || seedConfig.isBlank()) ? null : Long.valueOf(seedConfig.trim());
+        this.seed = this.configuredSeed;
         // bootstrap=false (기본, 대시보드) → 월드가 아직 없으므로 SETUP 에서 대기.
         // bootstrap=true (테스트/부하테스트) → DataInitializer 가 기동 시 이미 월드를 만들었다는 전제로 기존처럼 동작.
         this.state = !bootstrap ? State.SETUP : (autoStart ? State.RUNNING : State.PAUSED);
@@ -128,6 +136,9 @@ public class SimulationEngine {
     public State getState()                { return state; }
     public long getTickCount()             { return virtualClock.currentTick(); }
     public long getVirtualDaysElapsed()    { return virtualDaysElapsed.get(); }
+    public Long getSeed()                  { return seed; }
+    /** 시드를 바꾼다 (null = 무작위). 다음 틱부터 적용 — 같은 시드로 reset 후 다시 돌리면 같은 거래열이 나온다 */
+    public void setSeed(Long seed)         { this.seed = seed; }
     public LocalDateTime getVirtualNow()   { return virtualClock.now(); }
     public long getMinutesPerTick()        { return virtualClock.minutesPerTick(); }
     public LocalDateTime getVirtualStart() { return virtualClock.at(0); }
@@ -138,9 +149,15 @@ public class SimulationEngine {
 
     /** 설정 화면 → "시작": 고른 에이전트 수로 월드를 만들고 바로 RUNNING 으로 전환 */
     public synchronized void setup(int agentCount) {
+        setup(agentCount, null);
+    }
+
+    /** seed 가 null 이면 무작위 시드를 하나 뽑아 기록한다 — 무작위로 돌려도 종료 후 같은 시드로 다시 재현할 수 있다 */
+    public synchronized void setup(int agentCount, Long seed) {
         if (state != State.SETUP) {
             throw new IllegalStateException("이미 설정이 끝났습니다 (현재 상태: " + state + ")");
         }
+        this.seed = seed != null ? seed : ThreadLocalRandom.current().nextLong(1, 1_000_000_000L);
         setupUseCase.initialize(agentCount);
         virtualClock.reset();
         lastEodBusinessDate = null;
@@ -176,6 +193,7 @@ public class SimulationEngine {
             throw new IllegalStateException("종료(ENDED) 상태에서만 새 시뮬레이션을 시작할 수 있습니다 (현재 상태: " + state + ")");
         }
         setupUseCase.resetAll();
+        seed = configuredSeed;
         virtualClock.reset();
         virtualDaysElapsed.set(0);
         lastEodBusinessDate = null;
@@ -205,10 +223,10 @@ public class SimulationEngine {
     public synchronized void runTick() {
         long tick = virtualClock.advance();
         maybeRunVirtualEod();
-        List<Agent> agents = agentUseCase.findAll();
+        List<Agent> agents = agentUseCase.findAll(); // id 오름차순 고정
         if (agents.size() < 2) return;
         List<Account> merchants = spendUseCase.merchants();
-        ThreadLocalRandom rnd = ThreadLocalRandom.current();
+        RandomGenerator rnd = randomFor(tick);
 
         for (Agent agent : agents) {
             if (rnd.nextDouble() < agent.getChanceSpend() && !merchants.isEmpty()) {
@@ -226,7 +244,7 @@ public class SimulationEngine {
         }
 
         // 만기 도래 투자 정산
-        investUseCase.settleMatured(tick).forEach(this::publish);
+        investUseCase.settleMatured(tick, rnd).forEach(this::publish);
 
         // 월급날
         if (tick % paydayIntervalTicks == 0) {
@@ -258,7 +276,14 @@ public class SimulationEngine {
         }
     }
 
-    private void doSpend(Agent agent, List<Account> merchants, ThreadLocalRandom rnd) {
+    /** 시드가 있으면 (시드, 틱 번호)로 만든 생성기 — 한 틱의 모든 난수(행동·상대·금액·사유·만기·수익률)가 이 생성기 하나에서 고정된 순서로 나온다 */
+    private RandomGenerator randomFor(long tick) {
+        Long s = seed;
+        if (s == null) return ThreadLocalRandom.current();
+        return new SplittableRandom(s * 0x9E3779B97F4A7C15L + tick);
+    }
+
+    private void doSpend(Agent agent, List<Account> merchants, RandomGenerator rnd) {
         Account merchant = merchants.get(rnd.nextInt(merchants.size()));
         // 잔액의 1~3%, 100원 단위, 최소 1,000원
         BigDecimal amount = ratioOf(currentBalance(agent), 0.01 + rnd.nextDouble() * 0.02, -2);
@@ -273,7 +298,7 @@ public class SimulationEngine {
         
     }
 
-    private void doTransfer(Agent agent, List<Agent> agents, ThreadLocalRandom rnd) {
+    private void doTransfer(Agent agent, List<Agent> agents, RandomGenerator rnd) {
         List<Agent> others = agents.stream().filter(a -> !a.getId().equals(agent.getId())).toList();
         Agent target = others.get(rnd.nextInt(others.size()));
         // 잔액의 3~20%, 만원 단위
@@ -286,7 +311,7 @@ public class SimulationEngine {
         }
     }
 
-    private void doInvest(Agent agent, long tick, ThreadLocalRandom rnd) {
+    private void doInvest(Agent agent, long tick, RandomGenerator rnd) {
         // 잔액의 5~15%, 만원 단위, 만기 5~15틱
         BigDecimal amount = ratioOf(currentBalance(agent), 0.05 + rnd.nextDouble() * 0.10, -4);
         if (amount.signum() <= 0) return;

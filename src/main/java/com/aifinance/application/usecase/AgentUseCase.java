@@ -40,15 +40,18 @@ public class AgentUseCase {
         this.salaryRate = BigDecimal.valueOf(salaryRate);
     }
 
+    /** id 오름차순으로 고정 — 시드 재현(같은 순서로 순회)과 화면 순서를 위해 DB 반환 순서에 기대지 않는다 */
     public List<Agent> findAll() {
-        return agentPort.findAll();
+        List<Agent> agents = new ArrayList<>(agentPort.findAll());
+        agents.sort(java.util.Comparator.comparing(Agent::getId));
+        return agents;
     }
 
     /** 모든 에이전트에게 급여(초기 잔액 × salaryRate) 지급 */
     public List<Transfer> paySalary() {
         Long capitalId = capitalAccount().getId();
         List<Transfer> paid = new ArrayList<>();
-        for (Agent agent : agentPort.findAll()) {
+        for (Agent agent : findAll()) {
             BigDecimal amount = BigDecimal.valueOf(agent.getSalary()).multiply(salaryRate).setScale(0, RoundingMode.DOWN);
             if (amount.signum() <= 0) continue;
             Long agentAccountId = agent.getAccount().getId();

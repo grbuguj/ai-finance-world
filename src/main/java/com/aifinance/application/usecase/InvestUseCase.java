@@ -17,6 +17,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.random.RandomGenerator;
 
 /**
  * 투자: 에이전트 → 투자시장 납입 후, 만기 틱에 수익률 r ~ N(μ, σ²) 로 정산.
@@ -89,10 +90,15 @@ public class InvestUseCase {
 
     /** 만기 도래한 투자를 모두 정산. 수익률은 정규분포에서 샘플링. */
     public List<Transfer> settleMatured(long currentTick) {
+        return settleMatured(currentTick, ThreadLocalRandom.current());
+    }
+
+    /** 시드 재현용: 호출자가 준 난수 생성기로 수익률을 뽑는다 (만기 투자는 id 오름차순이라 순서가 고정된다) */
+    public List<Transfer> settleMatured(long currentTick, RandomGenerator rnd) {
         List<Transfer> settled = new ArrayList<>();
         for (Investment investment : investmentPort.findMatured(currentTick)) {
             try {
-                Transfer t = settle(investment.getId(), sampleReturnRate());
+                Transfer t = settle(investment.getId(), sampleReturnRate(rnd));
                 if (t != null) settled.add(t);
             } catch (RuntimeException e) {
                 // 동시에 다른 곳에서 정산된 경우 등 - 건너뜀
@@ -103,7 +109,11 @@ public class InvestUseCase {
 
     /** r ~ N(μ, σ²) */
     public BigDecimal sampleReturnRate() {
-        double r = meanReturn + stdDevReturn * ThreadLocalRandom.current().nextGaussian();
+        return sampleReturnRate(ThreadLocalRandom.current());
+    }
+
+    public BigDecimal sampleReturnRate(RandomGenerator rnd) {
+        double r = meanReturn + stdDevReturn * rnd.nextGaussian();
         return BigDecimal.valueOf(Math.max(-1.0, r)).setScale(6, RoundingMode.HALF_UP);
     }
 

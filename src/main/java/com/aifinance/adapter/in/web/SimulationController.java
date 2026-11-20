@@ -36,24 +36,30 @@ public class SimulationController {
 
     @GetMapping("/status")
     public Map<String, Object> status() {
-        return Map.of(
-                "state", simulationEngine.getState().name(),
-                "tickIntervalMs", simulationEngine.getTickIntervalMs(),
-                "tick", simulationEngine.getTickCount(),
-                "virtualNow", simulationEngine.getVirtualNow().toString(),
-                "virtualDay", simulationEngine.getVirtualDay(),
-                "virtualDaysElapsed", simulationEngine.getVirtualDaysElapsed(),
-                "minutesPerTick", simulationEngine.getMinutesPerTick(),
-                "virtualStart", simulationEngine.getVirtualStart().toString()
-        );
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("state", simulationEngine.getState().name());
+        m.put("tickIntervalMs", simulationEngine.getTickIntervalMs());
+        m.put("tick", simulationEngine.getTickCount());
+        m.put("virtualNow", simulationEngine.getVirtualNow().toString());
+        m.put("virtualDay", simulationEngine.getVirtualDay());
+        m.put("virtualDaysElapsed", simulationEngine.getVirtualDaysElapsed());
+        m.put("minutesPerTick", simulationEngine.getMinutesPerTick());
+        m.put("virtualStart", simulationEngine.getVirtualStart().toString());
+        m.put("seed", simulationEngine.getSeed());
+        return m;
     }
 
     /** 설정 화면 → "시작" — 에이전트 수를 골라 월드를 만들고 RUNNING 으로 전환 (SETUP 상태에서만 가능) */
     @PostMapping("/setup")
-    public ResponseEntity<Map<String, Object>> setup(@RequestParam(defaultValue = "10") int agentCount) {
+    public ResponseEntity<Map<String, Object>> setup(@RequestParam(defaultValue = "10") int agentCount,
+                                                     @RequestParam(required = false) Long seed) {
         return guarded(() -> {
-            simulationEngine.setup(agentCount);
-            return Map.of("state", simulationEngine.getState().name(), "agentCount", agentCount);
+            simulationEngine.setup(agentCount, seed);
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("state", simulationEngine.getState().name());
+            m.put("agentCount", agentCount);
+            m.put("seed", simulationEngine.getSeed());
+            return m;
         });
     }
 
@@ -124,6 +130,7 @@ public class SimulationController {
         result.put("sumOfAllBalances", integrity.sumOfAllBalances());
         result.put("lastReconciliation", lastReconciliation);
         result.put("virtualDaysElapsed", simulationEngine.getVirtualDaysElapsed());
+        result.put("seed", simulationEngine.getSeed());
         return result;
     }
 
