@@ -1,0 +1,65 @@
+name: Multi-instance (app x2)
+
+# ① 앱 2대 동시 실행 실험. push 마다 돌지 않는다 (수동 실행 + 이 실험 파일을 고쳤을 때만).
+# 두 변형을 차례로 돌린다: redis-on(릴레이 분산 락 있음), redis-off(락이 no-op — 2대가 동시에 발행할 수 있음).
+# 결과는 experiment-results 브랜치에 커밋된다: git fetch origin experiment-results
+on:
+  workflow_dispatch:
+  push:
+    branches: [feature/realism-hardening]
+    paths: [".github/workflows/multi-instance.yml", "tools/experiments/multi_instance.py", "tools/experiments/publish_results.sh", "docker-compose.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  multi-instance:
+    name: Two app instances
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      APP_PROFILES: infra,loadtest
+      APP_SIMULATION_AUTO_START: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run variant (redis-on)
+        env:
+          MODE: redis-on
+          OUT: results/multi-instance
+          APP_REDIS_ENABLED: "true"
+        run: |
+          mkdir -p results/multi-instance
+          docker compose --profile app up -d --build
+          for i in $(seq 1 90); do curl -fs localhost:8080/actuator/health | grep -q '"UP"' && break; sleep 2; done
+          # 두 번째 앱은 첫 번째 앱이 스키마를 만든 뒤에 기동 (ddl-auto=none)
+          docker compose --profile app --profile app2 up -d --no-deps app2
+          for i in $(seq 1 90); do curl -fs localhost:8081/actuator/health | grep -q '"UP"' && break; sleep 2; done
+          python3 tools/experiments/multi_instance.py 2>&1 | tee results/multi-instance/stdout-redis-on.txt
+          docker compose logs --no-color app 2>&1 | tail -200 > results/multi-instance/app1-redis-on.log || true
+          docker compose logs --no-color app2 2>&1 | tail -200 > results/multi-instance/app2-redis-on.log || true
+          docker compose --profile app --profile app2 down -v
+
+      - name: Run variant (redis-off)
+        if: always()
+        env:
+          MODE: redis-off
+          OUT: results/multi-instance
+          APP_REDIS_ENABLED: "false"
+        run: |
+          mkdir -p results/multi-instance
+          docker compose --profile app up -d --build
+          for i in $(seq 1 90); do curl -fs localhost:8080/actuator/health | grep -q '"UP"' && break; sleep 2; done
+          docker compose --profile app --profile app2 up -d --no-deps app2
+          for i in $(seq 1 90); do curl -fs localhost:8081/actuator/health | grep -q '"UP"' && break; sleep 2; done
+          python3 tools/experiments/multi_instance.py 2>&1 | tee results/multi-instance/stdout-redis-off.txt
+          docker compose logs --no-color app 2>&1 | tail -200 > results/multi-instance/app1-redis-off.log || true
+          docker compose logs --no-color app2 2>&1 | tail -200 > results/multi-instance/app2-redis-off.log || true
+
+      - name: Publish results to experiment-results branch
+        if: always()
+        run: bash tools/experiments/publish_results.sh results/multi-instance multi-instance
+
+      - name: Stop stack
+        if: always()
+        run: docker compose --profile app --profile app2 down -v
