@@ -3,1159 +3,621 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AI Finance World — 실시간 시뮬레이션</title>
+<title>AI Finance World</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  *{box-sizing:border-box;margin:0;padding:0}
   :root{
-    --bg:#0e1016; --panel:#191c26; --panel2:#21252f; --border:#2b3040;
-    --text:#e9ebf2; --muted:#888fa3; --blue:#4f8ef7; --purple:#8b5cf6;
-    --green:#22c55e; --red:#ef4444; --amber:#f59e0b; --bank:#2563eb;
+    --bg:#000; --fg:#f4f6f8; --mute:#8a919b; --dim:#555c66; --line:rgba(255,255,255,.14); --line2:rgba(255,255,255,.07);
+    --cy:#35e0ff; --am:#ffb347; --vi:#a98bff; --gr:#5dffb0; --pk:#ff7fb0; --red:#ff3b4e;
+    --sans:"Inter","Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    --mono:"JetBrains Mono","SF Mono",ui-monospace,Consolas,monospace;
   }
-  body{
-    background:
-      radial-gradient(900px 600px at 18% -5%, rgba(79,142,247,0.13), transparent 60%),
-      radial-gradient(800px 600px at 92% 8%, rgba(139,92,246,0.12), transparent 55%),
-      radial-gradient(700px 500px at 50% 110%, rgba(34,197,94,0.07), transparent 60%),
-      var(--bg);
-    background-attachment:fixed;
-    color:var(--text);
-    font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
-    padding:22px; min-height:100vh;
-  }
-  .wrap{ max-width:1320px; margin:0 auto; }
+  html,body{height:100%;background:var(--bg);color:var(--fg);font-family:var(--sans);overflow:hidden;font-weight:300}
+  canvas#cv{position:fixed;inset:0;width:100%;height:100%;display:block}
+  #vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.75) 100%);transition:box-shadow .6s}
+  body.alert #vignette{box-shadow:inset 0 0 160px 20px rgba(255,59,78,.35)}
+  .lb{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);font-weight:400}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  button{font:inherit;color:var(--fg);background:transparent;border:1px solid var(--line);padding:8px 16px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .15s;font-weight:400}
+  button:hover{border-color:var(--fg);background:rgba(255,255,255,.06)}
+  button:active{transform:scale(.98)}
+  button:disabled{opacity:.35;cursor:not-allowed}
+  button.solid{background:var(--fg);color:#000;border-color:var(--fg);font-weight:500}
+  button.solid:hover{background:#fff;box-shadow:0 0 24px rgba(255,255,255,.35)}
+  button.danger{border-color:rgba(255,59,78,.6);color:var(--red)}
+  button.danger:hover{background:rgba(255,59,78,.12);border-color:var(--red)}
+  button.good{border-color:rgba(93,255,176,.5);color:var(--gr)}
+  button.good:hover{background:rgba(93,255,176,.1);border-color:var(--gr)}
 
-  /* header */
-  .topbar{ display:flex; align-items:center; gap:16px; margin-bottom:18px; }
-  .topbar h1{ font-size:20px; font-weight:800; letter-spacing:-0.5px; }
-  .topbar .sub{ color:var(--muted); font-size:13px; }
-  .live{ display:inline-flex; align-items:center; gap:7px; background:#1c2333;
-    border:1px solid var(--border); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:700; }
-  .dot{ width:8px; height:8px; border-radius:50%; background:var(--green); animation:blink 1.1s infinite; }
-  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
-  .clock{ margin-left:auto; color:var(--muted); font-size:13px; font-variant-numeric:tabular-nums; }
+  header#top{position:fixed;left:0;right:0;top:0;height:64px;display:flex;align-items:center;gap:28px;padding:0 28px;z-index:5}
+  .brand{font-size:13px;letter-spacing:.34em;text-transform:uppercase;font-weight:500;white-space:nowrap}
+  .brand i{display:inline-block;width:9px;height:9px;background:var(--fg);margin-right:12px;transform:rotate(45deg)}
+  #clock{display:none;align-items:baseline;gap:14px;margin-left:auto}
+  body[data-view="run"] #clock{display:flex}
+  #clock-day{font-size:12px;letter-spacing:.3em;color:var(--mute)}
+  #clock-time{font-size:34px;font-weight:200;letter-spacing:.04em;font-family:var(--mono)}
+  #clock-date{font-size:12px;color:var(--dim);font-family:var(--mono)}
+  #ctl{display:none;gap:8px;align-items:center}
+  body[data-view="run"] #ctl{display:flex}
+  .badge{font-size:11px;letter-spacing:.2em;padding:5px 12px;border:1px solid var(--line);text-transform:uppercase;display:inline-flex;align-items:center;gap:8px}
+  .badge i{width:7px;height:7px;border-radius:50%;background:var(--gr);box-shadow:0 0 10px var(--gr);animation:pulse 1.4s infinite}
+  .badge.PAUSED i{background:var(--am);box-shadow:0 0 10px var(--am);animation:none}
+  .badge.ENDED i,.badge.SETUP i{background:var(--mute);box-shadow:none;animation:none}
+  @keyframes pulse{50%{opacity:.3}}
+  .seg{display:flex}
+  .seg button{padding:7px 12px;margin-left:-1px;letter-spacing:.08em;text-transform:none}
+  .seg button.on{background:var(--fg);color:#000;border-color:var(--fg)}
 
-  /* stats */
-  .stats{ display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:16px; }
-  .stat{
-    background:linear-gradient(160deg, rgba(36,40,54,0.85), rgba(20,23,32,0.85));
-    border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:16px 18px;
-    position:relative; overflow:hidden;
-    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-    box-shadow:0 8px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
-  }
-  .stat::before{ content:""; position:absolute; inset:0 0 auto 0; height:2px;
-    background:linear-gradient(90deg, transparent, rgba(79,142,247,0.7), transparent); opacity:0.6; }
-  .stat .label{ color:var(--muted); font-size:12.5px; margin-bottom:8px; }
-  .stat .value{ font-size:24px; font-weight:800; letter-spacing:-0.5px; font-variant-numeric:tabular-nums; transition:color .3s; }
-  .stat .value.amber{ color:var(--amber); } .stat .value.green{ color:var(--green); }
-  .stat .value.blue{ color:var(--blue); }
-  .stat .substat{ font-size:11px; color:var(--muted); margin-top:6px; min-height:14px; font-variant-numeric:tabular-nums; }
-  .stat.tps .value{ color:var(--blue); text-shadow:0 0 18px rgba(79,142,247,0.55); }
-  /* hero - 총 통화량 강조 */
-  .stat.hero{ background:linear-gradient(160deg, rgba(30,58,138,0.55), rgba(20,23,32,0.9)); }
-  .stat.hero::before{ background:linear-gradient(90deg, transparent, rgba(120,180,255,0.95), transparent); opacity:1; }
-  .stat.hero .value{ font-size:27px; color:#bcd4ff; text-shadow:0 0 22px rgba(79,142,247,0.5); }
-  .stat.ok{ border-color:rgba(34,197,94,0.35); }
-  .stat.ok .value{ color:var(--green); text-shadow:0 0 16px rgba(34,197,94,0.45); }
-  .stat.bad{ border-color:rgba(239,68,68,0.45); }
-  .stat.bad .value{ color:var(--red); text-shadow:0 0 16px rgba(239,68,68,0.5); }
-  .bump{ animation:bump .35s ease; }
-  @keyframes bump{ 0%{ transform:scale(1); } 40%{ transform:scale(1.12); } 100%{ transform:scale(1); } }
+  .panel{background:rgba(3,5,8,.66);border:1px solid var(--line);padding:14px 16px;position:relative;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .panel::before,.panel::after{content:"";position:absolute;width:10px;height:10px;pointer-events:none}
+  .panel::before{left:-1px;top:-1px;border-left:2px solid var(--fg);border-top:2px solid var(--fg)}
+  .panel::after{right:-1px;bottom:-1px;border-right:2px solid var(--fg);border-bottom:2px solid var(--fg)}
 
-  /* main grid — 그래프 메인으로 크게 */
-  .main{ display:grid; grid-template-columns:2fr 1fr; gap:16px; }
-  .panel{
-    background:linear-gradient(160deg, rgba(30,34,46,0.8), rgba(18,21,29,0.8));
-    border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:16px;
-    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-    box-shadow:0 10px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-  }
-  .panel h2{ font-size:14px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px;}
-  .tag{ font-size:10px; font-weight:800; background:#2a3550; color:#9cc0ff; padding:3px 8px; border-radius:6px; }
+  .view{position:fixed;inset:64px 0 0 0;z-index:3;display:none;pointer-events:none}
+  body[data-view="setup"] #view-setup,body[data-view="run"] #view-run,body[data-view="end"] #view-end{display:block}
+  .view .panel,.view button,.view input{pointer-events:auto}
 
-  svg{ width:100%; height:auto; display:block; }
-  .node-label{ font-size:12px; font-weight:700; fill:var(--text); }
-  .node-bal{ font-size:10.5px; fill:#cbd0e0; transition:all .5s ease; }
-  .ext-label{ font-size:11.5px; font-weight:700; fill:#e9ebf2; }
-  .ext-sub{ font-size:9.5px; fill:#cbd0e0; }
-  .caption{ font-size:11px; fill:var(--muted); }
-  .agent-node circle{ transition:r .55s ease, transform .15s; transform-origin:center; transform-box:fill-box;
-    filter:drop-shadow(0 0 5px rgba(139,92,246,0.5)); }
-  .pulse-flash circle{ animation:flash .8s ease; }
-  @keyframes flash{ 0%{ filter:drop-shadow(0 0 0 var(--blue)); } 30%{ filter:drop-shadow(0 0 16px var(--blue)); } 100%{ filter:drop-shadow(0 0 5px rgba(139,92,246,0.5)); } }
+  /* setup */
+  #view-setup{display:none;align-items:center;justify-content:center}
+  body[data-view="setup"] #view-setup{display:flex}
+  .hero{text-align:center;max-width:640px;padding:0 24px}
+  .hero h1{font-size:54px;font-weight:200;letter-spacing:.26em;text-transform:uppercase;line-height:1.15}
+  .hero p.sub{margin-top:16px;color:var(--mute);font-size:14px;letter-spacing:.06em}
+  .setup-card{margin-top:34px;text-align:left}
+  .setup-row{display:flex;align-items:center;gap:18px;margin-top:12px}
+  .setup-row input[type=number]{width:120px;background:transparent;border:1px solid var(--line);color:var(--fg);font:300 36px var(--mono);padding:6px 12px;text-align:center;outline:none}
+  .setup-row input[type=number]:focus{border-color:var(--fg)}
+  input[type=range]{flex:1;appearance:none;height:1px;background:var(--line);outline:none}
+  input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;background:var(--fg);transform:rotate(45deg);cursor:pointer;box-shadow:0 0 16px rgba(255,255,255,.6)}
+  .chips{display:flex;gap:8px;margin-top:14px}
+  .chips button{padding:5px 12px;letter-spacing:.06em}
+  .info{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2)}
+  .info div{background:rgba(0,0,0,.6);padding:10px 12px}
+  .info b{display:block;font:300 18px var(--mono);margin-top:4px}
+  #setup-err{color:var(--red);font-size:12px;margin-top:10px;min-height:16px}
+  .launch{margin-top:20px;width:100%;padding:16px;font-size:13px;letter-spacing:.34em}
 
-  /* 흐르는 연결선 - 항상 살아있는 느낌 */
-  .flow{ stroke-dasharray:5 9; animation:flow 0.9s linear infinite; }
-  @keyframes flow{ to{ stroke-dashoffset:-14; } }
-  /* 은행 펄스 링 */
-  .bank-ring{ animation:ring 2.6s ease-out infinite; }
-  .bank-ring.r2{ animation-delay:1.3s; }
-  @keyframes ring{ 0%{ r:46; opacity:0.55; } 100%{ r:96; opacity:0; } }
-  #bank-core{ filter:drop-shadow(0 0 14px rgba(59,130,246,0.85)); }
+  /* run */
+  #view-run{padding:8px 24px 24px;display:none;gap:18px;justify-content:space-between}
+  body[data-view="run"] #view-run{display:flex}
+  .col{display:flex;flex-direction:column;gap:12px;min-height:0;width:320px;flex:none}
+  .col.right{width:360px}
+  .kpi .v{font:200 30px var(--mono);margin-top:6px;letter-spacing:.02em}
+  .kpi .s{font-size:11px;color:var(--mute);margin-top:4px;font-family:var(--mono)}
+  .kpi canvas{width:100%;height:34px;display:block;margin-top:8px}
+  .chips4{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+  .ck{font-size:11px;display:flex;align-items:center;gap:7px;color:var(--mute);border:1px solid var(--line2);padding:6px 8px}
+  .ck i{width:6px;height:6px;border-radius:50%;background:var(--dim);flex:none}
+  .ck.ok i{background:var(--gr);box-shadow:0 0 8px var(--gr)} .ck.ok{color:var(--fg)}
+  .ck.bad i{background:var(--red);box-shadow:0 0 8px var(--red)} .ck.bad{color:var(--red)}
+  .grow{flex:1;min-height:0;display:flex;flex-direction:column}
+  .list{flex:1;min-height:0;overflow-y:auto;margin-top:10px;scrollbar-width:thin;scrollbar-color:#333 transparent}
+  .rk{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px solid var(--line2)}
+  .rk .n{color:var(--dim);font-family:var(--mono)} .rk .a{font-family:var(--mono)}
+  .rk .bar{grid-column:2/4;height:2px;background:var(--line2);position:relative}
+  .rk .bar b{position:absolute;left:0;top:0;bottom:0;background:var(--cy);box-shadow:0 0 8px var(--cy)}
+  .fd{font-size:12px;padding:6px 0;border-bottom:1px solid var(--line2);display:grid;grid-template-columns:8px 1fr auto;gap:8px;align-items:center}
+  .fd i{width:6px;height:6px;border-radius:50%}
+  .fd .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .fd .t small{color:var(--mute);font-size:11px;display:block;overflow:hidden;text-overflow:ellipsis}
+  .fd .m{font-family:var(--mono);font-size:12px}
+  @keyframes in{from{opacity:0;transform:translateX(10px)}}
+  .reliab .big{font:200 44px var(--mono);line-height:1}
+  .reliab .big.warn{color:var(--red);text-shadow:0 0 24px rgba(255,59,78,.6)}
+  .reliab .meta{font-size:11px;color:var(--mute);margin-top:8px;line-height:1.7;font-family:var(--mono)}
+  .reliab .meta b{color:var(--fg);font-weight:400}
+  .bar2{height:2px;background:var(--line2);margin-top:10px} .bar2 div{height:100%;background:var(--am);box-shadow:0 0 10px var(--am);width:0;transition:width .4s}
+  .btnrow{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .btnrow button{padding:7px 10px;font-size:11px;letter-spacing:.08em}
+  .sep{height:1px;background:var(--line2);margin:14px 0}
+  .rb{font-size:11px;letter-spacing:.14em;padding:3px 9px;border:1px solid var(--line);margin-left:8px}
+  .rb.MATCHED{color:var(--gr);border-color:rgba(93,255,176,.5)} .rb.PENDING_IN_FLIGHT{color:var(--am);border-color:rgba(255,179,71,.5)} .rb.UNMATCHED{color:var(--red);border-color:rgba(255,59,78,.6)}
+  .rcg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+  .rcg div{border:1px solid var(--line2);padding:6px;font-size:10px;color:var(--mute);letter-spacing:.06em} .rcg b{display:block;font:300 16px var(--mono);color:var(--fg);margin-top:2px} .rcg .bad b{color:var(--red)}
+  #cap{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);text-align:center;pointer-events:none;display:none}
+  body[data-view="run"] #cap{display:block}
+  #tip{position:fixed;z-index:9;pointer-events:none;background:rgba(0,0,0,.85);border:1px solid var(--line);padding:6px 10px;font-size:12px;display:none;font-family:var(--mono)}
 
-  /* 속도 슬라이더 */
-  .speed-bar{
-    display:flex; align-items:center; gap:14px;
-    background:linear-gradient(160deg,rgba(30,34,46,0.8),rgba(18,21,29,0.8));
-    border:1px solid rgba(255,255,255,0.07); border-radius:14px;
-    padding:12px 20px; margin-bottom:16px;
-    backdrop-filter:blur(8px);
-    box-shadow:0 4px 16px rgba(0,0,0,0.3);
-  }
-  .speed-bar label{ font-size:13px; font-weight:700; white-space:nowrap; color:var(--muted); }
-  .speed-bar .speed-name{ font-size:13px; font-weight:800; color:var(--blue); min-width:60px; text-align:center; }
-  .speed-bar .speed-ms{ font-size:11px; color:var(--muted); min-width:60px; font-variant-numeric:tabular-nums; }
-  input[type=range]{
-    flex:1; height:6px; appearance:none; background:linear-gradient(90deg,#1e3a8a,#4f8ef7);
-    border-radius:3px; cursor:pointer; outline:none;
-  }
-  input[type=range]::-webkit-slider-thumb{
-    appearance:none; width:20px; height:20px; border-radius:50%;
-    background:radial-gradient(circle at 35% 35%,#93c5fd,#1d4ed8);
-    box-shadow:0 0 10px rgba(79,142,247,0.7); cursor:grab; border:2px solid #bfdbfe;
-  }
-  input[type=range]:active::-webkit-slider-thumb{ cursor:grabbing; transform:scale(1.2); }
-  .speed-presets{ display:flex; gap:6px; }
-  .sp{ background:#1c2333; border:1px solid var(--border); border-radius:8px;
-    padding:4px 10px; font-size:11px; font-weight:700; color:var(--muted); cursor:pointer;
-    transition:all .2s; }
-  .sp:hover,.sp.active{ background:#2a3550; border-color:var(--blue); color:var(--blue); }
-
-  /* 시뮬레이션 컨트롤 버튼 */
-  .sim-controls{ display:flex; gap:8px; align-items:center; }
-  .sim-btn{
-    display:inline-flex; align-items:center; gap:5px;
-    border:none; border-radius:10px; padding:7px 14px;
-    font-size:12px; font-weight:800; cursor:pointer; transition:all .2s;
-    letter-spacing:0.2px;
-  }
-  .sim-btn:disabled{ opacity:0.35; cursor:not-allowed; }
-  .sim-btn.start { background:rgba(34,197,94,0.15);  border:1px solid rgba(34,197,94,0.4);  color:#4ade80; }
-  .sim-btn.pause { background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4); color:#fbbf24; }
-  .sim-btn.stop  { background:rgba(239,68,68,0.15);  border:1px solid rgba(239,68,68,0.4);  color:#f87171; }
-  .sim-btn.reset { background:rgba(139,92,246,0.15); border:1px solid rgba(139,92,246,0.4); color:#c4b5fd; }
-  .sim-btn.start:hover:not(:disabled) { background:rgba(34,197,94,0.28);  box-shadow:0 0 12px rgba(34,197,94,0.25); }
-  .sim-btn.pause:hover:not(:disabled) { background:rgba(245,158,11,0.28); box-shadow:0 0 12px rgba(245,158,11,0.25); }
-  .sim-btn.stop:hover:not(:disabled)  { background:rgba(239,68,68,0.28);  box-shadow:0 0 12px rgba(239,68,68,0.25); }
-  .sim-btn.reset:hover:not(:disabled) { background:rgba(139,92,246,0.28); box-shadow:0 0 12px rgba(139,92,246,0.25); }
-  .state-badge{
-    font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; white-space:nowrap;
-    background:#1c2333; border:1px solid var(--border);
-  }
-  .state-badge.RUNNING{ color:var(--green); border-color:rgba(34,197,94,0.4); }
-  .state-badge.PAUSED { color:var(--amber); border-color:rgba(245,158,11,0.4); }
-  .state-badge.STOPPED{ color:var(--red);   border-color:rgba(239,68,68,0.4); }
-
-  /* feed */
-  .feed{ display:flex; flex-direction:column; gap:9px; max-height:300px; overflow-y:auto; padding-right:4px; }
-  .feed::-webkit-scrollbar{ width:6px; } .feed::-webkit-scrollbar-thumb{ background:var(--border); border-radius:3px; }
-  .item{ background:var(--panel2); border-left:3px solid var(--blue); border-radius:8px; padding:10px 12px;
-    animation:slidein .35s ease; }
-  .item.new{ animation:pop .5s ease; }
-  @keyframes slidein{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:none;} }
-  @keyframes pop{ 0%{ background:#2d3a55; } 100%{ background:var(--panel2); } }
-  .item .meta{ font-size:11px; color:var(--muted); margin-bottom:4px; }
-  .item .line{ font-size:13.5px; font-weight:600; line-height:1.45; }
-  .item .name{ color:var(--blue); font-weight:700; }
-  .item .reason{ font-size:12px; color:var(--muted); font-style:italic; margin-top:3px; min-height:14px; }
-
-  /* top3 */
-  .rank{ display:flex; align-items:center; justify-content:space-between; padding:10px 4px; border-bottom:1px solid var(--border); }
-  .rank:last-child{ border-bottom:none; }
-  .rank .who{ display:flex; align-items:center; gap:10px; font-size:13.5px; }
-  .rank .medal{ width:22px; height:22px; border-radius:50%; display:grid; place-items:center; font-size:11px; font-weight:800; color:#0e1016; }
-  .rank .amt{ font-weight:800; font-size:14px; font-variant-numeric:tabular-nums; }
-  .side{ display:flex; flex-direction:column; gap:16px; }
-
-  /* bottom row: terminal + sparkline */
-  .bottom{ display:grid; grid-template-columns:1.7fr 1fr; gap:16px; margin-top:16px; }
-  .term{ background:#0a0c12; border:1px solid var(--border); border-radius:14px; padding:14px 16px; }
-  .term h2{ font-size:13px; font-weight:700; margin-bottom:10px; color:#7ee787; display:flex; align-items:center; gap:8px; }
-  .term .logbox{ font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace; font-size:12px; line-height:1.7;
-    height:200px; overflow-y:auto; }
-  .term .logbox::-webkit-scrollbar{ width:6px; } .term .logbox::-webkit-scrollbar-thumb{ background:#2b3040; border-radius:3px; }
-  .logline{ white-space:nowrap; animation:logfade .3s ease; }
-  @keyframes logfade{ from{opacity:0;} to{opacity:1;} }
-  .l-time{ color:#5a6478; } .l-tx{ color:#f59e0b; } .l-arrow{ color:#888fa3; }
-  .l-name{ color:#79c0ff; } .l-amt{ color:#e9ebf2; font-weight:700; }
-  .l-lock{ color:#d2a8ff; } .l-commit{ color:#7ee787; font-weight:700; }
-  .l-reason{ color:#6e7681; font-style:italic; }
-
-  .spark-val{ font-size:30px; font-weight:800; letter-spacing:-1px; color:var(--blue); font-variant-numeric:tabular-nums; }
-  .spark-sub{ font-size:11.5px; color:var(--muted); margin-bottom:6px; }
-  #spark{ width:100%; height:70px; }
-
-  /* 에이전트 클릭 팝업 */
-  .agent-popup{
-    display:none; position:fixed; z-index:999;
-    background:linear-gradient(160deg,rgba(22,26,38,0.97),rgba(12,14,20,0.97));
-    border:1px solid rgba(139,92,246,0.5); border-radius:18px; padding:20px;
-    min-width:260px; max-width:300px;
-    box-shadow:0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(139,92,246,0.18);
-    backdrop-filter:blur(16px); pointer-events:all;
-  }
-  .agent-popup.show{ display:block; animation:popin .22s cubic-bezier(.34,1.56,.64,1); }
-  @keyframes popin{ from{opacity:0;transform:scale(.88) translateY(8px);} to{opacity:1;transform:none;} }
-  .ap-close{ position:absolute; top:12px; right:14px; background:none; border:none; color:var(--muted);
-    font-size:18px; cursor:pointer; line-height:1; }
-  .ap-close:hover{ color:var(--text); }
-  .ap-avatar{ font-size:36px; text-align:center; margin-bottom:8px; }
-  .ap-name{ font-size:18px; font-weight:800; text-align:center; margin-bottom:4px; }
-  .ap-type{ font-size:13px; font-weight:700; text-align:center; margin-bottom:14px;
-    padding:4px 12px; border-radius:20px; display:inline-block;
-    background:rgba(139,92,246,0.2); border:1px solid rgba(139,92,246,0.4); color:#c4b5fd; }
-  .ap-type-wrap{ text-align:center; margin-bottom:14px; }
-  .ap-row{ display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; }
-  .ap-row .k{ color:var(--muted); } .ap-row .v{ font-weight:700; font-variant-numeric:tabular-nums; }
-  .ap-divider{ border:none; border-top:1px solid var(--border); margin:12px 0; }
-  .ap-prob-label{ font-size:11.5px; color:var(--muted); margin-bottom:3px; display:flex; justify-content:space-between; }
-  .ap-bar-wrap{ background:#1a1e2a; border-radius:4px; height:7px; margin-bottom:9px; overflow:hidden; }
-  .ap-bar{ height:100%; border-radius:4px; transition:width .5s ease; }
-
-  /* 예측 패널 */
-  .predict{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:16px; }
-  .predict-card{
-    background:linear-gradient(160deg,rgba(30,34,46,0.8),rgba(18,21,29,0.8));
-    border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:16px;
-    backdrop-filter:blur(8px);
-    box-shadow:0 8px 24px rgba(0,0,0,0.35);
-  }
-  .predict-card h3{ font-size:12.5px; font-weight:700; color:var(--muted); margin-bottom:12px; }
-  .trend-row{ display:flex; align-items:center; justify-content:space-between;
-    padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:13px; }
-  .trend-row:last-child{ border-bottom:none; }
-  .trend-name{ font-weight:600; }
-  .trend-val{ font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; }
-  .trend-up{ color:var(--green); } .trend-down{ color:var(--red); } .trend-flat{ color:var(--muted); }
-  .predict-winner{ text-align:center; padding:8px 0; }
-  .pw-emoji{ font-size:32px; margin-bottom:6px; }
-  .pw-name{ font-size:15px; font-weight:800; margin-bottom:4px; }
-  .pw-desc{ font-size:12px; color:var(--muted); }
-
-  .agent-node{ cursor:pointer; }
-
-
-  /* ── 신뢰성 컨트롤 룸 (Outbox · 장애 주입 · 대사) ── */
-  .reliab{ display:grid; grid-template-columns:1.1fr 1fr 1.3fr; gap:14px; margin-bottom:16px; }
-  .rcard{ background:linear-gradient(160deg, rgba(36,40,54,0.85), rgba(20,23,32,0.85));
-    border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:14px 16px; }
-  .rcard h3{ font-size:13px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
-  .rcard h3 .hint{ margin-left:auto; color:var(--muted); font-weight:400; font-size:11px; }
-  .ob-row{ display:flex; gap:14px; align-items:flex-end; }
-  .ob-big{ font-size:30px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1; }
-  .ob-big.warn{ color:var(--amber); text-shadow:0 0 16px rgba(245,158,11,0.45); }
-  .ob-big.okc{ color:var(--green); }
-  .ob-meta{ font-size:11.5px; color:var(--muted); line-height:1.6; font-variant-numeric:tabular-nums; }
-  .ob-meta b{ color:var(--text); font-weight:700; }
-  .ob-bar{ height:6px; background:#2a2f3d; border-radius:4px; margin-top:10px; overflow:hidden; }
-  .ob-bar > div{ height:100%; width:0; background:var(--amber); transition:width .4s; }
-  .chaos-state{ font-size:12px; font-weight:700; padding:3px 9px; border-radius:10px; }
-  .chaos-state.up{ background:rgba(34,197,94,0.15); color:#4ade80; }
-  .chaos-state.down{ background:rgba(239,68,68,0.18); color:#f87171; animation:blink 1.1s infinite; }
-  .rbtns{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-  .rbtn{ font-size:12px; font-weight:700; padding:7px 11px; border-radius:9px; cursor:pointer; color:var(--text);
-    background:rgba(255,255,255,0.05); border:1px solid var(--border); }
-  .rbtn:hover:not(:disabled){ background:rgba(255,255,255,0.1); }
-  .rbtn:disabled{ opacity:0.4; cursor:not-allowed; }
-  .rbtn.danger{ border-color:rgba(239,68,68,0.45); color:#f87171; }
-  .rbtn.good{ border-color:rgba(34,197,94,0.45); color:#4ade80; }
-  .rbtn.primary{ border-color:rgba(79,142,247,0.5); color:#93b8ff; }
-  .recon-badge{ font-size:12px; font-weight:800; padding:3px 9px; border-radius:10px; background:#2a2f3d; color:var(--muted); }
-  .recon-badge.MATCHED{ background:rgba(34,197,94,0.15); color:#4ade80; }
-  .recon-badge.PENDING_IN_FLIGHT{ background:rgba(245,158,11,0.15); color:#fbbf24; }
-  .recon-badge.UNMATCHED{ background:rgba(239,68,68,0.18); color:#f87171; }
-  .recon-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:10px; }
-  .recon-grid div{ background:rgba(255,255,255,0.03); border-radius:8px; padding:6px 8px; font-size:11px; color:var(--muted); }
-  .recon-grid b{ display:block; font-size:16px; color:var(--text); font-variant-numeric:tabular-nums; }
-  .recon-grid .bad b{ color:#f87171; }
-  @media(max-width:980px){ .reliab{grid-template-columns:1fr;} }
-  @media(max-width:1100px){ .stats{grid-template-columns:repeat(3,1fr);} .predict{grid-template-columns:repeat(2,1fr);} }
-  @media(max-width:980px){ .main{grid-template-columns:1fr;} .stats{grid-template-columns:repeat(2,1fr);} .bottom{grid-template-columns:1fr;} .predict{grid-template-columns:1fr;} }
+  /* end */
+  #view-end{display:none;align-items:center;justify-content:center;overflow:auto;padding:20px}
+  body[data-view="end"] #view-end{display:flex}
+  .endwrap{width:min(920px,100%)}
+  .endwrap h1{font-size:34px;font-weight:200;letter-spacing:.24em;text-transform:uppercase}
+  .grid{display:grid;gap:12px;margin-top:20px;grid-template-columns:repeat(4,1fr)}
+  .grid .panel .v{font:200 32px var(--mono);margin-top:6px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .tb{display:grid;grid-template-columns:70px 1fr 70px;gap:10px;align-items:center;font-size:12px;margin-top:8px}
+  .tb .bar{height:2px;background:var(--line2)} .tb .bar b{display:block;height:100%}
+  @media (max-width:1180px){.col{width:260px}.col.right{width:300px}.hero h1{font-size:38px}}
 </style>
 </head>
-<body>
-<div class="wrap">
+<body data-view="setup">
+<canvas id="cv"></canvas>
+<div id="vignette"></div>
 
-  <div class="topbar">
-    <h1>🏦 AI Finance World</h1>
-    <span class="sub">멀티 에이전트 금융 시뮬레이터</span>
-    <span class="live"><span class="dot"></span> LIVE</span>
-    <span class="clock" id="clock"></span>
+<header id="top">
+  <div class="brand"><i></i>AI Finance World</div>
+  <div id="clock">
+    <span id="clock-day">DAY 1</span><span id="clock-time">00:00</span><span id="clock-date">2026-01-01</span>
   </div>
-
-  <div class="speed-bar">
-    <div class="sim-controls">
-      <span class="state-badge RUNNING" id="state-badge">● RUNNING</span>
-      <button class="sim-btn start" id="btn-start" onclick="simStart()" disabled>▶ 시작</button>
-      <button class="sim-btn pause" id="btn-pause" onclick="simPause()">⏸ 일시정지</button>
-      <button class="sim-btn stop"  id="btn-stop"  onclick="simStop()">⏹ 정지</button>
-      <button class="sim-btn reset" id="btn-reset" onclick="simReset()">🔄 초기화</button>
+  <div id="ctl">
+    <span class="badge RUNNING" id="state-badge"><i></i><span id="state-text">실행 중</span></span>
+    <div class="seg" id="speed-seg">
+      <button data-ms="3000">느림</button><button data-ms="1000">보통</button><button data-ms="300">빠름</button><button data-ms="50">초고속</button>
     </div>
-    <label style="margin-left:8px;">⚡ 속도</label>
-    <span class="speed-presets">
-      <button class="sp" onclick="setSpeed(3000)">🐢 느림</button>
-      <button class="sp active" onclick="setSpeed(1000)">🚶 보통</button>
-      <button class="sp" onclick="setSpeed(300)">🏃 빠름</button>
-      <button class="sp" onclick="setSpeed(1)">🚀 초고속</button>
-    </span>
-    <input type="range" id="speed-slider" min="0" max="100" value="67"
-           oninput="onSliderInput(this.value)">
-    <span class="speed-name" id="speed-name">보통</span>
-    <span class="speed-ms" id="speed-ms">1000ms/틱</span>
+    <button id="btn-pause">일시정지</button>
+    <button id="btn-stop" class="danger">종료</button>
   </div>
+</header>
 
-  <div class="stats">
-    <div class="stat hero">
-      <div class="label">💰 총 통화량</div>
-      <div class="value" id="s-money">—</div>
-      <div class="substat">시스템 전체 잔액 · 항상 일정 (돈 보존)</div>
-    </div>
-    <div class="stat">
-      <div class="label">누적 거래액</div>
-      <div class="value amber" id="s-moved">—</div>
-      <div class="substat">지금까지 오간 돈의 총량</div>
-    </div>
-    <div class="stat">
-      <div class="label">총 거래 건수</div>
-      <div class="value" id="s-count">—</div>
-      <div class="substat">처리된 송금 트랜잭션</div>
-    </div>
-    <div class="stat tps">
-      <div class="label">⚡ 처리 속도 (TPS)</div>
-      <div class="value" id="s-tps">—</div>
-      <div class="substat">초당 처리 거래 수</div>
-    </div>
-    <div class="stat ok" id="s-integrity-card">
-      <div class="label">복식부기 무결성</div>
-      <div class="value" id="s-integrity">검증 중…</div>
-      <div class="substat" id="s-integrity-sub">차변 = 대변</div>
+<section id="view-setup" class="view">
+  <div class="hero">
+    <div class="lb">Multi-agent money simulation</div>
+    <h1>돈이 흐르는<br/>세계를 만든다</h1>
+    <p class="sub">에이전트 수를 정하고 시작하면, 은행 원장 위에서 거래가 시작됩니다.</p>
+    <div class="panel setup-card">
+      <div class="lb">에이전트 수 · 2 – 200</div>
+      <div class="setup-row">
+        <input type="number" id="agent-n" min="2" max="200" value="10"/>
+        <input type="range" id="agent-r" min="2" max="200" value="10"/>
+      </div>
+      <div class="chips" id="agent-chips"><button data-n="10">10</button><button data-n="30">30</button><button data-n="50">50</button><button data-n="100">100</button><button data-n="200">200</button></div>
+      <div class="info">
+        <div><span class="lb">가상 시간</span><b id="inf-mpt">10분 / 틱</b></div>
+        <div><span class="lb">가상 하루</span><b id="inf-day">144 틱</b></div>
+        <div><span class="lb">시작</span><b id="inf-start">2026-01-01</b></div>
+      </div>
+      <div class="setup-row" style="margin-top:16px"><span class="lb" style="min-width:60px">속도</span>
+        <div class="seg" id="speed-seg-setup"><button data-ms="3000">느림</button><button data-ms="1000">보통</button><button data-ms="300">빠름</button><button data-ms="50">초고속</button></div>
+      </div>
+      <div id="setup-err"></div>
+      <button class="solid launch" id="btn-launch">시뮬레이션 시작</button>
     </div>
   </div>
+</section>
 
+<main id="view-run" class="view">
+  <aside class="col">
+    <div class="panel kpi"><div class="lb">총 통화량</div><div class="v" id="s-money">—</div><div class="s" id="s-money-sub">에이전트 보유 합계</div></div>
+    <div class="panel kpi"><div class="lb">거래 수</div><div class="v" id="s-count">—</div><div class="s" id="s-types">—</div></div>
+    <div class="panel kpi"><div class="lb">TPS (실시간)</div><div class="v" id="s-tps">—</div><canvas id="spark"></canvas></div>
+    <div class="panel kpi" id="s-integrity-card"><div class="lb">복식부기 무결성</div>
+      <div class="chips4">
+        <div class="ck" id="ck1"><i></i>차변 = 대변</div><div class="ck" id="ck2"><i></i>분개 2건</div>
+        <div class="ck" id="ck3"><i></i>잔액 = 원장</div><div class="ck" id="ck4"><i></i>총합 0</div>
+      </div></div>
+    <div class="panel grow"><div class="lb">잔액 순위</div><div class="list" id="rank"></div></div>
+  </aside>
+  <aside class="col right">
+    <div class="panel reliab">
+      <div class="lb">신뢰성 컨트롤 룸 · Outbox</div>
+      <div style="display:flex;align-items:flex-end;gap:16px;margin-top:10px"><div class="big" id="ob-pending">—</div><div class="lb" style="padding-bottom:4px">대기 건</div></div>
+      <div class="meta">가장 오래 기다린 이벤트 <b id="ob-age">—</b><br/>발행 완료 <b id="ob-published">—</b> · 격리(DEAD) <b id="ob-dead">—</b></div>
+      <div class="bar2"><div id="ob-bar"></div></div>
+      <div class="sep"></div>
+      <div class="lb">장애 주입 <span id="chaos-state" class="mono" style="margin-left:8px;color:var(--gr)">브로커 정상</span></div>
+      <div class="btnrow">
+        <button class="danger" id="btn-broker-down">브로커 장애</button>
+        <button class="good" id="btn-broker-up">복구</button>
+        <button id="btn-ack-loss">ACK 유실 ×3</button>
+      </div>
+      <div class="meta" id="chaos-desc" style="font-family:var(--sans)">브로커가 멈춰도 거래는 계속 성공하고, 이벤트는 Outbox 에 쌓였다가 복구 후 순서대로 전달됩니다.</div>
+      <div class="sep"></div>
+      <div class="lb">일마감 대사 <span class="rb" id="recon-badge">미실행</span></div>
+      <div class="meta" id="recon-summary" style="font-family:var(--sans)">가상 자정이 지나면 자동으로 실행됩니다.</div>
+      <div class="rcg">
+        <div id="rc-missing-box">누락<b id="rc-missing">—</b></div><div>전달 중<b id="rc-inflight">—</b></div>
+        <div id="rc-unexpected-box">불명<b id="rc-unexpected">—</b></div><div id="rc-mismatch-box">금액 불일치<b id="rc-mismatch">—</b></div>
+      </div>
+      <div class="btnrow"><button id="btn-recon">지금 대사 실행</button></div>
+    </div>
+    <div class="panel grow"><div class="lb">실시간 거래 피드</div><div class="list" id="feed"></div></div>
+  </aside>
+  <div id="cap"><span class="lb" id="cap-t">—</span></div>
+</main>
 
-  <!-- 신뢰성 컨트롤 룸: 이벤트 유실 방지(Outbox) · 장애 주입 · 일마감 대사 -->
-  <div class="reliab">
-    <div class="rcard">
-      <h3>📤 Outbox 이벤트 발행 <span class="hint">외부 정산 시스템으로</span></h3>
-      <div class="ob-row">
-        <div>
-          <div class="ob-big okc" id="ob-pending">—</div>
-          <div class="ob-meta">발행 대기</div>
+<section id="view-end" class="view">
+  <div class="endwrap">
+    <div class="lb">Simulation ended</div>
+    <h1>종료 요약</h1>
+    <div class="grid">
+      <div class="panel"><div class="lb">총 거래 수</div><div class="v" id="e-total">—</div></div>
+      <div class="panel"><div class="lb">가상 경과 일수</div><div class="v" id="e-days">—</div></div>
+      <div class="panel"><div class="lb">에이전트</div><div class="v" id="e-agents">—</div></div>
+      <div class="panel"><div class="lb">원장 무결성</div><div class="v" id="e-bal">—</div></div>
+    </div>
+    <div class="two">
+      <div class="panel"><div class="lb">유형별 거래</div><div id="e-types"></div></div>
+      <div class="panel"><div class="lb">무결성 4조건</div>
+        <div class="chips4" style="margin-top:12px">
+          <div class="ck" id="ec1"><i></i>차변 = 대변</div><div class="ck" id="ec2"><i></i>분개 2건</div>
+          <div class="ck" id="ec3"><i></i>잔액 = 원장</div><div class="ck" id="ec4"><i></i>총합 0</div>
         </div>
-        <div class="ob-meta">
-          발행 완료 <b id="ob-published">—</b><br>
-          격리(DEAD) <b id="ob-dead">—</b><br>
-          가장 오래 기다린 이벤트 <b id="ob-age">—</b>
-        </div>
-      </div>
-      <div class="ob-bar"><div id="ob-bar"></div></div>
-    </div>
-
-    <div class="rcard">
-      <h3>💥 장애 주입 <span class="chaos-state up" id="chaos-state">브로커 정상</span></h3>
-      <div class="ob-meta" id="chaos-desc">브로커를 멈춰도 거래는 계속 성공하고, 이벤트는 Outbox 에 쌓였다가 복구 후 순서대로 전달됩니다.</div>
-      <div class="rbtns">
-        <button class="rbtn danger" id="btn-broker-down" onclick="chaos('/chaos/broker/down')">브로커 장애</button>
-        <button class="rbtn good" id="btn-broker-up" onclick="chaos('/chaos/broker/up')">복구</button>
-        <button class="rbtn" id="btn-ack-loss" onclick="chaos('/chaos/broker/ack-loss?n=3')">ACK 유실 ×3</button>
+        <div class="sep"></div>
+        <div class="lb">마지막 대사 <span class="rb" id="e-rbadge">없음</span></div>
+        <div class="meta" id="e-rtext" style="font-size:12px;color:var(--mute);margin-top:8px;line-height:1.7;font-family:var(--mono)">—</div>
       </div>
     </div>
-
-    <div class="rcard">
-      <h3>📒 일마감 대사 <span class="recon-badge" id="recon-badge">미실행</span>
-        <button class="rbtn primary" style="margin-left:auto;padding:4px 10px;" onclick="runRecon()">지금 대사</button></h3>
-      <div class="ob-meta" id="recon-summary">은행 원장과 외부 정산 장부를 거래 단위로 맞춰 봅니다.</div>
-      <div class="recon-grid">
-        <div id="rc-missing-box">누락<b id="rc-missing">—</b></div>
-        <div>전달 중<b id="rc-inflight">—</b></div>
-        <div id="rc-unexpected-box">불명<b id="rc-unexpected">—</b></div>
-        <div id="rc-mismatch-box">금액 불일치<b id="rc-mismatch">—</b></div>
-      </div>
-    </div>
+    <button class="solid launch" id="btn-new" style="margin-top:18px">새 시뮬레이션</button>
   </div>
-
-  <div class="main">
-    <div class="panel">
-      <h2>거래 흐름 <span class="sub" style="color:var(--muted);font-weight:400;font-size:12px;">원 크기 = 보유 잔액 · 에이전트 ↔ 은행 ↔ 에이전트</span></h2>
-      <svg id="graph" viewBox="0 0 790 540" role="img" aria-label="거래 흐름 그래프"></svg>
-    </div>
-
-    <div class="side">
-      <div class="panel">
-        <h2>실시간 거래 피드 <span class="tag">사유</span></h2>
-        <div class="feed" id="feed"></div>
-      </div>
-      <div class="panel">
-        <h2>잔액 TOP 3 🏆</h2>
-        <div id="top3"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 에이전트 클릭 팝업 -->
-  <div class="agent-popup" id="agent-popup">
-    <button class="ap-close" onclick="closePopup()">✕</button>
-    <div class="ap-avatar" id="ap-avatar"></div>
-    <div class="ap-name" id="ap-name"></div>
-    <div class="ap-type-wrap"><span class="ap-type" id="ap-type"></span></div>
-    <div class="ap-row"><span class="k">💰 현재 잔액</span><span class="v" id="ap-bal"></span></div>
-    <div class="ap-row"><span class="k">💵 월 급여</span><span class="v" id="ap-salary"></span></div>
-    <hr class="ap-divider">
-    <div class="ap-prob-label"><span>🔄 송금 확률 (chancePay)</span><span id="ap-pay-v"></span></div>
-    <div class="ap-bar-wrap"><div class="ap-bar" id="ap-pay-bar" style="background:#4f8ef7"></div></div>
-    <div class="ap-prob-label"><span>🛒 소비 확률 (chanceSpend)</span><span id="ap-spend-v"></span></div>
-    <div class="ap-bar-wrap"><div class="ap-bar" id="ap-spend-bar" style="background:#f59e0b"></div></div>
-    <div class="ap-prob-label"><span>↩️ 환불 확률 (chanceRefund)</span><span id="ap-refund-v"></span></div>
-    <div class="ap-bar-wrap"><div class="ap-bar" id="ap-refund-bar" style="background:#8b5cf6"></div></div>
-    <div class="ap-prob-label"><span>📈 투자 확률 (chanceInvest)</span><span id="ap-invest-v"></span></div>
-    <div class="ap-bar-wrap"><div class="ap-bar" id="ap-invest-bar" style="background:#22c55e"></div></div>
-  </div>
-
-  <!-- 예측 패널 -->
-  <div class="predict">
-    <div class="predict-card">
-      <h3>📈 잔액 증가 TOP 3</h3>
-      <div id="pred-gainers"></div>
-    </div>
-    <div class="predict-card">
-      <h3>📉 잔액 감소 TOP 3</h3>
-      <div id="pred-losers"></div>
-    </div>
-    <div class="predict-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
-      <h3 style="text-align:center;">🔮 이대로 가면 최후의 승자</h3>
-      <div class="predict-winner">
-        <div class="pw-emoji" id="pred-winner-emoji">—</div>
-        <div class="pw-name" id="pred-winner-name">계산 중…</div>
-        <div class="pw-desc" id="pred-winner-desc"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="bottom">
-    <div class="term">
-      <h2><span class="dot" style="background:#7ee787"></span> 시스템 트랜잭션 로그 <span style="color:#5a6478;font-weight:400;">— 실시간 백엔드 처리 내역</span></h2>
-      <div class="logbox" id="logbox"></div>
-    </div>
-    <div class="panel">
-      <h2>거래량 추이 <span class="sub" style="color:var(--muted);font-weight:400;font-size:12px;">최근 60틱</span></h2>
-      <div class="spark-sub">현재 활동량</div>
-      <div class="spark-val"><span id="spark-now">0</span> <span style="font-size:14px;color:var(--muted);">건/틱</span></div>
-      <svg id="spark" viewBox="0 0 340 70" preserveAspectRatio="none"></svg>
-    </div>
-  </div>
-</div>
+</section>
+<div id="tip"></div>
 
 <script>
-const SVGNS = "http://www.w3.org/2000/svg";
-const graph = document.getElementById("graph");
+(() => {
+const $ = id => document.getElementById(id);
+const fmt = n => Number(n).toLocaleString('ko-KR');
+const won = n => '₩' + fmt(Math.round(Number(n) || 0));
+const TYPE = {TRANSFER:['송금','#35e0ff'],SPEND:['소비','#ffb347'],INVEST:['투자','#a98bff'],INVEST_RETURN:['투자정산','#5dffb0'],REFUND:['환불','#ff7fb0'],SALARY:['급여','#ffffff'],OPENING:['개설','#8a919b']};
+const getJson = (p, o) => fetch(p, o).then(r => r.json().catch(() => ({})));
+const getOk = p => fetch(p).then(r => r.status === 200 ? r.json() : null).catch(() => null);
 
-// 외부 시스템(아키텍처 표시용 — 소비/구독/투자는 다음 단계)
-const EXTERNALS = [
-  {name:"쿠팡", sub:"결제처", color:"#b45309"},
-  {name:"무신사", sub:"결제처", color:"#92400e"},
-  {name:"배달의민족", sub:"결제처", color:"#a16207"},
-  {name:"넷플릭스", sub:"구독", color:"#b45309"},
-  {name:"KT 통신", sub:"구독", color:"#854d0e"},
-  {name:"한국증권", sub:"투자", color:"#15803d"},
-];
+/* ── 상태 ─────────────────────────────────────── */
+let view = 'setup', status = {state:'SETUP'}, chaosOn = true, brokerDown = false, pending = 0;
+function setView(v){
+  if(v === view) return;
+  view = v; document.body.dataset.view = v;
+  if(v === 'setup'){ resetWorld(); buildPreview(+$('agent-n').value); hardClear(); }
+  if(v === 'end'){ loadSummary(); }
+  if(v === 'run'){ preview = false; }
+}
 
-const BANK = {x:435, y:286};
-// 급여 = 초기 잔액 × salary-rate (application.properties 의 app.simulation.salary-rate 와 동일하게 유지)
-const SALARY_RATE = 0.05;
-const nodePos = {};
-let built = false;
-let lastMaxId = 0;
-let firstLoad = true;
+/* ── 3D 월드 ──────────────────────────────────── */
+const cv = $('cv'), ctx = cv.getContext('2d');
+let W = 0, H = 0, DPR = 1;
+function resize(){ DPR = Math.min(window.devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight; cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR,0,0,DPR,0,0); hardClear(); }
+function hardClear(){ ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = '#000'; ctx.fillRect(0,0,W,H); }
+addEventListener('resize', resize);
 
-// TPS / 스파크라인 상태
-let prevCount = null;
-let prevTs = null;
-const sparkData = [];
-const SPARK_MAX = 60;
+const cam = {yaw:0.6, pitch:0.38, dist:3.4, tyaw:0.6, tpitch:0.38, tdist:3.4, drag:false, lx:0, ly:0, vy:0.0016};
+const HUBS = [['발행계정','#ffffff'],['한국증권','#a98bff'],['쿠팡','#ffb347'],['무신사','#ffb347'],['배달의민족','#ffb347'],['넷플릭스','#ffb347'],['KT 통신','#ffb347']];
+const world = {agents:[], byName:new Map(), hubs:new Map(), maxBal:1, top:new Set(), key:''};
+HUBS.forEach(([n,c],i) => { const a = i / HUBS.length * Math.PI * 2; world.hubs.set(n, {name:n, color:c, x:Math.cos(a)*0.42, y:Math.sin(a*2)*0.1, z:Math.sin(a)*0.42, flash:0}); });
+const core = {name:'은행', x:0, y:0, z:0, flash:0};
+let preview = true;
 
-// 피드에 이미 렌더된 ID 추적 (채팅창 방식 — 새 것만 추가)
-const renderedFeedIds = new Set();
-const FEED_MAX = 60; // 최대 유지 줄 수
+function fib(i, n, hash){
+  const y = 1 - (i + 0.5) / n * 2, r = Math.sqrt(Math.max(0, 1 - y*y)), phi = i * 2.399963;
+  const rad = 0.92 + ((i * 2654435761 % 1000) / 1000) * 0.2;
+  return {x:Math.cos(phi)*r*rad, y:y*rad, z:Math.sin(phi)*r*rad};
+}
+function resetWorld(){ world.agents = []; world.byName.clear(); world.maxBal = 1; world.top.clear(); world.key = ''; streams.length = 0; queue.length = 0; }
+function buildPreview(n){
+  n = Math.max(2, Math.min(200, n || 10)); preview = true;
+  world.agents = []; world.byName.clear();
+  for(let i = 0; i < n; i++){ const p = fib(i, n); const a = {name:'P'+i, bal:1 + ((i*37)%100), flash:0, ...p, idx:i}; world.agents.push(a); world.byName.set(a.name, a); }
+  world.maxBal = 100; world.top = new Set(world.agents.slice(0, 12).map(a => a.name));
+}
+function updateWorld(list){
+  const sorted = list.slice().sort((a,b) => a.id - b.id);
+  const key = sorted.length + ':' + (sorted[0] ? sorted[0].name : '') + ':' + (sorted[sorted.length-1] ? sorted[sorted.length-1].name : '');
+  if(key !== world.key || preview){
+    world.key = key; preview = false; world.agents = []; world.byName.clear();
+    sorted.forEach((ag, i) => { const p = fib(i, sorted.length); const a = {name:ag.name, bal:0, flash:0, ...p, idx:i}; world.agents.push(a); world.byName.set(a.name, a); });
+  }
+  let max = 1;
+  sorted.forEach(ag => { const a = world.byName.get(ag.name); if(a){ a.bal = Number(ag.account.balance); a.id = ag.id; if(a.bal > max) max = a.bal; } });
+  world.maxBal = max;
+  world.top = new Set(world.agents.slice().sort((a,b) => b.bal - a.bal).slice(0, 12).map(a => a.name));
+}
+const nodeOf = name => world.byName.get(name) || world.hubs.get(name) || core;
 
-// 에이전트 전체 데이터 캐시 (클릭 팝업 / 예측용)
-let agentCache = {};         // name -> agent obj
-const balHistory = {};       // name -> [bal, bal, ...] 최근 30틱
-const HIST_MAX = 30;
+/* ── 입자 ─────────────────────────────────────── */
+const streams = [], queue = [];
+const dust = new Float32Array(1800 * 3);
+for(let i = 0; i < 1800; i++){ const r = 0.25 + Math.pow(Math.random(), 0.6) * 2.4, th = Math.random() * 6.2832, ph = Math.acos(2*Math.random()-1);
+  dust[i*3] = r*Math.sin(ph)*Math.cos(th); dust[i*3+1] = r*Math.cos(ph)*0.8; dust[i*3+2] = r*Math.sin(ph)*Math.sin(th); }
+let dustSpin = 0;
 
-// 에이전트 이름 → 이모지
-const AGENT_EMOJI = {
-  "일론머스크":"🚀","이재용":"📱","워런버핏":"💰","김범수":"💬",
-  "손흥민":"⚽","유재석":"🎤","아이유":"🎵","박찬호":"⚾",
-  "김태희":"🎬","이순신":"⚔️"
+function spawn(sender, receiver, amount, color){
+  const A = nodeOf(sender), B = nodeOf(receiver); if(A === B) return;
+  A.flash = Math.max(A.flash, .6);
+  const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2, mz = (A.z + B.z) / 2, pull = 0.25;
+  const s = {A, B, C:[mx*pull + (Math.random()-.5)*.25, my*pull + (Math.random()-.5)*.3, mz*pull + (Math.random()-.5)*.25], color, ps:[], hit:false};
+  const n = Math.max(8, Math.min(34, Math.round(6 + Math.log10(Math.max(10, Number(amount) || 10)) * 5)));
+  for(let i = 0; i < n; i++) s.ps.push({t:-Math.random()*0.4, v:0.007 + Math.random()*0.009, j:[(Math.random()-.5)*.05,(Math.random()-.5)*.05,(Math.random()-.5)*.05], sz:1 + Math.random()*1.8});
+  streams.push(s);
+  while(streams.length > 160) streams.shift();
+}
+
+/* ── 투영 ─────────────────────────────────────── */
+const P = {x:0, y:0, k:0, z:0};
+let cYaw = 1, sYaw = 0, cPit = 1, sPit = 0, SC = 400;
+function setCam(yaw, pitch){ cYaw = Math.cos(yaw); sYaw = Math.sin(yaw); cPit = Math.cos(pitch); sPit = Math.sin(pitch); }
+function proj(x, y, z){
+  const X = x*cYaw + z*sYaw; let Z = -x*sYaw + z*cYaw;
+  const Y = y*cPit - Z*sPit; Z = y*sPit + Z*cPit;
+  const k = cam.dist / Math.max(0.3, cam.dist + Z);
+  P.x = W*0.5 + X*k*SC; P.y = H*0.5 + Y*k*SC; P.k = k; P.z = Z; return P;
+}
+
+const sprites = {};
+function sprite(color){
+  if(sprites[color]) return sprites[color];
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0, color); gr.addColorStop(0.18, color); gr.addColorStop(0.5, color + '33'); gr.addColorStop(1, color + '00');
+  g.fillStyle = gr; g.fillRect(0,0,64,64); return sprites[color] = c;
+}
+const hits = [];
+function glow(color, x, y, size, alpha){ ctx.globalAlpha = alpha; ctx.drawImage(sprite(color), x - size, y - size, size*2, size*2); }
+
+function ring(radius, tilt, alpha){
+  ctx.beginPath();
+  for(let i = 0; i <= 72; i++){ const a = i/72*6.2832; const p = proj(Math.cos(a)*radius, Math.sin(a)*radius*Math.sin(tilt), Math.sin(a)*radius*Math.cos(tilt)); if(i) ctx.lineTo(p.x, p.y); else ctx.moveTo(p.x, p.y); }
+  ctx.strokeStyle = 'rgba(255,255,255,' + alpha + ')'; ctx.lineWidth = 1; ctx.stroke();
+}
+
+let last = performance.now();
+function frame(now){
+  const dt = Math.min(50, now - last) / 16.67; last = now;
+  SC = Math.min(W, H) * 0.34;
+  cam.tdist = (view === 'run') ? 3.4 : 3.9;
+  if(!cam.drag) cam.tyaw += cam.vy * dt * (view === 'run' ? 1 : 0.7);
+  cam.yaw += (cam.tyaw - cam.yaw) * 0.12; cam.pitch += (cam.tpitch - cam.pitch) * 0.12; cam.dist += (cam.tdist - cam.dist) * 0.06;
+  dustSpin += 0.0004 * dt;
+  const alert = brokerDown && view === 'run';
+
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  ctx.fillStyle = 'rgba(0,0,0,0.26)'; ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'lighter';
+
+  /* 먼지 */
+  setCam(cam.yaw + dustSpin, cam.pitch);
+  ctx.fillStyle = '#9fc9ff';
+  for(let i = 0; i < 1800; i++){
+    const p = proj(dust[i*3], dust[i*3+1], dust[i*3+2]);
+    if(p.k < 0.45) continue;
+    ctx.globalAlpha = Math.min(0.55, 0.12 + (p.k - 0.45) * 0.35) * (0.6 + 0.4 * Math.sin(now*0.002 + i));
+    const s = p.k > 1.1 ? 1.8 : 1.1; ctx.fillRect(p.x, p.y, s, s);
+  }
+  setCam(cam.yaw, cam.pitch);
+
+  /* 궤도 링 */
+  ring(0.42, 0, 0.09); ring(1.0, 0, 0.06); ring(1.0, 1.05, 0.05); ring(0.7, -0.6, 0.04);
+
+  /* 은행 코어 */
+  hits.length = 0;
+  const cp = proj(0, 0, 0); const pulse = 1 + Math.sin(now * 0.004) * 0.12;
+  const coreColor = alert ? '#ff3b4e' : '#ffffff';
+  glow(coreColor, cp.x, cp.y, (alert ? 62 : 44) * cp.k * pulse, 0.9);
+  glow(alert ? '#ff3b4e' : '#35e0ff', cp.x, cp.y, 120 * cp.k, alert ? 0.35 : 0.22);
+  hits.push({x:cp.x, y:cp.y, r:22, label:'은행 코어 · 원장'});
+
+  /* 허브 */
+  world.hubs.forEach(h => {
+    const p = proj(h.x, h.y, h.z); h.flash *= 0.94;
+    glow(h.color, p.x, p.y, (9 + h.flash * 22) * p.k, 0.7 + h.flash * .3);
+    hits.push({x:p.x, y:p.y, r:12, label:h.name});
+    if(p.k > 0.8){ ctx.globalAlpha = 0.7; ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = h.color; ctx.font = '300 11px ' + getComputedStyle(document.body).getPropertyValue('--sans'); ctx.fillText(h.name, p.x + 10, p.y + 4); ctx.globalCompositeOperation = 'lighter'; }
+  });
+
+  /* 에이전트 */
+  const labels = [];
+  for(const a of world.agents){
+    a.flash *= 0.93;
+    const bob = Math.sin(now * 0.0008 + a.idx) * 0.012;
+    const p = proj(a.x, a.y + bob, a.z); a.sx = p.x; a.sy = p.y; a.sk = p.k;
+    const isTop = world.top.has(a.name); const w = Math.sqrt(Math.max(0, a.bal) / world.maxBal);
+    const depthA = Math.max(0.25, Math.min(1, (p.k - 0.55) * 1.4));
+    if(isTop && !preview){
+      glow('#35e0ff', p.x, p.y, (8 + w * 16 + a.flash * 26) * p.k, depthA);
+      glow('#ffffff', p.x, p.y, (2.5 + w * 3) * p.k, depthA);
+      labels.push([a, p.x, p.y, p.k, depthA]);
+    } else {
+      glow(preview ? '#7fd8ff' : '#35e0ff', p.x, p.y, (2.6 + w * 3 + a.flash * 14) * p.k, depthA * (preview ? 0.6 + 0.4*Math.sin(now*0.003 + a.idx) : 0.55));
+    }
+    hits.push({x:p.x, y:p.y, r:10, label: preview ? null : a.name + ' · ' + won(a.bal)});
+  }
+
+  /* 거래 입자 */
+  for(let si = streams.length - 1; si >= 0; si--){
+    const s = streams[si]; let alive = false; ctx.fillStyle = s.color;
+    for(const q of s.ps){
+      q.t += q.v * dt; if(q.t >= 1){ if(!s.hit){ s.hit = true; s.B.flash = 1; } continue; } if(q.t < 0){ alive = true; continue; }
+      alive = true; const t = q.t, u = 1 - t, e = t * t * (3 - 2*t); const tt = e;
+      const uu = 1 - tt;
+      const x = uu*uu*s.A.x + 2*uu*tt*s.C[0] + tt*tt*s.B.x + q.j[0];
+      const y = uu*uu*s.A.y + 2*uu*tt*s.C[1] + tt*tt*s.B.y + q.j[1];
+      const z = uu*uu*s.A.z + 2*uu*tt*s.C[2] + tt*tt*s.B.z + q.j[2];
+      const p = proj(x, y, z); ctx.globalAlpha = Math.min(1, 0.35 + p.k * 0.5) * (t < 0.1 ? t * 10 : 1);
+      const sz = q.sz * p.k * 1.4; ctx.fillRect(p.x - sz/2, p.y - sz/2, sz, sz);
+    }
+    if(!alive) streams.splice(si, 1);
+  }
+
+  /* Outbox 대기열: 코어 주위를 도는 주황 입자 */
+  const target = Math.min(420, view === 'run' ? pending : 0);
+  for(let i = 0; i < 6 && queue.length < target; i++) queue.push({a:Math.random()*6.28, r:0.14 + Math.random()*0.2, w:0.01 + Math.random()*0.02, y:(Math.random()-.5)*0.14, ph:Math.random()*6});
+  for(let rm = 0; rm < 14 && queue.length > target; rm++){
+    const q = queue.pop(); const tgt = world.agents.length ? world.agents[(Math.random()*world.agents.length)|0] : core;
+    const n = streams.length; spawn('은행', tgt.name, 5000, '#ffb347');
+    if(streams.length > n) streams[streams.length-1].A = {x:Math.cos(q.a)*q.r, y:q.y, z:Math.sin(q.a)*q.r, flash:0};
+  }
+  ctx.fillStyle = '#ffb347';
+  for(const q of queue){ q.a += q.w * dt; const p = proj(Math.cos(q.a)*q.r, q.y + Math.sin(q.a*2 + q.ph)*0.04, Math.sin(q.a)*q.r); ctx.globalAlpha = 0.85; ctx.fillRect(p.x-1.2, p.y-1.2, 2.6*p.k, 2.6*p.k); }
+
+  /* 라벨 */
+  ctx.globalCompositeOperation = 'source-over'; ctx.font = '300 11px ui-monospace,Consolas,monospace';
+  for(const [a, x, y, k, d] of labels){ ctx.globalAlpha = d * 0.9; ctx.fillStyle = '#e8f6ff'; ctx.fillText(a.name, x + 10 * k + 4, y + 4); }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(frame);
+}
+
+/* 카메라 입력 */
+cv.addEventListener('pointerdown', e => { cam.drag = true; cam.lx = e.clientX; cam.ly = e.clientY; cv.setPointerCapture(e.pointerId); });
+addEventListener('pointerup', () => { cam.drag = false; });
+addEventListener('pointermove', e => {
+  if(cam.drag){ cam.tyaw += (e.clientX - cam.lx) * 0.006; cam.tpitch = Math.max(-1.2, Math.min(1.2, cam.tpitch + (e.clientY - cam.ly) * 0.005)); cam.lx = e.clientX; cam.ly = e.clientY; }
+  const tip = $('tip'); let best = null, bd = 1e9;
+  if(e.target === cv) for(const h of hits){ if(!h.label) continue; const d = Math.hypot(h.x - e.clientX, h.y - e.clientY); if(d < h.r && d < bd){ bd = d; best = h; } }
+  if(best){ tip.style.display = 'block'; tip.textContent = best.label; tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px'; } else tip.style.display = 'none';
+});
+cv.addEventListener('wheel', e => { e.preventDefault(); cam.tdist = Math.max(2.2, Math.min(6, cam.tdist + e.deltaY * 0.002)); }, {passive:false});
+
+/* ── 설정 화면 ────────────────────────────────── */
+const nIn = $('agent-n'), nRg = $('agent-r');
+function setN(v){ v = Math.max(2, Math.min(200, Math.round(+v || 10))); nIn.value = v; nRg.value = v; if(view === 'setup') buildPreview(v); }
+nIn.addEventListener('input', () => { if(nIn.value !== '') setN(nIn.value); });
+nRg.addEventListener('input', () => setN(nRg.value));
+document.querySelectorAll('#agent-chips button').forEach(b => b.onclick = () => setN(b.dataset.n));
+function speedBind(segId){ document.querySelectorAll('#' + segId + ' button').forEach(b => b.onclick = async () => { await fetch('/simulation/speed?ms=' + b.dataset.ms, {method:'POST'}); markSpeed(+b.dataset.ms); }); }
+function markSpeed(ms){ document.querySelectorAll('.seg button').forEach(b => b.classList.toggle('on', +b.dataset.ms === ms)); }
+speedBind('speed-seg'); speedBind('speed-seg-setup');
+$('btn-launch').onclick = async () => {
+  const n = +nIn.value; const err = $('setup-err'); err.textContent = '';
+  if(!Number.isInteger(n) || n < 2 || n > 200){ err.textContent = '에이전트 수는 2 ~ 200 사이 정수로 입력하세요'; return; }
+  $('btn-launch').disabled = true;
+  const r = await fetch('/simulation/setup?agentCount=' + n, {method:'POST'}); const d = await r.json().catch(() => ({}));
+  $('btn-launch').disabled = false;
+  if(!r.ok){ err.textContent = d.error || '시작하지 못했습니다'; return; }
+  resetWorld(); lastTotal = null; ob = null; poll();
 };
 
-// chancePay 기준 성격 분류
-function agentType(a){
-  const pay = a.chancePay || 0;
-  const inv = a.chanceInvest || 0;
-  if(inv >= 0.5)  return {label:"📈 투자귀재형", color:"#22c55e"};
-  if(pay >= 0.75) return {label:"🔥 큰손형",    color:"#ef4444"};
-  if(pay >= 0.55) return {label:"💸 활발형",    color:"#f59e0b"};
-  if(pay >= 0.35) return {label:"⚖️ 균형형",    color:"#4f8ef7"};
-  if(pay >= 0.15) return {label:"🏦 저축형",    color:"#8b5cf6"};
-  return           {label:"🐢 수전노형",         color:"#888fa3"};
+/* ── 컨트롤 ───────────────────────────────────── */
+$('btn-pause').onclick = async () => { const run = status.state === 'RUNNING'; await fetch('/simulation/' + (run ? 'pause' : 'start'), {method:'POST'}); poll(); };
+$('btn-stop').onclick = async () => { if(!confirm('종료하면 다시 이어서 실행할 수 없고, 요약 화면으로 이동합니다. 종료할까요?')) return; await fetch('/simulation/stop', {method:'POST'}); poll(); };
+$('btn-new').onclick = async () => { await fetch('/simulation/reset', {method:'POST'}); $('feed').innerHTML = ''; poll(); };
+
+/* ── 폴링 / 렌더 ──────────────────────────────── */
+let lastTotal = null, lastT = 0, tpsEma = 0; const tpsHist = [];
+function countTo(el, v, f){ el._to = v; if(el._raf) return; const from = el._v == null ? v : el._v; const t0 = performance.now();
+  const step = n => { const p = Math.min(1, (n - t0) / 450); const cur = from + (el._to - from) * (1 - Math.pow(1 - p, 3)); el._v = cur; el.textContent = f(Math.round(cur)); if(p < 1) el._raf = requestAnimationFrame(step); else { el._raf = 0; el._v = el._to; } };
+  el._raf = requestAnimationFrame(step); }
+
+function renderStatus(s){
+  status = s; const st = s.state;
+  const map = {SETUP:'setup', RUNNING:'run', PAUSED:'run', ENDED:'end'};
+  setView(map[st] || 'setup');
+  $('state-badge').className = 'badge ' + st; $('state-text').textContent = {RUNNING:'실행 중', PAUSED:'일시정지', ENDED:'종료', SETUP:'설정'}[st] || st;
+  $('btn-pause').textContent = st === 'RUNNING' ? '일시정지' : '재개';
+  markSpeed(s.tickIntervalMs);
+  if(s.virtualNow){ const t = s.virtualNow.split('T'); $('clock-day').textContent = 'DAY ' + s.virtualDay; $('clock-time').textContent = (t[1] || '00:00').slice(0, 5); $('clock-date').textContent = t[0]; }
+  if(s.minutesPerTick){ const tpd = Math.round(1440 / s.minutesPerTick); $('inf-mpt').textContent = s.minutesPerTick + '분 / 틱'; $('inf-day').textContent = tpd + ' 틱'; $('inf-start').textContent = (s.virtualStart || '').split('T')[0]; }
 }
+async function pollStatus(){ try{ renderStatus(await getJson('/simulation/status')); }catch(e){} }
 
-// ── 팝업 ────────────────────────────────────────────────
-function openPopup(name, evt){
-  const a = agentCache[name]; if(!a) return;
-  const popup = document.getElementById("agent-popup");
-  const type = agentType(a);
-
-  document.getElementById("ap-avatar").textContent  = AGENT_EMOJI[name] || "👤";
-  document.getElementById("ap-name").textContent    = name;
-  document.getElementById("ap-type").textContent    = type.label;
-  document.getElementById("ap-type").style.background = type.color + "30";
-  document.getElementById("ap-type").style.borderColor = type.color + "80";
-  document.getElementById("ap-type").style.color    = type.color;
-  document.getElementById("ap-bal").textContent     = fmtMoney(a.account.balance);
-  document.getElementById("ap-salary").textContent  = fmtMoney((a.salary||0) * SALARY_RATE);
-
-  const probs = [
-    {key:"pay",  v:a.chancePay},
-    {key:"spend",v:a.chanceSpend},
-    {key:"refund",v:a.chanceRefund},
-    {key:"invest",v:a.chanceInvest},
-  ];
-  probs.forEach(p => {
-    const pct = Math.round((p.v||0)*100);
-    document.getElementById(`ap-${p.key}-v`).textContent = pct + "%";
-    document.getElementById(`ap-${p.key}-bar`).style.width = pct + "%";
-  });
-
-  // 화면 밖으로 안 나가게 위치 조정
-  const px = Math.min(evt.clientX + 16, window.innerWidth - 320);
-  const py = Math.min(evt.clientY - 10, window.innerHeight - 420);
-  popup.style.left = px + "px";
-  popup.style.top  = py + "px";
-  popup.classList.add("show");
-}
-
-function closePopup(){
-  document.getElementById("agent-popup").classList.remove("show");
-}
-document.addEventListener("click", e => {
-  const popup = document.getElementById("agent-popup");
-  if(popup.classList.contains("show") && !popup.contains(e.target) && !e.target.closest(".agent-node"))
-    closePopup();
-});
-
-// ── 잔액 히스토리 & 예측 ────────────────────────────────
-function trackBalances(agents){
-  agents.forEach(a => {
-    if(!balHistory[a.name]) balHistory[a.name] = [];
-    balHistory[a.name].push(Number(a.account.balance));
-    if(balHistory[a.name].length > HIST_MAX) balHistory[a.name].shift();
-  });
-}
-
-function slope(arr){
-  if(arr.length < 3) return 0;
-  const n = arr.length;
-  const sumX = n*(n-1)/2, sumY = arr.reduce((a,b)=>a+b,0);
-  const sumXY = arr.reduce((s,v,i)=>s+i*v,0);
-  const sumX2 = arr.reduce((s,_,i)=>s+i*i,0);
-  return (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
-}
-
-function renderPrediction(agents){
-  const trends = agents.map(a => ({
-    name: a.name,
-    emoji: AGENT_EMOJI[a.name] || "👤",
-    bal: Number(a.account.balance),
-    slope: slope(balHistory[a.name] || [])
-  }));
-  trends.sort((a,b) => b.slope - a.slope);
-
-  const gainers = document.getElementById("pred-gainers");
-  gainers.innerHTML = "";
-  trends.slice(0,3).forEach(t => {
-    const d = document.createElement("div"); d.className = "trend-row";
-    const perTick = t.slope >= 0 ? `+${fmtMoney(t.slope)}/틱` : `${fmtMoney(t.slope)}/틱`;
-    d.innerHTML = `<span class="trend-name">${t.emoji} ${t.name}</span>
-                   <span class="trend-val trend-up">▲ ${fmtMoney(Math.abs(t.slope))}/틱</span>`;
-    gainers.appendChild(d);
-  });
-
-  const losers = document.getElementById("pred-losers");
-  losers.innerHTML = "";
-  [...trends].reverse().slice(0,3).forEach(t => {
-    const d = document.createElement("div"); d.className = "trend-row";
-    d.innerHTML = `<span class="trend-name">${t.emoji} ${t.name}</span>
-                   <span class="trend-val trend-down">▼ ${fmtMoney(Math.abs(t.slope))}/틱</span>`;
-    losers.appendChild(d);
-  });
-
-  // 최후 승자: 현재잔액 + 기울기*미래틱이 가장 큰 에이전트
-  const FUTURE = 100;
-  const winner = trends.reduce((best, t) => {
-    const predicted = t.bal + t.slope * FUTURE;
-    return predicted > (best.bal + best.slope * FUTURE) ? t : best;
-  }, trends[0]);
-
-  if(winner){
-    document.getElementById("pred-winner-emoji").textContent = winner.emoji;
-    document.getElementById("pred-winner-name").textContent  = winner.name;
-    const gain = winner.slope * FUTURE;
-    document.getElementById("pred-winner-desc").textContent =
-      `${FUTURE}틱 후 예상 잔액 ${fmtMoney(winner.bal + gain)}`;
-  }
-}
-
-function el(tag, attrs){ const e=document.createElementNS(SVGNS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; }
-
-function fmtMoney(v){
-  v = Math.floor(Number(v||0));
-  const eok = Math.floor(v / 1e8);
-  const man = Math.floor((v % 1e8) / 1e4);
-  if (eok > 0) return man > 0 ? `${eok.toLocaleString()}억 ${man.toLocaleString()}만` : `${eok.toLocaleString()}억`;
-  if (man > 0) return `${man.toLocaleString()}만`;
-  return v.toLocaleString() + "원";
-}
-function fmtBalMan(v){ return fmtMoney(v); }
-
-// 잔액 -> 원 반지름 매핑 (전체 에이전트 잔액 분포 기준)
-function radiusFor(bal, min, max){
-  const MIN_R = 17, MAX_R = 36;
-  if (max <= min) return (MIN_R+MAX_R)/2;
-  const t = (Number(bal) - min) / (max - min);
-  return MIN_R + t * (MAX_R - MIN_R);
-}
-
-function buildGraph(agents){
-  graph.innerHTML = "";
-
-  // 에이전트 노드 좌표 계산 (2열 x 5행)
-  const cols=[85,210], yBase=58, gap=98;
-  agents.slice(0,10).forEach((a,i)=>{
-    const x = cols[i<5?0:1];
-    const y = yBase + (i%5)*gap;
-    nodePos[a.name] = {x,y};
-  });
-
-  // 1) 연결선: 에이전트 -> 은행 (흐르는 애니메이션)
-  agents.slice(0,10).forEach(a=>{
-    const p = nodePos[a.name];
-    graph.appendChild(el("line",{x1:p.x,y1:p.y,x2:BANK.x-58,y2:BANK.y,stroke:"#3a4a7a","stroke-width":1.5,class:"flow"}));
-  });
-  // 2) 연결선: 은행 -> 외부 시스템
-  EXTERNALS.forEach((e,i)=>{
-    const ey = 40 + i*82 + 28;
-    graph.appendChild(el("line",{x1:BANK.x+58,y1:BANK.y,x2:625,y2:ey,stroke:"#2b3040","stroke-width":1.5}));
-  });
-
-  // 3) 외부 시스템 박스
-  EXTERNALS.forEach((e,i)=>{
-    const ey = 40 + i*82;
-    const g = el("g",{});
-    g.appendChild(el("rect",{x:625,y:ey,width:130,height:56,rx:9,fill:e.color,opacity:0.92}));
-    const t1 = el("text",{x:690,y:ey+24,"text-anchor":"middle"}); t1.setAttribute("class","ext-label"); t1.textContent=e.name; g.appendChild(t1);
-    const t2 = el("text",{x:690,y:ey+41,"text-anchor":"middle"}); t2.setAttribute("class","ext-sub"); t2.textContent=e.sub; g.appendChild(t2);
-    graph.appendChild(g);
-  });
-  const ec = el("text",{x:690,y:535,"text-anchor":"middle"}); ec.setAttribute("class","caption"); ec.textContent="외부 시스템"; graph.appendChild(ec);
-
-  // 4) 은행 박스 (펄스 링 + 글로우 코어)
-  const bg = el("g",{});
-  bg.appendChild(el("circle",{cx:BANK.x,cy:BANK.y,r:46,fill:"none",stroke:"#3b82f6","stroke-width":2,class:"bank-ring"}));
-  bg.appendChild(el("circle",{cx:BANK.x,cy:BANK.y,r:46,fill:"none",stroke:"#60a5fa","stroke-width":2,class:"bank-ring r2"}));
-  bg.appendChild(el("rect",{x:BANK.x-58,y:BANK.y-42,width:116,height:84,rx:12,fill:"#1e3a8a",stroke:"#3b82f6","stroke-width":1.5,id:"bank-core"}));
-  const b1=el("text",{x:BANK.x,y:BANK.y-6,"text-anchor":"middle"}); b1.setAttribute("class","node-label"); b1.style.fontSize="15px"; b1.textContent="은행"; bg.appendChild(b1);
-  const b2=el("text",{x:BANK.x,y:BANK.y+12,"text-anchor":"middle"}); b2.setAttribute("class","ext-sub"); b2.textContent="백엔드 시스템"; bg.appendChild(b2);
-  const b3=el("text",{x:BANK.x,y:BANK.y+28,"text-anchor":"middle"}); b3.setAttribute("class","ext-sub"); b3.textContent="송금 / 입금 / 원장"; bg.appendChild(b3);
-  graph.appendChild(bg);
-
-  // 5) 에이전트 노드 (원 크기는 updateBalances 에서 갱신, 클릭 시 팝업)
-  const bals = agents.slice(0,10).map(a=>Number(a.account.balance));
-  const min = Math.min(...bals), max = Math.max(...bals);
-  agents.slice(0,10).forEach(a=>{
-    const p = nodePos[a.name];
-    const r = radiusFor(a.account.balance, min, max);
-    const emoji = AGENT_EMOJI[a.name] || "";
-    const g = el("g",{id:"node-"+cssId(a.name)}); g.setAttribute("class","agent-node");
-    g.appendChild(el("circle",{cx:p.x,cy:p.y,r:r,fill:"#3b2d6b",stroke:"#8b5cf6","stroke-width":2,id:"circ-"+cssId(a.name)}));
-    // 이모지 아바타
-    const em=el("text",{x:p.x,y:p.y-4,"text-anchor":"middle","font-size":"14"}); em.textContent=emoji; g.appendChild(em);
-    const nm=el("text",{x:p.x,y:p.y+11,"text-anchor":"middle"}); nm.setAttribute("class","node-label"); nm.style.fontSize="9.5px"; nm.textContent=shortName(a.name); g.appendChild(nm);
-    const bal=el("text",{x:p.x,y:p.y+50,"text-anchor":"middle"}); bal.setAttribute("class","node-bal"); bal.setAttribute("id","bal-"+cssId(a.name)); bal.textContent=fmtBalMan(a.account.balance); g.appendChild(bal);
-    g.addEventListener("click", evt => { evt.stopPropagation(); openPopup(a.name, evt); });
-    graph.appendChild(g);
-  });
-
-  const cap = el("text",{x:147,y:535,"text-anchor":"middle"}); cap.setAttribute("class","caption"); cap.textContent = agents.length > 10 ? "에이전트 "+agents.length+"명 (상위 10명 표시)" : "에이전트 "+agents.length+"명"; graph.appendChild(cap);
-  built = true;
-}
-
-function cssId(name){ return encodeURIComponent(name).replace(/%/g,""); }
-function shortName(name){ return name.length>4 ? name.slice(0,4) : name; }
-
-function updateBalances(agents){
-  const bals = agents.slice(0,10).map(a=>Number(a.account.balance));
-  const min = Math.min(...bals), max = Math.max(...bals);
-  agents.forEach(a=>{
-    const t = document.getElementById("bal-"+cssId(a.name));
-    if(t) t.textContent = fmtBalMan(a.account.balance);
-    const c = document.getElementById("circ-"+cssId(a.name));
-    if(c) c.setAttribute("r", radiusFor(a.account.balance, min, max).toFixed(1));
-  });
-}
-
-// 외부 시스템 박스 중심 좌표 (가맹점/투자시장 계좌 이름과 동일)
-function externalPos(name){
-  const i = EXTERNALS.findIndex(e => e.name === name);
-  return i < 0 ? null : {x:690, y:40 + i*82 + 28};
-}
-
-function animatePulse(senderName, receiverName){
-  // 에이전트가 아니면 외부 시스템 박스, 그것도 아니면(발행계정) 은행 위치를 사용
-  const s = nodePos[senderName] || externalPos(senderName) || (nodePos[receiverName] ? BANK : null);
-  const r = nodePos[receiverName] || externalPos(receiverName) || (nodePos[senderName] ? BANK : null);
-  if(!s || !r) return;
-  const path = `M ${s.x} ${s.y} L ${BANK.x} ${BANK.y} L ${r.x} ${r.y}`;
-  const dot = el("circle",{r:6,fill:"#4f8ef7",filter:"drop-shadow(0 0 6px #4f8ef7)"});
-  const motion = el("animateMotion",{dur:"0.9s",path:path,fill:"freeze",repeatCount:"1"});
-  dot.appendChild(motion); graph.appendChild(dot);
-  if(motion.beginElement) motion.beginElement();
-  // 노드 반짝
-  [senderName,receiverName].forEach(n=>{
-    const node = document.getElementById("node-"+cssId(n));
-    if(node){ node.classList.add("pulse-flash"); setTimeout(()=>node.classList.remove("pulse-flash"),800); }
-  });
-  setTimeout(()=>dot.remove(), 950);
-}
-
-function renderFeed(items){
-  const box = document.getElementById("feed");
-
-  // 처음 로드면 최신 10개 위에서부터 채우기 (최신이 맨 위)
-  if(renderedFeedIds.size === 0 && items.length > 0){
-    [...items].forEach(it => {
-      renderedFeedIds.add(it.id);
-      box.appendChild(makeFeedItem(it, false));
-    });
-    return;
-  }
-
-  // 이후엔 새 항목만 맨 위에 추가
-  const fresh = items.filter(it => !renderedFeedIds.has(it.id));
-  if(fresh.length === 0) return;
-
-  // 최신순(id 내림차순)으로 맨 위에 삽입
-  [...fresh].sort((a,b) => b.id - a.id).forEach(it => {
-    renderedFeedIds.add(it.id);
-    box.insertBefore(makeFeedItem(it, true), box.firstChild);
-  });
-
-  // 최대 줄 수 초과 시 아래에서 제거
-  while(box.children.length > FEED_MAX) box.removeChild(box.lastChild);
-}
-
-function makeFeedItem(it, isNew){
-  const div = document.createElement("div");
-  div.className = "item" + (isNew ? " new" : "");
-  const time = (it.createdAt||"").slice(11,19);
-  const amt = fmtMoney(it.amount);
-  div.innerHTML =
-    `<div class="meta">${time} · ${it.txLabel || "송금"}</div>
-     <div class="line"><span class="name">${it.senderName}</span> → <span class="name">${it.receiverName}</span> · ${amt}</div>
-     <div class="reason">${it.description ? "사유: "+it.description : ""}</div>`;
-  return div;
-}
-
-// 터미널 로그 — 새 트랜잭션을 백엔드 로그처럼 출력
-function pushLog(items){
-  const box = document.getElementById("logbox");
-  items.forEach(it=>{
-    const time = (it.createdAt||"").slice(11,19);
-    const amt = Number(it.amount||0).toLocaleString();
-    const line = document.createElement("div");
-    line.className = "logline";
-    line.innerHTML =
-      `<span class="l-time">[${time}]</span> ` +
-      `<span class="l-tx">TX#${String(it.id).padStart(5,"0")}</span> ` +
-      `<span class="l-name">${it.senderName}</span><span class="l-arrow"> → </span><span class="l-name">${it.receiverName}</span> ` +
-      `<span class="l-amt">₩${amt}</span> ` +
-      `<span class="l-lock">🔒LOCK</span> <span class="l-commit">✓COMMIT</span>` +
-      (it.description ? ` <span class="l-reason">// ${it.description}</span>` : ``);
-    box.insertBefore(line, box.firstChild);
-  });
-  // 최대 60줄 유지
-  while(box.childNodes.length > 60) box.removeChild(box.lastChild);
-}
-
-function renderTop3(agents){
-  const box = document.getElementById("top3");
-  box.innerHTML = "";
-  const medals=["#f5c518","#c0c4cc","#cd7f32"];
-  [...agents].sort((a,b)=>Number(b.account.balance)-Number(a.account.balance)).slice(0,3).forEach((a,i)=>{
-    const row=document.createElement("div"); row.className="rank";
-    row.innerHTML =
-      `<div class="who"><span class="medal" style="background:${medals[i]}">${i+1}</span>${a.name}</div>
-       <div class="amt">${fmtBalMan(a.account.balance)}</div>`;
-    box.appendChild(row);
-  });
-}
-
-function bump(id){
-  const e = document.getElementById(id);
-  if(!e) return;
-  e.classList.remove("bump"); void e.offsetWidth; e.classList.add("bump");
-}
-
-// 숫자 카운트업 애니메이션 (따따땅 굴러 올라감)
-const numState = {};
-function animateNumber(id, target, fmt){
-  const e = document.getElementById(id); if(!e) return;
-  fmt = fmt || fmtMoney;
-  const from = numState[id] || 0;
-  if(from === target){ e.textContent = fmt(target); return; }
-  const dur = 550, start = performance.now();
-  function step(now){
-    const t = Math.min(1, (now - start) / dur);
-    const eased = 1 - Math.pow(1 - t, 3);
-    e.textContent = fmt(from + (target - from) * eased);
-    if(t < 1) requestAnimationFrame(step);
-    else { e.textContent = fmt(target); numState[id] = target; }
-  }
-  numState[id] = target;
-  requestAnimationFrame(step);
-}
-function fmtInt(v){ return Math.round(Number(v||0)).toLocaleString(); }
-
-function renderStats(stats, nowTs){
-  const count = Number(stats.totalTransfers||0);
-  animateNumber("s-money", Number(stats.totalBalance||0), fmtMoney);  // 총 통화량 (에이전트 잔액 합 - 소비/투자/급여로 변동)
-  animateNumber("s-moved", Number(stats.totalMoved||0), fmtMoney);    // 누적 거래액 (증가)
-  animateNumber("s-count", count, fmtInt);
-
-  // TPS 계산 (거래건수 증가량 / 경과 시간)
-  let deltaCount = 0;
-  if(prevCount !== null && prevTs !== null){
-    deltaCount = Math.max(0, count - prevCount);
-    const dt = (nowTs - prevTs) / 1000;
-    const tps = dt > 0 ? deltaCount / dt : 0;
-    document.getElementById("s-tps").textContent = Math.round(tps).toLocaleString();
-    // 스파크라인 데이터 누적
-    sparkData.push(deltaCount);
-    while(sparkData.length > SPARK_MAX) sparkData.shift();
-    drawSpark();
-    document.getElementById("spark-now").textContent = deltaCount.toLocaleString();
-  }
-  prevCount = count; prevTs = nowTs;
-
-  // 복식부기 무결성
-  const card = document.getElementById("s-integrity-card");
-  const val = document.getElementById("s-integrity");
-  const sub = document.getElementById("s-integrity-sub");
-  if(stats.balanced){
-    val.textContent = "✓ 균형";
-    card.className = "stat ok";
-  }else{
-    val.textContent = "✗ 불일치";
-    card.className = "stat bad";
-  }
-  sub.textContent = "차변 " + fmtMoney(stats.totalDebit) + " = 대변 " + fmtMoney(stats.totalCredit)
-    + (stats.integrityCheckMs != null ? " · 검증 " + stats.integrityCheckMs + "ms" : "");
-}
-
-function drawSpark(){
-  const spark = document.getElementById("spark");
-  spark.innerHTML = "";
-  const W=340, H=70, pad=4;
-  const max = Math.max(1, ...sparkData);
-  const n = sparkData.length;
-  if(n < 2) return;
-  const stepX = (W) / (SPARK_MAX - 1);
-  // 영역 폴리곤
-  let pts = [];
-  sparkData.forEach((v,i)=>{
-    const x = i * stepX;
-    const y = H - pad - (v / max) * (H - pad*2);
-    pts.push([x,y]);
-  });
-  const lineStr = pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
-  const areaStr = `0,${H} ` + lineStr + ` ${pts[pts.length-1][0].toFixed(1)},${H}`;
-  spark.appendChild(el("polygon",{points:areaStr, fill:"rgba(79,142,247,0.18)"}));
-  spark.appendChild(el("polyline",{points:lineStr, fill:"none", stroke:"#4f8ef7","stroke-width":2,"stroke-linejoin":"round"}));
-  // 마지막 점
-  const last = pts[pts.length-1];
-  spark.appendChild(el("circle",{cx:last[0],cy:last[1],r:3,fill:"#4f8ef7"}));
-}
-
-async function tick(){
+async function pollRun(){
+  if(view !== 'run') return;
   try{
-    const nowTs = Date.now();
-    const [agents, stats] = await Promise.all([
-      fetch("/agents").then(r=>r.json()),
-      fetch("/stats").then(r=>r.json()),
-    ]);
-
-    agents.forEach(a => { agentCache[a.name] = a; });
-
-    if(!built) buildGraph(agents); else updateBalances(agents);
-    renderTop3(agents);
-    renderStats(stats, nowTs);
-    trackBalances(agents);
-    renderPrediction(agents);
-  }catch(e){
-    document.getElementById("s-tps").textContent = "—";
-  }
-}
-
-// ── SSE 실시간 피드 ────────────────────────────────────────
-let feedEs = null;
-function initFeedStream(){
-  if(feedEs){ feedEs.close(); }
-  feedEs = new EventSource("/feed/stream");
-  feedEs.onmessage = function(e){
-    try{
-      const it = JSON.parse(e.data);
-      // 피드 (맨 위에 삽입)
-      const box = document.getElementById("feed");
-      renderedFeedIds.add(it.id);
-      box.insertBefore(makeFeedItem(it, true), box.firstChild);
-      while(box.children.length > FEED_MAX) box.removeChild(box.lastChild);
-      // 터미널 로그
-      pushLog([it]);
-      // 그래프 애니메이션
-      animatePulse(it.senderName, it.receiverName);
-    }catch(_){}
-  };
-  feedEs.onerror = function(){
-    // 연결 끊기면 3초 후 재연결
-    feedEs.close(); feedEs = null;
-    setTimeout(initFeedStream, 3000);
-  };
-}
-
-// 초기 기존 피드 로드 후 SSE 구독
-fetch("/feed").then(r=>r.json()).then(items=>{
-  const box = document.getElementById("feed");
-  [...items].forEach(it=>{
-    renderedFeedIds.add(it.id);
-    box.appendChild(makeFeedItem(it, false));
-  });
-}).catch(()=>{}).finally(()=>{ initFeedStream(); });
-
-
-// ── 신뢰성 컨트롤 룸 ───────────────────────────────────────
-let chaosAvailable = true;
-function fmtAge(ms){
-  if(!ms) return "0초";
-  if(ms < 1000) return ms + "ms";
-  const s = Math.round(ms/1000);
-  return s < 60 ? s + "초" : Math.floor(s/60) + "분 " + (s%60) + "초";
-}
-async function refreshReliability(){
-  try{
-    const ob = await fetch("/ops/outbox").then(r=>r.json());
-    const pendingEl = document.getElementById("ob-pending");
-    pendingEl.textContent = Number(ob.pending).toLocaleString();
-    // 대기 건수 자체보다 "얼마나 오래 못 나가고 있나"가 장애 신호 (정상이면 100ms 주기로 비워짐)
-    const stuck = ob.dead > 0 || ob.oldestPendingAgeMillis > 2000;
-    pendingEl.className = "ob-big " + (stuck ? "warn" : "okc");
-    document.getElementById("ob-published").textContent = Number(ob.published).toLocaleString();
-    document.getElementById("ob-dead").textContent = Number(ob.dead).toLocaleString();
-    document.getElementById("ob-age").textContent = fmtAge(ob.oldestPendingAgeMillis);
-    const total = ob.pending + ob.published;
-    document.getElementById("ob-bar").style.width = total ? Math.min(100, ob.pending / total * 100 * 5) + "%" : "0%";
-  }catch(e){ /* 서버 재시작 중 */ }
-  if(!chaosAvailable) return;
-  try{
-    const res = await fetch("/chaos");
-    if(res.status === 404){ disableChaos(); return; }
-    renderChaos(await res.json());
+    const [agents, stats] = await Promise.all([getJson('/agents'), getJson('/stats')]);
+    if(Array.isArray(agents) && agents.length){ updateWorld(agents); renderRank(); $('cap-t').textContent = '에이전트 ' + agents.length + '명 중 상위 ' + Math.min(12, agents.length) + '명 표시'; }
+    countTo($('s-money'), Number(stats.totalBalance) || 0, won);
+    countTo($('s-count'), Number(stats.totalTransfers) || 0, fmt);
+    const bt = stats.countByType || {}; $('s-types').textContent = Object.keys(bt).map(k => (TYPE[k] ? TYPE[k][0] : k) + ' ' + fmt(bt[k])).join(' · ') || '—';
+    const now = performance.now(), tot = Number(stats.totalTransfers) || 0;
+    if(lastTotal != null && now - lastT > 400){ const inst = Math.max(0, (tot - lastTotal) / ((now - lastT) / 1000)); tpsEma = tpsEma ? tpsEma * 0.6 + inst * 0.4 : inst; tpsHist.push(tpsEma); if(tpsHist.length > 60) tpsHist.shift(); $('s-tps').textContent = tpsEma.toFixed(1); drawSpark(); }
+    if(lastTotal == null || now - lastT > 400){ lastTotal = tot; lastT = now; }
   }catch(e){}
+}
+function renderRank(){
+  const arr = world.agents.slice().sort((a,b) => b.bal - a.bal); const max = Math.max(1, arr[0] ? arr[0].bal : 1);
+  const box = $('rank'); const frag = document.createDocumentFragment();
+  arr.forEach((a, i) => { const r = document.createElement('div'); r.className = 'rk';
+    const n = document.createElement('span'); n.className = 'n'; n.textContent = i + 1; const nm = document.createElement('span'); nm.textContent = a.name;
+    const am = document.createElement('span'); am.className = 'a'; am.textContent = won(a.bal);
+    const bar = document.createElement('div'); bar.className = 'bar'; const b = document.createElement('b'); b.style.width = Math.max(1, a.bal / max * 100) + '%'; bar.appendChild(b);
+    r.append(n, nm, am, bar); frag.appendChild(r); });
+  box.replaceChildren(frag);
+}
+function drawSpark(){
+  const c = $('spark'); const w = c.clientWidth, h = c.clientHeight; if(!w) return; c.width = w * DPR; c.height = h * DPR; const g = c.getContext('2d'); g.setTransform(DPR,0,0,DPR,0,0);
+  const max = Math.max(1, ...tpsHist); g.beginPath(); tpsHist.forEach((v, i) => { const x = i / 59 * w, y = h - 3 - v / max * (h - 6); i ? g.lineTo(x, y) : g.moveTo(x, y); });
+  g.strokeStyle = '#35e0ff'; g.lineWidth = 1.5; g.shadowColor = '#35e0ff'; g.shadowBlur = 8; g.stroke();
+}
+async function pollIntegrity(){
+  if(view !== 'run') return;
+  try{ const r = await getJson('/integrity'); const set = (id, ok) => $(id).className = 'ck ' + (ok ? 'ok' : 'bad');
+    set('ck1', r.debitEqualsCredit); set('ck2', r.transfersWithoutTwoEntries === 0); set('ck3', r.mismatchedAccountCount === 0); set('ck4', Number(r.sumOfAllBalances) === 0);
+    $('s-integrity-card').dataset.balanced = r.balanced; }catch(e){}
+}
+
+let ob = null;
+function fmtAge(ms){ if(!ms) return '0초'; if(ms < 1000) return ms + 'ms'; const s = Math.round(ms/1000); return s < 60 ? s + '초' : Math.floor(s/60) + '분 ' + (s%60) + '초'; }
+async function pollReliability(){
+  if(view !== 'run') return;
+  try{
+    ob = await getJson('/ops/outbox'); pending = Number(ob.pending) || 0;
+    const el = $('ob-pending'); countTo(el, pending, fmt);
+    el.className = 'big' + ((ob.dead > 0 || ob.oldestPendingAgeMillis > 2000) ? ' warn' : '');
+    $('ob-published').textContent = fmt(ob.published); $('ob-dead').textContent = fmt(ob.dead); $('ob-age').textContent = fmtAge(ob.oldestPendingAgeMillis);
+    const tot = ob.pending + ob.published; $('ob-bar').style.width = tot ? Math.min(100, ob.pending / tot * 500) + '%' : '0%';
+  }catch(e){}
+  if(!chaosOn) return;
+  try{ const r = await fetch('/chaos'); if(r.status === 404){ disableChaos(); return; } renderChaos(await r.json()); }catch(e){}
 }
 function renderChaos(c){
-  const st = document.getElementById("chaos-state");
-  if(c.brokerDown){ st.textContent = "브로커 장애 중"; st.className = "chaos-state down"; }
-  else{ st.textContent = c.remainingAckLosses > 0 ? "ACK 유실 대기 " + c.remainingAckLosses + "건" : "브로커 정상"; st.className = "chaos-state up"; }
+  brokerDown = !!c.brokerDown; document.body.classList.toggle('alert', brokerDown);
+  const st = $('chaos-state'); if(brokerDown){ st.textContent = '브로커 장애 중'; st.style.color = 'var(--red)'; }
+  else { st.textContent = c.remainingAckLosses > 0 ? 'ACK 유실 대기 ' + c.remainingAckLosses + '건' : '브로커 정상'; st.style.color = c.remainingAckLosses > 0 ? 'var(--am)' : 'var(--gr)'; }
 }
-function disableChaos(){
-  chaosAvailable = false;
-  ["btn-broker-down","btn-broker-up","btn-ack-loss"].forEach(id => document.getElementById(id).disabled = true);
-  document.getElementById("chaos-desc").textContent = "장애 주입 API 가 꺼져 있습니다 (app.chaos.enabled=true, local 프로필에서 켜짐).";
+function disableChaos(){ chaosOn = false; ['btn-broker-down','btn-broker-up','btn-ack-loss'].forEach(id => $(id).disabled = true); $('chaos-desc').textContent = '장애 주입 API 가 꺼져 있습니다 (app.chaos.enabled=true, local 프로필에서 켜짐).'; }
+async function chaos(path){ try{ const r = await fetch(path, {method:'POST'}); if(r.status === 404){ disableChaos(); return; } renderChaos(await r.json()); }catch(e){} }
+$('btn-broker-down').onclick = () => chaos('/chaos/broker/down');
+$('btn-broker-up').onclick = () => chaos('/chaos/broker/up');
+$('btn-ack-loss').onclick = () => chaos('/chaos/broker/ack-loss?n=3');
+
+const RL = {MATCHED:'일치', PENDING_IN_FLIGHT:'전달 중', UNMATCHED:'불일치'};
+function renderRecon(r){
+  if(!r) return; const b = $('recon-badge'); b.textContent = RL[r.status] || r.status; b.className = 'rb ' + r.status;
+  $('recon-summary').innerHTML = ''; const t = document.createElement('span');
+  t.textContent = '영업일 ' + r.businessDate + ' · 은행 ' + fmt(r.bankCount) + '건 / 정산 ' + fmt(r.settlementCount) + '건 · 중복 수신 ' + fmt(r.duplicateDeliveries) + '건 · 원장 ' + (r.ledgerBalanced ? '정상' : '불일치'); $('recon-summary').appendChild(t);
+  const set = (id, v, bad) => { $(id).textContent = fmt(v); const box = $(id + '-box'); if(box) box.className = bad && v > 0 ? 'bad' : ''; };
+  set('rc-missing', r.missingCount, true); set('rc-inflight', r.inFlightCount, false); set('rc-unexpected', r.unexpectedCount, true); set('rc-mismatch', r.mismatchCount, true);
 }
-async function chaos(path){
+async function pollRecon(){ if(view !== 'run') return; renderRecon(await getOk('/ops/reconciliation/latest')); }
+$('btn-recon').onclick = async () => { $('recon-badge').textContent = '대사 중…'; try{ renderRecon(await getJson('/ops/reconciliation', {method:'POST'})); }catch(e){ $('recon-badge').textContent = '실패'; } };
+
+/* ── 피드 (SSE) ───────────────────────────────── */
+let es = null; const feedIds = new Set();
+function addFeed(it, animate){
+  if(feedIds.has(it.id)) return; feedIds.add(it.id);
+  const [label, color] = TYPE[it.txType] || [it.txLabel || it.txType, '#8a919b'];
+  const row = document.createElement('div'); row.className = 'fd';
+  const dot = document.createElement('i'); dot.style.background = color; dot.style.boxShadow = '0 0 8px ' + color;
+  const t = document.createElement('div'); t.className = 't'; t.textContent = it.senderName + ' → ' + it.receiverName;
+  const sm = document.createElement('small'); sm.textContent = label + (it.description ? ' · ' + it.description : ''); t.appendChild(sm);
+  const m = document.createElement('div'); m.className = 'm'; m.textContent = won(it.amount);
+  row.append(dot, t, m);
+  if(animate) spawn(it.senderName, it.receiverName, it.amount, color);
+  feedQ.push(row); if(feedQ.length > 40) feedQ.splice(0, feedQ.length - 40);
+}
+const feedQ = [];
+setInterval(() => {
+  const box = $('feed'); const take = feedQ.splice(-5);
+  take.forEach(r => box.insertBefore(r, box.firstChild)); while(box.children.length > 60) box.removeChild(box.lastChild);
+}, 150);
+function openStream(){
+  if(es) es.close(); es = new EventSource('/feed/stream');
+  es.onmessage = e => { try{ if(view === 'run') addFeed(JSON.parse(e.data), true); }catch(_){} };
+  es.onerror = () => { es.close(); es = null; setTimeout(openStream, 3000); };
+}
+fetch('/feed').then(r => r.json()).then(items => { items.slice().reverse().forEach(it => addFeed(it, false)); }).catch(() => {}).finally(openStream);
+
+/* ── 종료 요약 ────────────────────────────────── */
+async function loadSummary(){
   try{
-    const res = await fetch(path, {method:"POST"});
-    if(res.status === 404){ disableChaos(); return; }
-    renderChaos(await res.json());
-    pushSystemLog(path.includes("down") ? "💥 브로커 장애 주입 — 이벤트는 Outbox 에 대기합니다"
-                : path.includes("up") ? "✅ 브로커 복구 — 대기 이벤트를 순서대로 발행합니다"
-                : "📭 ACK 유실 3건 주입 — 재발행된 중복은 정산 시스템이 걸러냅니다");
+    const [s, st] = await Promise.all([getJson('/simulation/summary'), getJson('/stats')]);
+    countTo($('e-total'), s.totalTransfers, fmt); $('e-days').textContent = s.virtualDaysElapsed + ' 일'; $('e-agents').textContent = fmt(st.agentCount || 0);
+    $('e-bal').textContent = s.integrityBalanced ? '정상' : '불일치'; $('e-bal').style.color = s.integrityBalanced ? 'var(--gr)' : 'var(--red)';
+    const set = (id, ok) => $(id).className = 'ck ' + (ok ? 'ok' : 'bad');
+    set('ec1', s.integrityDebitEqualsCredit); set('ec2', s.transfersWithoutTwoEntries === 0); set('ec3', s.mismatchedAccountCount === 0); set('ec4', Number(s.sumOfAllBalances) === 0);
+    const box = $('e-types'); box.replaceChildren(); const bt = s.countByType || {}; const mx = Math.max(1, ...Object.values(bt));
+    Object.keys(bt).forEach(k => { const [l, c] = TYPE[k] || [k, '#8a919b']; const r = document.createElement('div'); r.className = 'tb';
+      const a = document.createElement('span'); a.textContent = l; const bar = document.createElement('div'); bar.className = 'bar'; const b = document.createElement('b'); b.style.width = bt[k] / mx * 100 + '%'; b.style.background = c; b.style.boxShadow = '0 0 8px ' + c; bar.appendChild(b);
+      const n = document.createElement('span'); n.className = 'mono'; n.style.textAlign = 'right'; n.textContent = fmt(bt[k]); r.append(a, bar, n); box.appendChild(r); });
+    const lr = s.lastReconciliation; const rb = $('e-rbadge');
+    if(lr){ rb.textContent = RL[lr.status] || lr.status; rb.className = 'rb ' + lr.status; $('e-rtext').textContent = '영업일 ' + lr.businessDate + ' · 은행 ' + fmt(lr.bankCount) + ' / 정산 ' + fmt(lr.settlementCount) + ' · 누락 ' + lr.missingCount + ' · 전달 중 ' + lr.inFlightCount + ' · 불명 ' + lr.unexpectedCount + ' · 금액 불일치 ' + lr.mismatchCount; }
+    else { rb.textContent = '없음'; rb.className = 'rb'; $('e-rtext').textContent = '아직 가상 하루가 지나지 않아 대사가 실행되지 않았습니다.'; }
   }catch(e){}
 }
-async function runRecon(){
-  const badge = document.getElementById("recon-badge");
-  badge.textContent = "대사 중…"; badge.className = "recon-badge";
-  try{
-    const r = await fetch("/ops/reconciliation", {method:"POST"}).then(x=>x.json());
-    renderRecon(r);
-  }catch(e){ badge.textContent = "실패"; }
-}
-const RECON_LABEL = { MATCHED:"일치", PENDING_IN_FLIGHT:"전달 중", UNMATCHED:"불일치" };
-function renderRecon(r){
-  if(!r) return;
-  const badge = document.getElementById("recon-badge");
-  badge.textContent = RECON_LABEL[r.status] || r.status; badge.className = "recon-badge " + r.status;
-  document.getElementById("recon-summary").innerHTML =
-    "은행 <b>" + fmtInt(r.bankCount) + "</b>건 / 정산 <b>" + fmtInt(r.settlementCount) + "</b>건 · 중복 수신 제거 <b>" +
-    fmtInt(r.duplicateDeliveries) + "</b>건 · 원장 무결성 " + (r.ledgerBalanced ? "✓" : "✗") + " · " + r.durationMs + "ms";
-  const set = (id, v, bad) => {
-    document.getElementById(id).textContent = fmtInt(v);
-    const box = document.getElementById(id + "-box");
-    if(box) box.className = bad && v > 0 ? "bad" : "";
-  };
-  set("rc-missing", r.missingCount, true);
-  set("rc-inflight", r.inFlightCount, false);
-  set("rc-unexpected", r.unexpectedCount, true);
-  set("rc-mismatch", r.mismatchCount, true);
-}
-function pushSystemLog(msg){
-  const box = document.getElementById("logbox");
-  if(!box) return;
-  const line = document.createElement("div");
-  line.className = "logline";
-  line.textContent = "[" + new Date().toLocaleTimeString() + "] " + msg;
-  box.prepend(line);
-}
-fetch("/ops/reconciliation/latest").then(r => r.status === 200 ? r.json() : null).then(renderRecon).catch(()=>{});
-setInterval(refreshReliability, 1000); refreshReliability();
 
-function updateClock(){
-  const now = new Date();
-  document.getElementById("clock").textContent = "실시간 " + now.toLocaleTimeString("ko-KR");
-}
-setInterval(updateClock, 1000); updateClock();
-setInterval(tick, 600); tick();
-
-// ── 속도 슬라이더 ──────────────────────────────────────
-// 슬라이더 0~100 → 구간 선형: 4개 프리셋이 0/33/67/100 에 균등 배치
-const SLIDER_SEG = [
-  {v:0,   ms:3000},
-  {v:33,  ms:1000},
-  {v:67,  ms:300},
-  {v:100, ms:1},
-];
-function sliderToMs(v){
-  v = Math.max(0, Math.min(100, Number(v)));
-  for(let i = 0; i < SLIDER_SEG.length - 1; i++){
-    const a = SLIDER_SEG[i], b = SLIDER_SEG[i+1];
-    if(v <= b.v){
-      const t = (v - a.v) / (b.v - a.v);
-      return Math.max(1, Math.round(a.ms + (b.ms - a.ms) * t));
-    }
-  }
-  return 1;
-}
-function msToSlider(ms){
-  ms = Math.max(1, Math.min(3000, ms));
-  for(let i = 0; i < SLIDER_SEG.length - 1; i++){
-    const a = SLIDER_SEG[i], b = SLIDER_SEG[i+1];
-    if(ms >= b.ms){
-      const t = (ms - a.ms) / (b.ms - a.ms);
-      return Math.round(a.v + (b.v - a.v) * t);
-    }
-  }
-  return 0;
-}
-
-const SPEED_LABELS = [
-  {min:1500, name:"🐢 느림"},
-  {min:400,  name:"🚶 보통"},
-  {min:80,   name:"🏃 빠름"},
-  {min:0,    name:"🚀 초고속"},
-];
-function msToLabel(ms){
-  for(const s of SPEED_LABELS) if(ms >= s.min) return s.name;
-  return "🚀 초고속";
-}
-
-function updateSpeedUI(ms){
-  document.getElementById("speed-ms").textContent = ms + "ms/틱";
-  document.getElementById("speed-name").textContent = msToLabel(ms);
-  document.getElementById("speed-slider").value = msToSlider(ms);
-  // 프리셋 버튼 active 표시
-  document.querySelectorAll(".sp").forEach(b => b.classList.remove("active"));
-  const presets = {3000:"🐢 느림", 1000:"🚶 보통", 300:"🏃 빠름", 80:"🚀 초고속"};
-  document.querySelectorAll(".sp").forEach(b => {
-    if(b.textContent === presets[ms]) b.classList.add("active");
-  });
-}
-
-// 프리셋 버튼용 — 슬라이더 위치도 같이 업데이트
-async function setSpeed(ms){
-  ms = Math.max(1, Math.min(5000, ms));
-  await fetch(`/simulation/speed?ms=${ms}`, {method:"POST"}).catch(()=>{});
-  updateSpeedUI(ms);
-}
-
-// 슬라이더 드래그용 — slider.value 를 건드리지 않음 (드래그 끊김 방지)
-function onSliderInput(v){
-  const ms = sliderToMs(Number(v));
-  const clamped = Math.max(1, Math.min(5000, ms));
-  document.getElementById("speed-ms").textContent = clamped + "ms/틱";
-  document.getElementById("speed-name").textContent = msToLabel(clamped);
-  document.querySelectorAll(".sp").forEach(b => b.classList.remove("active"));
-  fetch(`/simulation/speed?ms=${clamped}`, {method:"POST"}).catch(()=>{});
-}
-
-// 초기 서버 상태 동기화
-fetch("/simulation/status").then(r=>r.json()).then(d => {
-  updateSpeedUI(d.tickIntervalMs);
-  updateStateUI(d.state);
-}).catch(()=>{});
-
-// ── 시뮬레이션 컨트롤 ─────────────────────────────────
-function updateStateUI(state){
-  const badge = document.getElementById("state-badge");
-  const btnStart = document.getElementById("btn-start");
-  const btnPause = document.getElementById("btn-pause");
-  const btnStop  = document.getElementById("btn-stop");
-
-  badge.className = "state-badge " + state;
-  const labels = {RUNNING:"● RUNNING", PAUSED:"⏸ PAUSED", STOPPED:"⏹ STOPPED"};
-  badge.textContent = labels[state] || state;
-
-  // 상태에 따라 버튼 활성/비활성
-  btnStart.disabled = (state === "RUNNING");
-  btnPause.disabled = (state !== "RUNNING");
-  btnStop.disabled  = (state === "STOPPED");
-}
-
-async function simStart(){
-  const d = await fetch("/simulation/start", {method:"POST"}).then(r=>r.json()).catch(()=>({}));
-  if(d.state) updateStateUI(d.state);
-}
-async function simPause(){
-  const d = await fetch("/simulation/pause", {method:"POST"}).then(r=>r.json()).catch(()=>({}));
-  if(d.state) updateStateUI(d.state);
-}
-async function simStop(){
-  const d = await fetch("/simulation/stop", {method:"POST"}).then(r=>r.json()).catch(()=>({}));
-  if(d.state) updateStateUI(d.state);
-}
-async function simReset(){
-  if(!confirm("초기화하면 모든 거래 내역이 삭제되고 잔액이 초기값으로 돌아갑니다. 진행할까요?")) return;
-  await fetch("/simulation/reset", {method:"POST"}).catch(()=>{});
-  // 프론트 상태도 초기화
-  renderedFeedIds.clear();
-  document.getElementById("feed").innerHTML = "";
-  document.getElementById("logbox").innerHTML = "";
-  Object.keys(balHistory).forEach(k => delete balHistory[k]);
-  lastMaxId = 0; firstLoad = true;
-  updateStateUI("STOPPED");
-  // SSE 재연결 (리셋 후 새 이벤트 수신)
-  initFeedStream();
-  tick();
-}
+/* ── 시작 ─────────────────────────────────────── */
+function poll(){ pollStatus().then(() => { pollRun(); pollReliability(); pollRecon(); pollIntegrity(); }); }
+resize(); buildPreview(10);
+setInterval(pollStatus, 800); setInterval(pollRun, 1000); setInterval(pollReliability, 1000); setInterval(pollRecon, 3000); setInterval(pollIntegrity, 5000);
+setInterval(() => { if(view === 'setup' && world.agents.length > 1 && Math.random() < 0.8){ const a = world.agents[(Math.random()*world.agents.length)|0], b = world.agents[(Math.random()*world.agents.length)|0]; const cols = ['#35e0ff','#ffb347','#a98bff','#5dffb0']; spawn(a.name, b.name, Math.pow(10, 3 + Math.random()*4), cols[(Math.random()*4)|0]); } }, 220);
+poll(); requestAnimationFrame(frame);
+})();
 </script>
 </body>
 </html>

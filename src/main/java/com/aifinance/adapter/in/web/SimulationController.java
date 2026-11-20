@@ -42,7 +42,9 @@ public class SimulationController {
                 "tick", simulationEngine.getTickCount(),
                 "virtualNow", simulationEngine.getVirtualNow().toString(),
                 "virtualDay", simulationEngine.getVirtualDay(),
-                "virtualDaysElapsed", simulationEngine.getVirtualDaysElapsed()
+                "virtualDaysElapsed", simulationEngine.getVirtualDaysElapsed(),
+                "minutesPerTick", simulationEngine.getMinutesPerTick(),
+                "virtualStart", simulationEngine.getVirtualStart().toString()
         );
     }
 

@@ -129,6 +129,8 @@ public class SimulationEngine {
     public long getTickCount()             { return virtualClock.currentTick(); }
     public long getVirtualDaysElapsed()    { return virtualDaysElapsed.get(); }
     public LocalDateTime getVirtualNow()   { return virtualClock.now(); }
+    public long getMinutesPerTick()        { return virtualClock.minutesPerTick(); }
+    public LocalDateTime getVirtualStart() { return virtualClock.at(0); }
     /** 가상 며칠째인지 (시작일 = 1) */
     public long getVirtualDay() {
         return java.time.temporal.ChronoUnit.DAYS.between(virtualClock.startDate(), virtualClock.now().toLocalDate()) + 1;
