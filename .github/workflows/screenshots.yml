@@ -61,9 +61,18 @@ jobs:
         working-directory: tools/capture
         env: { OUT: ../../docs/screenshots }
         run: |
+          # 브로커 장애 → 시뮬레이션 재개(거래는 계속 성공) → 발행 대기 이벤트가 충분히 쌓일 때까지 기다린 뒤 캡처
           curl -fs -X POST localhost:8080/chaos/broker/down; echo
-          sleep 8
-          curl -fs localhost:8080/ops/outbox | tee ../../docs/screenshots/outbox-down.json; echo
+          curl -fs -X POST "localhost:8080/simulation/speed?ms=50" || true
+          curl -fs -X POST localhost:8080/simulation/start || true
+          for i in $(seq 1 90); do
+            curl -fs localhost:8080/ops/outbox > ../../docs/screenshots/outbox-down.json
+            P=$(grep -o '"pending":[0-9]*' ../../docs/screenshots/outbox-down.json | cut -d: -f2)
+            echo "t=$((i*2))s pending=${P:-0}"
+            [ "${P:-0}" -ge 3000 ] && break; sleep 2
+          done
+          cat ../../docs/screenshots/outbox-down.json; echo
+          curl -fs localhost:8080/integrity | tee ../../docs/screenshots/integrity-down.json; echo
           node capture.mjs chaos-down
 
       - name: Broker up → reconcile → capture
@@ -71,7 +80,11 @@ jobs:
         env: { OUT: ../../docs/screenshots }
         run: |
           curl -fs -X POST localhost:8080/chaos/broker/up; echo
-          for i in $(seq 1 60); do
+          # 복구 직후에는 시뮬레이션이 계속 도는 상태에서 대기 건수가 줄어드는 것을 먼저 본다
+          sleep 5
+          curl -fs localhost:8080/ops/outbox | tee ../../docs/screenshots/outbox-recovering.json; echo
+          curl -fs -X POST localhost:8080/simulation/stop || true
+          for i in $(seq 1 120); do
             curl -fs localhost:8080/ops/outbox > ../../docs/screenshots/outbox-up.json
             grep -q '"pending":0' ../../docs/screenshots/outbox-up.json && break; sleep 2
           done
@@ -81,6 +94,7 @@ jobs:
             grep -q '"status":"MATCHED"' ../../docs/screenshots/recon.json && break; sleep 2
           done
           cat ../../docs/screenshots/recon.json; echo
+          curl -fs localhost:8080/integrity | tee ../../docs/screenshots/integrity-up.json; echo
           node capture.mjs chaos-up
 
       - name: Capture Grafana
