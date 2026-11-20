@@ -8,15 +8,22 @@ import com.aifinance.application.usecase.RefundUseCase;
 import com.aifinance.application.usecase.SimulationSetupUseCase;
 import com.aifinance.application.usecase.SpendUseCase;
 import com.aifinance.application.usecase.TransferUseCase;
+import com.aifinance.application.service.EndOfDayService;
+import com.aifinance.application.service.VirtualClock;
 import com.aifinance.domain.account.Account;
 import com.aifinance.domain.agent.Agent;
 import com.aifinance.domain.transfer.Transfer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -33,6 +40,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Component
 public class SimulationEngine {
+
+    private static final Logger log = LoggerFactory.getLogger(SimulationEngine.class);
+
+    /** 자정(00:00) 이후 이 시각을 지나는 틱에서 전날 대사를 자동 실행한다 (자정 직전 거래의 전달 지연 흡수) */
+    private static final LocalTime VIRTUAL_EOD_GRACE = LocalTime.of(0, 10);
 
     /**
      * SETUP: 월드 미생성, 사용자가 에이전트 수를 고르길 대기 (setup() 호출 전).
@@ -76,19 +88,23 @@ public class SimulationEngine {
     private final AgentUseCase agentUseCase;
     private final SimulationSetupUseCase setupUseCase;
     private final FeedSseService feedSseService;
+    private final VirtualClock virtualClock;
+    private final EndOfDayService endOfDayService;
 
     private final AtomicLong tickIntervalMs = new AtomicLong(1000);
-    private final AtomicLong tickCount = new AtomicLong(0);
-    // 완료된 가상 하루(일마감 대사 통과) 수 — B단계(가상 시간)에서 증가시킨다
+    // 완료된 가상 하루(일마감 대사 통과) 수
     private final AtomicLong virtualDaysElapsed = new AtomicLong(0);
     private final long paydayIntervalTicks;
     private volatile long lastTickAt = 0;
     private volatile State state;
+    // 자동 일마감이 이미 처리한 마지막 영업일 — 같은 날 중복 실행 방지
+    private volatile LocalDate lastEodBusinessDate = null;
 
     public SimulationEngine(TransferUseCase transferUseCase, SpendUseCase spendUseCase,
                             InvestUseCase investUseCase, RefundUseCase refundUseCase,
                             AgentUseCase agentUseCase, SimulationSetupUseCase setupUseCase,
-                            FeedSseService feedSseService,
+                            FeedSseService feedSseService, VirtualClock virtualClock,
+                            EndOfDayService endOfDayService,
                             @Value("${app.simulation.auto-start:true}") boolean autoStart,
                             @Value("${app.simulation.bootstrap:false}") boolean bootstrap,
                             @Value("${app.simulation.payday-interval-ticks:10}") long paydayIntervalTicks) {
@@ -99,6 +115,8 @@ public class SimulationEngine {
         this.agentUseCase = agentUseCase;
         this.setupUseCase = setupUseCase;
         this.feedSseService = feedSseService;
+        this.virtualClock = virtualClock;
+        this.endOfDayService = endOfDayService;
         this.paydayIntervalTicks = Math.max(1, paydayIntervalTicks);
         // bootstrap=false (기본, 대시보드) → 월드가 아직 없으므로 SETUP 에서 대기.
         // bootstrap=true (테스트/부하테스트) → DataInitializer 가 기동 시 이미 월드를 만들었다는 전제로 기존처럼 동작.
@@ -108,8 +126,13 @@ public class SimulationEngine {
     public void setTickIntervalMs(long ms) { tickIntervalMs.set(Math.max(1, Math.min(5000, ms))); }
     public long getTickIntervalMs()        { return tickIntervalMs.get(); }
     public State getState()                { return state; }
-    public long getTickCount()             { return tickCount.get(); }
+    public long getTickCount()             { return virtualClock.currentTick(); }
     public long getVirtualDaysElapsed()    { return virtualDaysElapsed.get(); }
+    public LocalDateTime getVirtualNow()   { return virtualClock.now(); }
+    /** 가상 며칠째인지 (시작일 = 1) */
+    public long getVirtualDay() {
+        return java.time.temporal.ChronoUnit.DAYS.between(virtualClock.startDate(), virtualClock.now().toLocalDate()) + 1;
+    }
 
     /** 설정 화면 → "시작": 고른 에이전트 수로 월드를 만들고 바로 RUNNING 으로 전환 */
     public synchronized void setup(int agentCount) {
@@ -117,7 +140,8 @@ public class SimulationEngine {
             throw new IllegalStateException("이미 설정이 끝났습니다 (현재 상태: " + state + ")");
         }
         setupUseCase.initialize(agentCount);
-        tickCount.set(0);
+        virtualClock.reset();
+        lastEodBusinessDate = null;
         state = State.RUNNING;
     }
 
@@ -150,8 +174,9 @@ public class SimulationEngine {
             throw new IllegalStateException("종료(ENDED) 상태에서만 새 시뮬레이션을 시작할 수 있습니다 (현재 상태: " + state + ")");
         }
         setupUseCase.reset();
-        tickCount.set(0);
+        virtualClock.reset();
         virtualDaysElapsed.set(0);
+        lastEodBusinessDate = null;
         state = State.SETUP;
     }
 
@@ -159,8 +184,9 @@ public class SimulationEngine {
     public synchronized void reset() {
         state = State.PAUSED;
         setupUseCase.reset();
-        tickCount.set(0);
+        virtualClock.reset();
         virtualDaysElapsed.set(0);
+        lastEodBusinessDate = null;
     }
 
     // 5ms 마다 기반 틱 — 실제 간격은 tickIntervalMs 로 조절 (최대 1ms까지 지원)
@@ -175,7 +201,8 @@ public class SimulationEngine {
 
     /** 틱 1회 실행 (테스트에서 직접 호출 가능) */
     public synchronized void runTick() {
-        long tick = tickCount.incrementAndGet();
+        long tick = virtualClock.advance();
+        maybeRunVirtualEod();
         List<Agent> agents = agentUseCase.findAll();
         if (agents.size() < 2) return;
         List<Account> merchants = spendUseCase.merchants();
@@ -205,6 +232,27 @@ public class SimulationEngine {
                 agentUseCase.paySalary().forEach(this::publish);
             } catch (RuntimeException ignored) {
             }
+        }
+    }
+
+    /**
+     * 가상 시계가 새 가상 하루의 00:10 을 지나는 틱에서 직전 가상 하루에 대해 자동으로 일마감 대사를 실행한다.
+     * 실제 시계 기반 @Scheduled(app.eod.cron) 은 시뮬레이션에서는 쓰지 않는다 (ADR-0006).
+     * 브로커가 죽어 있어도 대사 자체는 그대로 실행된다 — Outbox 가 비지 않은 건은 PENDING_IN_FLIGHT 로 잡힐 뿐,
+     * 오탐(누락/불일치) 없이 다음 대사에서 정상적으로 MATCHED 로 넘어간다.
+     */
+    private void maybeRunVirtualEod() {
+        LocalDateTime virtualNow = virtualClock.now();
+        if (virtualNow.toLocalTime().isBefore(VIRTUAL_EOD_GRACE)) return;
+        LocalDate businessDate = virtualNow.toLocalDate().minusDays(1);
+        if (businessDate.isBefore(virtualClock.startDate())) return; // 시작일 이전은 마감 대상이 아니다
+        if (businessDate.equals(lastEodBusinessDate)) return; // 이미 그 영업일은 마감했다
+        try {
+            endOfDayService.closeBusinessDay(businessDate);
+            lastEodBusinessDate = businessDate;
+            virtualDaysElapsed.incrementAndGet();
+        } catch (RuntimeException e) {
+            log.warn("[가상 EOD] {} 대사 실행 실패 — 다음 틱에서 재시도", businessDate, e);
         }
     }
 

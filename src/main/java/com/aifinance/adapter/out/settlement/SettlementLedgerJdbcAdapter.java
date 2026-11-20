@@ -15,7 +15,10 @@ import java.util.List;
  * 대사 쿼리 구현 — 애플리케이션 메모리로 두 장부를 다 올리지 않고, DB 에서 집합 연산(LEFT JOIN anti-join)으로 차이만 뽑는다.
  * 거래가 수백만 건이어도 결과(차이)만 네트워크를 탄다.
  *
- * 사용 인덱스: transfers(created_at), settlement_records(occurred_at), outbox_events(aggregate_id)
+ * 기간 비교는 transfers.occurred_at(가상 시각)과 settlement_records.occurred_at 을 같은 기준으로 맞춘다 —
+ * 실제(wall-clock) 생성 시각(created_at)은 감사용으로만 남겨둔다 (ADR-0006).
+ *
+ * 사용 인덱스: transfers(occurred_at), settlement_records(occurred_at), outbox_events(aggregate_id)
  */
 @Component
 public class SettlementLedgerJdbcAdapter implements SettlementLedgerPort {
@@ -25,7 +28,7 @@ public class SettlementLedgerJdbcAdapter implements SettlementLedgerPort {
             from transfers t
             left join settlement_records s on s.transfer_id = t.id
             left join outbox_events o on o.aggregate_id = t.id and o.aggregate_type = 'TRANSFER'
-            where t.created_at >= ? and t.created_at < ?
+            where t.occurred_at >= ? and t.occurred_at < ?
               and s.transfer_id is null
             """;
 
@@ -39,7 +42,7 @@ public class SettlementLedgerJdbcAdapter implements SettlementLedgerPort {
     private static final String MISMATCH_BASE = """
             from transfers t
             join settlement_records s on s.transfer_id = t.id
-            where t.created_at >= ? and t.created_at < ?
+            where t.occurred_at >= ? and t.occurred_at < ?
               and t.amount <> s.amount
             """;
 
@@ -57,7 +60,7 @@ public class SettlementLedgerJdbcAdapter implements SettlementLedgerPort {
     @Override
     public Totals bankTotals(LocalDateTime from, LocalDateTime to) {
         return jdbc.queryForObject(
-                "select count(*), coalesce(sum(amount), 0) from transfers where created_at >= ? and created_at < ?",
+                "select count(*), coalesce(sum(amount), 0) from transfers where occurred_at >= ? and occurred_at < ?",
                 (rs, i) -> new Totals(rs.getLong(1), rs.getBigDecimal(2)), ts(from), ts(to));
     }
 

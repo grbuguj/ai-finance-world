@@ -41,16 +41,18 @@ public class LedgerPostingService {
     private final ApplicationEventPublisher eventPublisher;
     private final PostingMetricsPort metrics;
     private final OutboxPort outboxPort;
+    private final VirtualClock virtualClock;
 
     public LedgerPostingService(AccountPort accountPort, LedgerPort ledgerPort, TransferPort transferPort,
                                 ApplicationEventPublisher eventPublisher, PostingMetricsPort metrics,
-                                OutboxPort outboxPort) {
+                                OutboxPort outboxPort, VirtualClock virtualClock) {
         this.accountPort = accountPort;
         this.ledgerPort = ledgerPort;
         this.transferPort = transferPort;
         this.eventPublisher = eventPublisher;
         this.metrics = metrics;
         this.outboxPort = outboxPort;
+        this.virtualClock = virtualClock;
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -106,7 +108,7 @@ public class LedgerPostingService {
         accountPort.save(fromAccount);
         accountPort.save(toAccount);
 
-        // 4. 거래 이력 저장
+        // 4. 거래 이력 저장 (occurredAt = 가상 시각 — 대사가 이 값으로 "그날 거래"를 가른다)
         Transfer transfer = transferPort.save(Transfer.builder()
                 .sender(fromAccount)
                 .receiver(toAccount)
@@ -115,6 +117,7 @@ public class LedgerPostingService {
                 .txType(txType)
                 .description(description)
                 .originalTransferId(originalTransferId)
+                .occurredAt(virtualClock.now())
                 .build());
 
         // 5. 원장 분개 2건 (같은 transfer_id)
@@ -143,7 +146,7 @@ public class LedgerPostingService {
                 fromAccount.getBalance(),
                 toAccount.getBalance(),
                 description,
-                transfer.getCreatedAt() != null ? transfer.getCreatedAt() : LocalDateTime.now()
+                transfer.getOccurredAt()
         );
         outboxPort.save(OutboxEvent.pending(
                 "TRANSFER", transfer.getId(), "TRANSACTION_POSTED",

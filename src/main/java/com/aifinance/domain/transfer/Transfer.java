@@ -24,8 +24,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transfers", indexes = {
-        // 대사(기간 조회)·통계용. 없으면 일마감 대사가 transfers 전체를 스캔한다
+        // 통계·감사용 실제 생성 시각 조회
         @Index(name = "idx_transfers_created_at", columnList = "created_at"),
+        // 대사(영업일 기간 조회)용 가상 발생 시각. 없으면 일마감 대사가 transfers 전체를 스캔한다
+        @Index(name = "idx_transfers_occurred_at", columnList = "occurred_at"),
         // 환불 대상 조회: sender + 유형 + 환불여부 (findTop5BySenderIdAndTxTypeAndRefundedFalse...)
         @Index(name = "idx_transfers_sender_type_refunded", columnList = "sender_id, tx_type, refunded")
 })
@@ -65,8 +67,12 @@ public class Transfer {
     @Builder.Default
     private boolean refunded = false;
 
+    /** 실제(wall-clock) 생성 시각 — 감사·운영용 */
     @CreatedDate
     private LocalDateTime createdAt;
+
+    /** 가상 시각(VirtualClock) — 대사의 "그날 거래" 판별 기준. LedgerPostingService 가 기록 시점에 직접 채운다 */
+    private LocalDateTime occurredAt;
 
     public void describe(String description) {
         this.description = description;

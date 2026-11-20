@@ -38,7 +38,11 @@ public class SimulationController {
     public Map<String, Object> status() {
         return Map.of(
                 "state", simulationEngine.getState().name(),
-                "tickIntervalMs", simulationEngine.getTickIntervalMs()
+                "tickIntervalMs", simulationEngine.getTickIntervalMs(),
+                "tick", simulationEngine.getTickCount(),
+                "virtualNow", simulationEngine.getVirtualNow().toString(),
+                "virtualDay", simulationEngine.getVirtualDay(),
+                "virtualDaysElapsed", simulationEngine.getVirtualDaysElapsed()
         );
     }
 
