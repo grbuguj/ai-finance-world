@@ -435,8 +435,8 @@ class LockStrategyBenchmark {
         KeyHolder key = new GeneratedKeyHolder();
         jdbc.update(con -> {
             PreparedStatement ps = con.prepareStatement("""
-                    insert into transfers (sender_id, receiver_id, amount, type, tx_type, description, refunded, created_at)
-                    values (?, ?, ?, 'SUCCESS', 'TRANSFER', 'benchmark', false, ?)""", new String[]{"id"});
+                    insert into transfers (sender_id, receiver_id, amount, type, tx_type, description, created_at)
+                    values (?, ?, ?, 'SUCCESS', 'TRANSFER', 'benchmark', ?)""", new String[]{"id"});
             ps.setLong(1, from);
             ps.setLong(2, to);
             ps.setBigDecimal(3, AMOUNT);

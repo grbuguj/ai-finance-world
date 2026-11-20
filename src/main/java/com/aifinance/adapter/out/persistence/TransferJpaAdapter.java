@@ -51,13 +51,8 @@ public class TransferJpaAdapter implements TransferPort {
     }
 
     @Override
-    public List<Transfer> findUndescribed() {
-        return transferRepository.findTop3ByDescriptionIsNullOrderByIdDesc();
-    }
-
-    @Override
     public List<Transfer> findRefundableSpends(Long accountId) {
-        return transferRepository.findTop5BySenderIdAndTxTypeAndRefundedFalseOrderByIdDesc(accountId, TransactionType.SPEND);
+        return transferRepository.findRefundable(accountId, TransactionType.SPEND, PageRequest.of(0, 5));
     }
 
     @Override
@@ -80,7 +75,12 @@ public class TransferJpaAdapter implements TransferPort {
     }
 
     @Override
-    public void deleteAll() {
+    public boolean existsRefundOf(Long spendTransferId) {
+        return transferRepository.existsRefundOf(spendTransferId);
+    }
+
+    @Override
+    public void deleteAllForSimulationReset() {
         transferRepository.deleteAllInBatch();
     }
 }

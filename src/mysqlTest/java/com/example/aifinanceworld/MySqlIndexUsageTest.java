@@ -55,14 +55,14 @@ class MySqlIndexUsageTest {
     }
 
     @Test
-    void 대사_기간_조회는_transfers_created_at_인덱스를_쓴다() {
+    void 대사_기간_조회는_transfers_occurred_at_인덱스를_쓴다() {
         assertCandidateIndex("""
                 select t.id from transfers t
                 left join settlement_records s on s.transfer_id = t.id
                 left join outbox_events o on o.aggregate_id = t.id and o.aggregate_type = 'TRANSFER'
-                where t.created_at >= now() - interval 1 day and t.created_at < now() + interval 1 day
+                where t.occurred_at >= now() - interval 1 day and t.occurred_at < now() + interval 1 day
                   and s.transfer_id is null""",
-                "t", "idx_transfers_created_at");
+                "t", "idx_transfers_occurred_at");
     }
 
     @Test
@@ -70,7 +70,7 @@ class MySqlIndexUsageTest {
         assertCandidateIndex("""
                 select t.id from transfers t
                 left join outbox_events o on o.aggregate_id = t.id and o.aggregate_type = 'TRANSFER'
-                where t.created_at >= now() - interval 1 day""",
+                where t.occurred_at >= now() - interval 1 day""",
                 "o", "idx_outbox_aggregate");
     }
 
@@ -82,9 +82,13 @@ class MySqlIndexUsageTest {
     }
 
     @Test
-    void 환불_대상_조회는_sender_type_refunded_인덱스를_쓴다() {
-        assertCandidateIndex(
-                "select * from transfers where sender_id = 11 and tx_type = 'SPEND' and refunded = false order by id desc limit 5",
-                "transfers", "idx_transfers_sender_type_refunded");
+    void 환불_대상_조회는_sender_type_인덱스를_쓰고_환불_존재는_유니크_인덱스로_판정한다() {
+        String sql = """
+                select t.* from transfers t
+                where t.sender_id = 11 and t.tx_type = 'SPEND'
+                  and not exists (select 1 from transfers r where r.original_transfer_id = t.id and r.tx_type = 'REFUND')
+                order by t.id desc limit 5""";
+        assertCandidateIndex(sql, "t", "idx_transfers_sender_type");
+        assertCandidateIndex(sql, "r", "uk_transfers_original");
     }
 }

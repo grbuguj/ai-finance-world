@@ -66,6 +66,11 @@ public class Account {
         this.balance = this.balance.add(amount);
     }
 
+    /** 잔액 재구성 전용 — 잔액을 원장 재계산 값으로 교정한다 (잔액은 원장에서 언제든 다시 만들 수 있는 파생값) */
+    public void correctBalanceTo(BigDecimal ledgerBalance) {
+        this.balance = ledgerBalance;
+    }
+
     /** 시뮬레이션 초기화 전용 - 원장을 비운 뒤 잔액도 0으로 맞춘다. */
     public void resetBalance() {
         this.balance = BigDecimal.ZERO;

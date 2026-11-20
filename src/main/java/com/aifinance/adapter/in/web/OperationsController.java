@@ -1,6 +1,8 @@
 package com.aifinance.adapter.in.web;
 
+import com.aifinance.adapter.in.scheduler.SimulationEngine;
 import com.aifinance.application.service.OutboxRelayService;
+import com.aifinance.application.usecase.BalanceRebuildUseCase;
 import com.aifinance.application.usecase.ReconciliationUseCase;
 import com.aifinance.application.usecase.ReconciliationUseCase.RunView;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,6 +21,7 @@ import java.util.Map;
  *  - POST /ops/reconciliation        : 대사 실행 (date 없으면 오늘 0시~지금)
  *  - GET  /ops/reconciliation        : 최근 대사 20건
  *  - GET  /ops/reconciliation/latest : 최근 대사 상세 (차이 내역 포함)
+ *  - POST /ops/rebuild-balances      : 잔액 재구성 (기본 dry-run=차이만 보고, apply=true 면 원장 기준으로 교정. 시뮬레이션 실행 중에는 거부)
  */
 @RestController
 @RequestMapping("/ops")
@@ -26,10 +29,24 @@ public class OperationsController {
 
     private final OutboxRelayService relayService;
     private final ReconciliationUseCase reconciliationUseCase;
+    private final BalanceRebuildUseCase balanceRebuildUseCase;
+    private final SimulationEngine simulationEngine;
 
-    public OperationsController(OutboxRelayService relayService, ReconciliationUseCase reconciliationUseCase) {
+    public OperationsController(OutboxRelayService relayService, ReconciliationUseCase reconciliationUseCase,
+                                BalanceRebuildUseCase balanceRebuildUseCase, SimulationEngine simulationEngine) {
         this.relayService = relayService;
         this.reconciliationUseCase = reconciliationUseCase;
+        this.balanceRebuildUseCase = balanceRebuildUseCase;
+        this.simulationEngine = simulationEngine;
+    }
+
+    @PostMapping("/rebuild-balances")
+    public ResponseEntity<?> rebuildBalances(@RequestParam(defaultValue = "false") boolean apply) {
+        if (apply && simulationEngine.getState() == SimulationEngine.State.RUNNING) {
+            return ResponseEntity.status(409).body(Map.of("error",
+                    "시뮬레이션이 실행 중일 때는 잔액을 교정할 수 없습니다. 일시정지 또는 종료한 뒤 다시 시도하세요 (dry-run 은 언제든 가능)."));
+        }
+        return ResponseEntity.ok(balanceRebuildUseCase.rebuild(apply));
     }
 
     @GetMapping("/outbox")

@@ -63,7 +63,12 @@ public class LedgerJpaAdapter implements LedgerPort {
     }
 
     @Override
-    public void deleteAll() {
+    public BigDecimal ledgerBalanceOf(Long accountId) {
+        return ledgerRepository.ledgerBalanceOf(accountId);
+    }
+
+    @Override
+    public void deleteAllForSimulationReset() {
         ledgerRepository.deleteAllInBatch();
     }
 }

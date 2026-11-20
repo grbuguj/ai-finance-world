@@ -77,15 +77,15 @@ class StatsScaleBenchmark {
             seed.add(new Object[]{a, b, now});
             seed.add(new Object[]{b, a, now});
         }
-        jdbc.batchUpdate("insert into transfers (sender_id, receiver_id, amount, type, tx_type, description, refunded, created_at)"
-                + " values (?, ?, 100, 'SUCCESS', 'TRANSFER', 'bulk', false, ?)", seed);
+        jdbc.batchUpdate("insert into transfers (sender_id, receiver_id, amount, type, tx_type, description, created_at)"
+                + " values (?, ?, 100, 'SUCCESS', 'TRANSFER', 'bulk', ?)", seed);
 
         List<String> rows = new ArrayList<>();
         long ledgeredUpTo = 0;
         for (long target : sizes()) {
             while (bulkCount() < target) {
-                jdbc.update("insert into transfers (sender_id, receiver_id, amount, type, tx_type, description, refunded, created_at)"
-                        + " select sender_id, receiver_id, amount, type, tx_type, description, refunded, created_at"
+                jdbc.update("insert into transfers (sender_id, receiver_id, amount, type, tx_type, description, created_at)"
+                        + " select sender_id, receiver_id, amount, type, tx_type, description, created_at"
                         + " from transfers where description = 'bulk'");
             }
             // 새로 만든 거래의 분개 (거래마다 DEBIT 1건 + CREDIT 1건)

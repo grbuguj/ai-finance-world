@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 환불: 소비(SPEND) 거래의 역거래 (가맹점 → 에이전트).
  *
- * 원거래 행을 비관적 락으로 잡은 뒤 refunded 플래그를 확인하므로,
+ * 원거래 행을 비관적 락으로 잡은 뒤 REFUND 존재 여부를 확인하므로,
  * 같은 소비 건에 환불 요청이 동시에 여러 번 들어와도 정확히 1번만 환불된다.
  * 원거래는 수정/삭제하지 않고 새 거래를 추가해 원장을 보정한다 (원장 불변성).
  */
@@ -39,8 +39,13 @@ public class RefundUseCase {
         return lockExecutor.execute(List.of(agentAccountId, merchantAccountId), () -> {
             Transfer original = transferPort.findByIdWithLock(spendTransferId)
                     .orElseThrow(() -> new IllegalArgumentException("거래 없음: " + spendTransferId));
-            original.markRefunded(); // SPEND 가 아니거나 이미 환불됐으면 예외 → 롤백
-            transferPort.save(original);
+            // 원거래 행은 수정하지 않는다(불변). 환불 여부는 REFUND 거래의 존재로 판정하고, 정정은 반대 분개를 새로 추가할 뿐이다.
+            if (original.getTxType() != TransactionType.SPEND) {
+                throw new IllegalStateException("소비 거래만 환불할 수 있습니다 (거래 " + original.getId() + ", 유형 " + original.getTxType() + ")");
+            }
+            if (transferPort.existsRefundOf(original.getId())) {
+                throw new IllegalStateException("이미 환불된 거래입니다 (거래 " + original.getId() + ")");
+            }
 
             String description = "환불 · " + (original.getDescription() == null ? "" : original.getDescription());
             return postingService.post(merchantAccountId, agentAccountId, original.getAmount(),

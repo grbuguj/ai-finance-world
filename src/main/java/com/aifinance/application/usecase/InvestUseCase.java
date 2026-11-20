@@ -74,6 +74,7 @@ public class InvestUseCase {
         return lockExecutor.execute(List.of(agentAccountId, marketId), () -> {
             Investment investment = investmentPort.findByIdWithLock(investmentId)
                     .orElseThrow(() -> new IllegalArgumentException("투자 없음: " + investmentId));
+            investment.assertOpen(); // 정산 거래를 쓰기 전에 중복 정산을 거절 (유니크 제약 이전에 도메인 규칙으로)
             BigDecimal payout = investment.payoutFor(rate);
 
             Transfer transfer = null;

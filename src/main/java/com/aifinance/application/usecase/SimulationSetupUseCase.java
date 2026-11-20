@@ -166,8 +166,8 @@ public class SimulationSetupUseCase {
         settlementLedgerPort.deleteAll(); // 외부 정산 장부도 같은 세계의 일부이므로 함께 초기화
         investmentPort.deleteAll();
         idempotencyPort.deleteAll(); // 원거래가 삭제되므로 키도 함께 정리
-        ledgerPort.deleteAll();   // FK 순서: ledger → transfer
-        transferPort.deleteAll();
+        ledgerPort.deleteAllForSimulationReset();   // FK 순서: ledger → transfer
+        transferPort.deleteAllForSimulationReset();
     }
 
     /**
