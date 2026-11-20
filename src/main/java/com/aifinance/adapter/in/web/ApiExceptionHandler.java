@@ -4,7 +4,11 @@ import com.aifinance.domain.account.InsufficientBalanceException;
 import com.aifinance.domain.idempotency.IdempotencyKeyMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.dao.QueryTimeoutException;
+import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,6 +45,25 @@ public class ApiExceptionHandler {
         log.warn("동시 수정 충돌로 요청 거절 (락을 우회한 갱신 경로 점검 필요): {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", "다른 거래와 동시에 처리되어 거절되었습니다. 다시 시도해 주세요."));
+    }
+
+    /**
+     * 락 대기 시간 초과·데드락 (InnoDB innodb_lock_wait_timeout, DeadlockLoser 포함). 트랜잭션 전체가 롤백되어
+     * 거래·원장·Outbox·잔액 어디에도 흔적이 없으므로, 500 이 아니라 "잠시 후 다시 시도"를 뜻하는 503 + Retry-After 로 응답한다.
+     */
+    @ExceptionHandler({PessimisticLockingFailureException.class, QueryTimeoutException.class})
+    public ResponseEntity<Map<String, String>> lockTimeout(RuntimeException e) {
+        log.warn("락 대기 초과/데드락으로 요청 거절 (롤백됨, 재시도 가능): {}", e.getClass().getSimpleName());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Retry-After", "1")
+                .body(Map.of("error", "같은 계좌를 처리 중인 다른 거래 때문에 지연되어 거절되었습니다. 기록은 남지 않았으니 잠시 후 다시 시도해 주세요."));
+    }
+
+    /** DB 연결 불가 (커넥션 풀 타임아웃 등). Hikari connection-timeout 이 짧아 오래 매달리지 않고 빠르게 실패한다. */
+    @ExceptionHandler({CannotCreateTransactionException.class, DataAccessResourceFailureException.class})
+    public ResponseEntity<Map<String, String>> databaseUnavailable(RuntimeException e) {
+        log.warn("DB 연결 불가로 요청 거절: {}", e.getClass().getSimpleName());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Retry-After", "2")
+                .body(Map.of("error", "데이터베이스에 일시적으로 연결할 수 없습니다. 잠시 후 다시 시도해 주세요."));
     }
 
     @ExceptionHandler(IllegalStateException.class)

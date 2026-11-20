@@ -18,6 +18,8 @@ public class MySqlContainerConfig {
         return new MySQLContainer("mysql:8.0")
                 .withDatabaseName("ai_finance")
                 .withUsername("finance")
-                .withPassword("finance1234");
+                .withPassword("finance1234")
+                // 바이너리 로그가 켜진 MySQL 8 에서 SUPER 권한 없는 계정이 트리거를 만들려면 필요 (원장 불변성 가드)
+                .withCommand("--log-bin-trust-function-creators=1");
     }
 }

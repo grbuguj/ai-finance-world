@@ -17,9 +17,11 @@ import java.util.Optional;
 public class TransferJpaAdapter implements TransferPort {
 
     private final TransferRepository transferRepository;
+    private final LedgerGuard guard;
 
-    public TransferJpaAdapter(TransferRepository transferRepository) {
+    public TransferJpaAdapter(TransferRepository transferRepository, LedgerGuard guard) {
         this.transferRepository = transferRepository;
+        this.guard = guard;
     }
 
     @Override
@@ -81,6 +83,6 @@ public class TransferJpaAdapter implements TransferPort {
 
     @Override
     public void deleteAllForSimulationReset() {
-        transferRepository.deleteAllInBatch();
+        guard.allowResetDuring(transferRepository::deleteAllInBatch);
     }
 }

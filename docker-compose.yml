@@ -9,6 +9,8 @@ services:
   mysql:
     image: mysql:8.0
     container_name: ai-finance-mysql
+    # 원장 불변성 가드(app.ledger.guard.enabled=true)가 트리거를 만들 수 있도록 (바이너리 로그 ON + 비SUPER 계정)
+    command: --log-bin-trust-function-creators=1
     environment:
       MYSQL_ROOT_PASSWORD: root1234
       MYSQL_DATABASE: ai_finance
@@ -71,7 +73,7 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${APP_PROFILES:-infra}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ai_finance?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ai_finance?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&connectTimeout=2000&socketTimeout=15000
       SPRING_DATASOURCE_USERNAME: finance
       SPRING_DATASOURCE_PASSWORD: finance1234
       SPRING_DATA_REDIS_HOST: redis

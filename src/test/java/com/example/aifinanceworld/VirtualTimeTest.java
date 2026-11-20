@@ -53,6 +53,7 @@ class VirtualTimeTest {
 
         faults.setBrokerDown(false);
         faults.loseNextAcks(0);
+        jdbc.update("update outbox_events set next_attempt_at = created_at where status = 'PENDING'"); // 같은 마이크로초 경합 방지
         relay.drain(100); // 월드 생성 시의 초기 자본금(OPENING) 이벤트는 장애 주입 전에 비워 둔다
 
         agentAccountId = agentUseCase.findAll().get(0).getAccount().getId();

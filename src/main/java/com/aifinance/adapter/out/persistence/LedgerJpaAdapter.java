@@ -14,9 +14,11 @@ import java.util.Map;
 public class LedgerJpaAdapter implements LedgerPort {
 
     private final LedgerRepository ledgerRepository;
+    private final LedgerGuard guard;
 
-    public LedgerJpaAdapter(LedgerRepository ledgerRepository) {
+    public LedgerJpaAdapter(LedgerRepository ledgerRepository, LedgerGuard guard) {
         this.ledgerRepository = ledgerRepository;
+        this.guard = guard;
     }
 
     @Override
@@ -69,6 +71,6 @@ public class LedgerJpaAdapter implements LedgerPort {
 
     @Override
     public void deleteAllForSimulationReset() {
-        ledgerRepository.deleteAllInBatch();
+        guard.allowResetDuring(ledgerRepository::deleteAllInBatch);
     }
 }
