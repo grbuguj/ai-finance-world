@@ -121,3 +121,19 @@ DB 가 멈추면 요청이 풀에서 커넥션을 기다리며 30초씩 매달�
 **수정함**: `ApiExceptionHandler.jpaSystem` — 원인 체인에 연결 오류(SQLState 08xx, Communications/JDBCConnection 계열)가 있을 때만 503 + `Retry-After`,
 그 밖의 `JpaSystemException` 은 500 + 클래스명 로그. 단위 테스트 `ApiExceptionHandlerTest`(연결 오류 → 503, 그 밖 → 500).
 이 수정 후의 실제 컨테이너 재실행(500 이 0건이 되는지)은 이 문서 작성 시점에 하지 않았다 — 필요하면 `db-fault.yml` 을 다시 실행해 `app-errors.log` 와 구간별 응답 코드를 확인한다.
+
+### 최종 재실행 (통합한 소비자 수정, 커밋 `00da93a` 기준)
+
+원본: `experiment-results` 브랜치 `db-fault/44705700617/` (20 스레드, MySQL 20초 정지).
+
+| 항목 | 값 |
+|---|---|
+| 사후 대사 | **MATCHED** (은행 9,707 = 정산 9,707, 누락 0, 전달 중 0, 재전달 중복 200건은 멱등이 흡수) |
+| Outbox / 무결성 | 대기 0, 발행 9,707, DEAD 0 (비우는 데 10.3초) / balanced |
+| DB 정지 중 | 120건 전부 503 |
+| `docker start` → 첫 성공 | 2.1초 (이번 실행. 앞선 두 실행은 9.2초 — 실행마다 달랐다) |
+| 복구 후 | 6,148건 전부 200 |
+| 500 | 6건 (장애 직전 5, 정지 진행 중 1) — 전부 `JpaSystemException: Unable to rollback against JDBC Connection` ← `SQLException: Connection is closed` |
+
+세 번의 실행(수정 전 1, 수정 후 2) 모두에서 정산 유실은 수정 후 0건이다. 남은 500 은 SQLState 없이 "Connection is closed" 메시지로만 오는 경우라
+`isConnectionFailure` 가 놓쳤다 → 메시지 검사를 추가함(`ApiExceptionHandlerTest`). **이 수정 이후의 컨테이너 재실행(500 이 0건이 되는지)은 하지 않았다.**

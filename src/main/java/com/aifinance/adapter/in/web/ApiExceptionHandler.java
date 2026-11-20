@@ -82,6 +82,8 @@ public class ApiExceptionHandler {
         for (Throwable c = t; c != null; c = (c.getCause() == c ? null : c.getCause())) {
             if (c instanceof java.sql.SQLException s && s.getSQLState() != null && s.getSQLState().startsWith("08")) return true;
             if (c instanceof java.sql.SQLTransientConnectionException || c instanceof java.sql.SQLNonTransientConnectionException) return true;
+            // 커넥션이 이미 닫힌 뒤 롤백하려는 경우 (db-fault 실험: "Unable to rollback against JDBC Connection" ← "Connection is closed", SQLState 없음)
+            if (c instanceof java.sql.SQLException s2 && s2.getMessage() != null && s2.getMessage().toLowerCase().contains("connection is closed")) return true;
             String n = c.getClass().getName();
             if (n.contains("CommunicationsException") || n.contains("JDBCConnectionException")) return true;
         }

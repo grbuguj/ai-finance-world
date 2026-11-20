@@ -23,6 +23,13 @@ class ApiExceptionHandlerTest {
     }
 
     @Test
+    void 닫힌_커넥션에_롤백하려다_실패한_JpaSystemException_은_503_이다() {
+        var e = new JpaSystemException(new PersistenceException("Unable to rollback against JDBC Connection",
+                new RuntimeException("rollback failed", new SQLException("Connection is closed"))));
+        assertEquals(503, handler.jpaSystem(e).getStatusCode().value());
+    }
+
+    @Test
     void 연결과_무관한_JpaSystemException_은_500_이다() {
         var e = new JpaSystemException(new PersistenceException("constraint", new SQLException("dup", "23000")));
         assertEquals(500, handler.jpaSystem(e).getStatusCode().value());
