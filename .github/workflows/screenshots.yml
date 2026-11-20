@@ -84,6 +84,11 @@ jobs:
           sleep 5
           curl -fs localhost:8080/ops/outbox | tee ../../docs/screenshots/outbox-recovering.json; echo
           curl -fs -X POST localhost:8080/simulation/stop || true
+          # 장기 장애로 재시도 한도를 넘겨 DEAD 가 된 이벤트: 대사가 먼저 찾아낸다
+          sleep 20
+          curl -fs -X POST localhost:8080/ops/reconciliation > ../../docs/screenshots/recon-before-requeue.json; echo
+          cat ../../docs/screenshots/recon-before-requeue.json | head -c 400; echo
+          curl -fs -X POST localhost:8080/ops/outbox/requeue-dead | tee ../../docs/screenshots/requeue.json; echo
           for i in $(seq 1 120); do
             curl -fs localhost:8080/ops/outbox > ../../docs/screenshots/outbox-up.json
             grep -q '"pending":0' ../../docs/screenshots/outbox-up.json && break; sleep 2
