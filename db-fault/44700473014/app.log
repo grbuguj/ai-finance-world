@@ -1,0 +1,400 @@
+ai-finance-app  | 	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:101) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:190) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquireConnectionIfNeeded(LogicalConnectionManagedImpl.java:87) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.getPhysicalConnection(LogicalConnectionManagedImpl.java:126) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.getConnectionForTransactionManagement(LogicalConnectionManagedImpl.java:277) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.begin(LogicalConnectionManagedImpl.java:286) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.begin(JdbcResourceLocalTransactionCoordinatorImpl.java:226) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.transaction.internal.TransactionImpl.begin(TransactionImpl.java:75) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.beginTransaction(HibernateJpaDialect.java:147) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:411) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	... 21 common frames omitted
+ai-finance-app  | Caused by: java.sql.SQLTransientConnectionException: HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:714) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:184) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:142) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:127) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.connections.internal.DataSourceConnectionProvider.getConnection(DataSourceConnectionProvider.java:137) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.internal.NonContextualJdbcConnectionAccess.obtainConnection(NonContextualJdbcConnectionAccess.java:47) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:187) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	... 29 common frames omitted
+ai-finance-app  | Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 
+ai-finance-app  | The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:840) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:416) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:237) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:373) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:210) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:752) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:731) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.FutureTask.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	... 3 common frames omitted
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 
+ai-finance-app  | The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+ai-finance-app  | 	at jdk.internal.reflect.GeneratedConstructorAccessor74.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:79) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.NativeSession.connect(NativeSession.java:142) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:964) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:828) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	... 13 common frames omitted
+ai-finance-app  | Caused by: java.net.UnknownHostException: mysql
+ai-finance-app  | 	at java.base/java.net.InetAddress$CachedAddresses.get(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName0(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName(Unknown Source) ~[na:na]
+ai-finance-app  | 	at com.mysql.cj.protocol.StandardSocketFactory.connect(StandardSocketFactory.java:121) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:53) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	... 16 common frames omitted
+ai-finance-app  | 
+ai-finance-app  | 2026-11-20T17:13:19.988+09:00  WARN 1 --- [io-8080-exec-23] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:19.988+09:00  WARN 1 --- [io-8080-exec-23] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=24)
+ai-finance-app  | 2026-11-20T17:13:19.988+09:00  WARN 1 --- [io-8080-exec-23] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:19.988+09:00  WARN 1 --- [io-8080-exec-23] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=24)
+ai-finance-app  | 2026-11-20T17:13:21.332+09:00  WARN 1 --- [   scheduling-4] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.333+09:00  WARN 1 --- [   scheduling-4] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 2026-11-20T17:13:21.333+09:00  WARN 1 --- [   scheduling-4] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.333+09:00  WARN 1 --- [   scheduling-4] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 2026-11-20T17:13:21.333+09:00 ERROR 1 --- [   scheduling-4] o.s.s.s.TaskUtils$LoggingErrorHandler    : Unexpected error occurred in scheduled task
+ai-finance-app  | 
+ai-finance-app  | org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction
+ai-finance-app  | 	at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:457) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(AbstractPlatformTransactionManager.java:532) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:405) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.interceptor.TransactionAspectSupport.createTransactionIfNecessary(TransactionAspectSupport.java:628) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:365) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179) ~[spring-aop-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:719) ~[spring-aop-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at com.aifinance.application.usecase.IntegrityUseCase$$SpringCGLIB$$0.check(<generated>) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at com.aifinance.application.service.IntegrityMonitor.refresh(IntegrityMonitor.java:44) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at com.aifinance.application.service.IntegrityMonitor.refreshIfDue(IntegrityMonitor.java:78) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at com.aifinance.adapter.in.scheduler.IntegrityMonitorScheduler.check(IntegrityMonitorScheduler.java:28) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at jdk.internal.reflect.GeneratedMethodAccessor70.invoke(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[na:na]
+ai-finance-app  | 	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:128) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$1(ScheduledMethodRunnable.java:122) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at io.micrometer.observation.Observation.observe(Observation.java:569) ~[micrometer-observation-1.16.5.jar!/:1.16.5]
+ai-finance-app  | 	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:122) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.scheduling.config.Task$OutcomeTrackingRunnable.run(Task.java:88) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.FutureTask.runAndReset(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.Thread.run(Unknown Source) ~[na:na]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: Unable to acquire JDBC Connection [HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)] [n/a]
+ai-finance-app  | 	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:101) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:190) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquireConnectionIfNeeded(LogicalConnectionManagedImpl.java:87) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.getPhysicalConnection(LogicalConnectionManagedImpl.java:126) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.beginTransaction(HibernateJpaDialect.java:135) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:411) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	... 26 common frames omitted
+ai-finance-app  | Caused by: java.sql.SQLTransientConnectionException: HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:714) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:184) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:142) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:127) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.connections.internal.DataSourceConnectionProvider.getConnection(DataSourceConnectionProvider.java:137) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.internal.NonContextualJdbcConnectionAccess.obtainConnection(NonContextualJdbcConnectionAccess.java:47) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:187) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	... 30 common frames omitted
+ai-finance-app  | Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 
+ai-finance-app  | The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:840) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:416) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:237) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:373) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:210) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:752) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:731) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.FutureTask.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	... 3 common frames omitted
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 
+ai-finance-app  | The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+ai-finance-app  | 	at jdk.internal.reflect.GeneratedConstructorAccessor74.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:79) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.NativeSession.connect(NativeSession.java:142) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:964) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:828) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	... 13 common frames omitted
+ai-finance-app  | Caused by: java.net.UnknownHostException: mysql
+ai-finance-app  | 	at java.base/java.net.InetAddress$CachedAddresses.get(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName0(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName(Unknown Source) ~[na:na]
+ai-finance-app  | 	at com.mysql.cj.protocol.StandardSocketFactory.connect(StandardSocketFactory.java:121) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:53) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	... 16 common frames omitted
+ai-finance-app  | 
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-17] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-18] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-17] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-18] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-17] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-18] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-17] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-18] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-18] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [io-8080-exec-17] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [nio-8080-exec-9] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [nio-8080-exec-9] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [nio-8080-exec-9] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.496+09:00  WARN 1 --- [nio-8080-exec-9] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:13:21.497+09:00  WARN 1 --- [nio-8080-exec-9] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.501+09:00  WARN 1 --- [io-8080-exec-15] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.501+09:00  WARN 1 --- [io-8080-exec-15] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.501+09:00  WARN 1 --- [io-8080-exec-15] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.501+09:00  WARN 1 --- [io-8080-exec-15] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.502+09:00  WARN 1 --- [io-8080-exec-15] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.502+09:00  WARN 1 --- [nio-8080-exec-5] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.502+09:00  WARN 1 --- [nio-8080-exec-5] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.502+09:00  WARN 1 --- [nio-8080-exec-5] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.502+09:00  WARN 1 --- [nio-8080-exec-5] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.502+09:00  WARN 1 --- [nio-8080-exec-5] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.515+09:00  WARN 1 --- [io-8080-exec-19] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.515+09:00  WARN 1 --- [io-8080-exec-19] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.515+09:00  WARN 1 --- [io-8080-exec-19] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.515+09:00  WARN 1 --- [io-8080-exec-19] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.515+09:00  WARN 1 --- [io-8080-exec-19] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.516+09:00  WARN 1 --- [nio-8080-exec-3] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.516+09:00  WARN 1 --- [nio-8080-exec-3] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.516+09:00  WARN 1 --- [nio-8080-exec-3] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.516+09:00  WARN 1 --- [nio-8080-exec-3] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.516+09:00  WARN 1 --- [nio-8080-exec-3] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.516+09:00  WARN 1 --- [io-8080-exec-10] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.517+09:00  WARN 1 --- [io-8080-exec-10] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:13:21.517+09:00  WARN 1 --- [io-8080-exec-10] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.517+09:00  WARN 1 --- [io-8080-exec-10] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:13:21.517+09:00  WARN 1 --- [io-8080-exec-10] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.519+09:00  WARN 1 --- [io-8080-exec-14] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.519+09:00  WARN 1 --- [io-8080-exec-14] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.519+09:00  WARN 1 --- [io-8080-exec-14] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.519+09:00  WARN 1 --- [io-8080-exec-14] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.519+09:00  WARN 1 --- [io-8080-exec-14] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.533+09:00  WARN 1 --- [io-8080-exec-22] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.533+09:00  WARN 1 --- [io-8080-exec-22] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.533+09:00  WARN 1 --- [io-8080-exec-22] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.533+09:00  WARN 1 --- [io-8080-exec-22] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.533+09:00  WARN 1 --- [io-8080-exec-22] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.557+09:00  WARN 1 --- [nio-8080-exec-7] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.557+09:00  WARN 1 --- [nio-8080-exec-7] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.557+09:00  WARN 1 --- [nio-8080-exec-7] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.557+09:00  WARN 1 --- [nio-8080-exec-7] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.557+09:00  WARN 1 --- [nio-8080-exec-7] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [nio-8080-exec-2] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [nio-8080-exec-2] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [nio-8080-exec-2] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [nio-8080-exec-2] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [nio-8080-exec-2] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [io-8080-exec-20] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [io-8080-exec-20] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [io-8080-exec-20] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [io-8080-exec-20] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.569+09:00  WARN 1 --- [io-8080-exec-20] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.573+09:00  WARN 1 --- [ntainer#0-0-C-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.573+09:00  WARN 1 --- [ntainer#0-0-C-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.573+09:00  WARN 1 --- [ntainer#0-0-C-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.573+09:00  WARN 1 --- [ntainer#0-0-C-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:13:21.615+09:00  WARN 1 --- [io-8080-exec-12] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.616+09:00  WARN 1 --- [io-8080-exec-12] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.616+09:00  WARN 1 --- [io-8080-exec-12] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.616+09:00  WARN 1 --- [io-8080-exec-12] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.616+09:00  WARN 1 --- [io-8080-exec-12] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.618+09:00  WARN 1 --- [io-8080-exec-24] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.618+09:00  WARN 1 --- [io-8080-exec-24] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.618+09:00  WARN 1 --- [io-8080-exec-24] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.618+09:00  WARN 1 --- [io-8080-exec-24] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.618+09:00  WARN 1 --- [io-8080-exec-24] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [io-8080-exec-11] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [io-8080-exec-11] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [io-8080-exec-11] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [nio-8080-exec-4] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [io-8080-exec-11] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [nio-8080-exec-4] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [nio-8080-exec-4] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [nio-8080-exec-4] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [nio-8080-exec-4] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [io-8080-exec-11] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [io-8080-exec-21] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [io-8080-exec-21] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=19)
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [io-8080-exec-21] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.621+09:00  WARN 1 --- [io-8080-exec-21] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=19)
+ai-finance-app  | 2026-11-20T17:13:21.622+09:00  WARN 1 --- [io-8080-exec-21] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [io-8080-exec-13] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [io-8080-exec-13] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [io-8080-exec-13] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [io-8080-exec-13] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [io-8080-exec-13] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [nio-8080-exec-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [nio-8080-exec-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [nio-8080-exec-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [nio-8080-exec-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:13:21.625+09:00  WARN 1 --- [nio-8080-exec-1] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:13:22.077+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Seeking to offset 274 for partition ai-finance.transactions-0
+ai-finance-app  | 2026-11-20T17:13:22.077+09:00  INFO 1 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Record in retry and not yet recovered
+ai-finance-app  | 2026-11-20T17:13:22.516+09:00  WARN 1 --- [   scheduling-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:22.516+09:00  WARN 1 --- [   scheduling-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=24)
+ai-finance-app  | 2026-11-20T17:13:22.516+09:00  WARN 1 --- [   scheduling-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:22.516+09:00  WARN 1 --- [   scheduling-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=24)
+ai-finance-app  | 2026-11-20T17:13:22.517+09:00 ERROR 1 --- [   scheduling-1] o.s.s.s.TaskUtils$LoggingErrorHandler    : Unexpected error occurred in scheduled task
+ai-finance-app  | 
+ai-finance-app  | org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction
+ai-finance-app  | 	at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:457) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(AbstractPlatformTransactionManager.java:532) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:405) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.TransactionTemplate.execute(TransactionTemplate.java:134) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at com.aifinance.application.service.OutboxRelayService.doRelay(OutboxRelayService.java:126) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at com.aifinance.application.service.OutboxRelayService.relayOnce(OutboxRelayService.java:87) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at com.aifinance.adapter.in.scheduler.OutboxRelayScheduler.relay(OutboxRelayScheduler.java:24) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at jdk.internal.reflect.GeneratedMethodAccessor67.invoke(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[na:na]
+ai-finance-app  | 	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:128) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$1(ScheduledMethodRunnable.java:122) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at io.micrometer.observation.Observation.observe(Observation.java:569) ~[micrometer-observation-1.16.5.jar!/:1.16.5]
+ai-finance-app  | 	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:122) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.scheduling.config.Task$OutcomeTrackingRunnable.run(Task.java:88) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.FutureTask.runAndReset(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.Thread.run(Unknown Source) ~[na:na]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: Unable to acquire JDBC Connection [HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=24)] [n/a]
+ai-finance-app  | 	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:101) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:190) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquireConnectionIfNeeded(LogicalConnectionManagedImpl.java:87) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.getPhysicalConnection(LogicalConnectionManagedImpl.java:126) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.getConnectionForTransactionManagement(LogicalConnectionManagedImpl.java:277) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.begin(LogicalConnectionManagedImpl.java:286) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.begin(JdbcResourceLocalTransactionCoordinatorImpl.java:226) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.transaction.internal.TransactionImpl.begin(TransactionImpl.java:75) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.beginTransaction(HibernateJpaDialect.java:147) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:411) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	... 21 common frames omitted
+ai-finance-app  | Caused by: java.sql.SQLTransientConnectionException: HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=24)
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:714) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:184) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:142) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:127) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.connections.internal.DataSourceConnectionProvider.getConnection(DataSourceConnectionProvider.java:137) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.internal.NonContextualJdbcConnectionAccess.obtainConnection(NonContextualJdbcConnectionAccess.java:47) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:187) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	... 29 common frames omitted
+ai-finance-app  | Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 
+ai-finance-app  | The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:840) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:416) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:237) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:373) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:210) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:752) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:731) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.FutureTask.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	... 3 common frames omitted
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 
+ai-finance-app  | The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+ai-finance-app  | 	at jdk.internal.reflect.GeneratedConstructorAccessor74.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:79) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.NativeSession.connect(NativeSession.java:142) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:964) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:828) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	... 13 common frames omitted
+ai-finance-app  | Caused by: java.net.UnknownHostException: mysql
+ai-finance-app  | 	at java.base/java.net.InetAddress$CachedAddresses.get(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName0(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName(Unknown Source) ~[na:na]
+ai-finance-app  | 	at com.mysql.cj.protocol.StandardSocketFactory.connect(StandardSocketFactory.java:121) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:53) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	... 16 common frames omitted
+ai-finance-app  | 
+ai-finance-app  | 2026-11-20T17:13:22.610+09:00  WARN 1 --- [nio-8080-exec-8] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:22.610+09:00  WARN 1 --- [nio-8080-exec-8] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 2026-11-20T17:13:22.610+09:00  WARN 1 --- [nio-8080-exec-8] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:13:22.610+09:00  WARN 1 --- [nio-8080-exec-8] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 2026-11-20T17:13:49.232+09:00  INFO 1 --- [io-8080-exec-20] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 3313건, 누락 6668 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:13:51.379+09:00  INFO 1 --- [nio-8080-exec-8] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 4045건, 누락 5936 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:13:53.506+09:00  INFO 1 --- [io-8080-exec-12] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 4967건, 누락 5014 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:13:55.635+09:00  INFO 1 --- [io-8080-exec-15] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 5849건, 누락 4132 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:13:57.785+09:00  INFO 1 --- [nio-8080-exec-6] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 6430건, 누락 3551 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:13:59.890+09:00  INFO 1 --- [nio-8080-exec-1] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 7382건, 누락 2599 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:02.051+09:00  INFO 1 --- [nio-8080-exec-3] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 8398건, 누락 1583 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:04.430+09:00  INFO 1 --- [nio-8080-exec-2] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9225건, 누락 756 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:06.577+09:00  INFO 1 --- [io-8080-exec-19] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:08.682+09:00  INFO 1 --- [io-8080-exec-21] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:10.792+09:00  INFO 1 --- [nio-8080-exec-4] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:12.906+09:00  INFO 1 --- [nio-8080-exec-7] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:15.010+09:00  INFO 1 --- [io-8080-exec-18] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:17.117+09:00  INFO 1 --- [io-8080-exec-14] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:19.307+09:00  INFO 1 --- [nio-8080-exec-8] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:21.411+09:00  INFO 1 --- [io-8080-exec-12] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:23.513+09:00  INFO 1 --- [io-8080-exec-15] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:25.618+09:00  INFO 1 --- [nio-8080-exec-6] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:27.721+09:00  INFO 1 --- [nio-8080-exec-1] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:29.827+09:00  INFO 1 --- [nio-8080-exec-3] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:31.931+09:00  INFO 1 --- [nio-8080-exec-2] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:34.036+09:00  INFO 1 --- [io-8080-exec-19] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:36.139+09:00  INFO 1 --- [io-8080-exec-21] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:38.246+09:00  INFO 1 --- [nio-8080-exec-4] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:40.350+09:00  INFO 1 --- [nio-8080-exec-7] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:42.453+09:00  INFO 1 --- [io-8080-exec-18] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:44.561+09:00  INFO 1 --- [io-8080-exec-20] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:46.666+09:00  INFO 1 --- [nio-8080-exec-8] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:48.780+09:00  INFO 1 --- [io-8080-exec-12] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:14:50.885+09:00  INFO 1 --- [io-8080-exec-15] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9981건 / 정산 9979건, 누락 2 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 0 · 원장무결성 true

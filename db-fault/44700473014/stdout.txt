@@ -1,0 +1,141 @@
+docker stop rc=0 took=3.0s
+{
+  "config": {
+    "threads": 20,
+    "pre_s": 15.0,
+    "outage_target_s": 20.0,
+    "post_s": 20.0
+  },
+  "timeline_s": {
+    "docker_stop_took": 3.0,
+    "mysql_down_duration(stop_end→docker_start)": 20.0,
+    "docker_start→db_ready": 1.4,
+    "docker_start→first_success": 9.2,
+    "db_ready→first_success": 7.8,
+    "total_run": 67.5
+  },
+  "windows": {
+    "before_outage": {
+      "requests": 3430,
+      "success": 3430,
+      "failed": 0,
+      "status_distribution": {
+        "200": 3430
+      },
+      "latency_ms_all": {
+        "p50": 75.0,
+        "p95": 186.4,
+        "max": 475.5
+      },
+      "latency_ms_failed": {
+        "p50": null,
+        "p95": null,
+        "max": null
+      }
+    },
+    "stopping(docker stop 진행 중)": {
+      "requests": 38,
+      "success": 5,
+      "failed": 33,
+      "status_distribution": {
+        "200": 5,
+        "503": 26,
+        "500": 7
+      },
+      "latency_ms_all": {
+        "p50": 3006.6,
+        "p95": 3020.4,
+        "max": 3022.2
+      },
+      "latency_ms_failed": {
+        "p50": 3007.3,
+        "p95": 3020.4,
+        "max": 3022.2
+      }
+    },
+    "db_down": {
+      "requests": 137,
+      "success": 0,
+      "failed": 137,
+      "status_distribution": {
+        "503": 137
+      },
+      "latency_ms_all": {
+        "p50": 3002.8,
+        "p95": 3006.3,
+        "max": 3008.0
+      },
+      "latency_ms_failed": {
+        "p50": 3002.8,
+        "p95": 3006.3,
+        "max": 3008.0
+      }
+    },
+    "db_starting(docker start→첫 성공)": {
+      "requests": 60,
+      "success": 20,
+      "failed": 40,
+      "status_distribution": {
+        "503": 40,
+        "200": 20
+      },
+      "latency_ms_all": {
+        "p50": 3001.5,
+        "p95": 3003.9,
+        "max": 3004.1
+      },
+      "latency_ms_failed": {
+        "p50": 3002.1,
+        "p95": 3004.0,
+        "max": 3004.1
+      }
+    },
+    "after_recovery": {
+      "requests": 6404,
+      "success": 6404,
+      "failed": 0,
+      "status_distribution": {
+        "200": 6404
+      },
+      "latency_ms_all": {
+        "p50": 44.4,
+        "p95": 202.7,
+        "max": 537.5
+      },
+      "latency_ms_failed": {
+        "p50": null,
+        "p95": null,
+        "max": null
+      }
+    }
+  },
+  "post": {
+    "outbox": {
+      "pending": 0,
+      "published": 9981,
+      "dead": 0,
+      "oldestPendingAgeMillis": 0
+    },
+    "outbox_drain_s": 5.1,
+    "integrity_balanced": true,
+    "reconciliation": {
+      "id": 30,
+      "businessDate": "2026-01-01",
+      "windowFrom": "2026-01-01T00:00:00",
+      "windowTo": "2026-01-01T00:20:01",
+      "status": "UNMATCHED",
+      "bankCount": 9981,
+      "bankAmount": 10041082400.0,
+      "settlementCount": 9979,
+      "settlementAmount": 10041080400.0,
+      "missingCount": 2,
+      "inFlightCount": 0,
+      "unexpectedCount": 0,
+      "mismatchCount": 0,
+      "duplicateDeliveries": 0,
+      "ledgerBalanced": true,
+      "executedAt": "2026-11-20T17:14:50.78440094",
+      "durationMs": 100
+    }
+  }
+}
