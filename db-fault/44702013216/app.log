@@ -1,0 +1,400 @@
+ai-finance-app  | 2026-11-20T17:24:56.114+09:00  WARN 1 --- [nio-8080-exec-2] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.117+09:00  WARN 1 --- [nio-8080-exec-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.117+09:00  WARN 1 --- [nio-8080-exec-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.117+09:00  WARN 1 --- [nio-8080-exec-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.117+09:00  WARN 1 --- [nio-8080-exec-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.118+09:00  WARN 1 --- [nio-8080-exec-1] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-21] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-13] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-13] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-21] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-21] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-21] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-21] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-12] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [io-8080-exec-12] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=19)
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [io-8080-exec-12] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [io-8080-exec-12] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=19)
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [io-8080-exec-12] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [nio-8080-exec-7] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [nio-8080-exec-7] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=17)
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [nio-8080-exec-7] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [nio-8080-exec-7] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=17)
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [nio-8080-exec-5] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [nio-8080-exec-5] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=18)
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [nio-8080-exec-5] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [nio-8080-exec-5] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=18)
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [nio-8080-exec-7] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-13] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.121+09:00  WARN 1 --- [io-8080-exec-13] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:24:56.121+09:00  WARN 1 --- [io-8080-exec-13] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.119+09:00  WARN 1 --- [io-8080-exec-14] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.122+09:00  WARN 1 --- [io-8080-exec-14] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=18)
+ai-finance-app  | 2026-11-20T17:24:56.122+09:00  WARN 1 --- [io-8080-exec-14] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.122+09:00  WARN 1 --- [io-8080-exec-14] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=18)
+ai-finance-app  | 2026-11-20T17:24:56.122+09:00  WARN 1 --- [io-8080-exec-14] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.120+09:00  WARN 1 --- [nio-8080-exec-5] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.140+09:00  WARN 1 --- [io-8080-exec-20] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.141+09:00  WARN 1 --- [io-8080-exec-20] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.141+09:00  WARN 1 --- [io-8080-exec-20] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.141+09:00  WARN 1 --- [io-8080-exec-20] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.141+09:00  WARN 1 --- [io-8080-exec-20] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.145+09:00  WARN 1 --- [io-8080-exec-24] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.145+09:00  WARN 1 --- [io-8080-exec-24] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.145+09:00  WARN 1 --- [io-8080-exec-24] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.145+09:00  WARN 1 --- [io-8080-exec-24] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.145+09:00  WARN 1 --- [io-8080-exec-24] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.150+09:00  WARN 1 --- [io-8080-exec-18] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.150+09:00  WARN 1 --- [io-8080-exec-18] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.150+09:00  WARN 1 --- [io-8080-exec-18] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.150+09:00  WARN 1 --- [io-8080-exec-18] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.150+09:00  WARN 1 --- [io-8080-exec-18] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.158+09:00  WARN 1 --- [io-8080-exec-11] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.158+09:00  WARN 1 --- [io-8080-exec-11] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.158+09:00  WARN 1 --- [io-8080-exec-11] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.158+09:00  WARN 1 --- [io-8080-exec-11] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.158+09:00  WARN 1 --- [io-8080-exec-11] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.188+09:00  WARN 1 --- [nio-8080-exec-6] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.188+09:00  WARN 1 --- [nio-8080-exec-6] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.188+09:00  WARN 1 --- [nio-8080-exec-6] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.188+09:00  WARN 1 --- [nio-8080-exec-6] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.188+09:00  WARN 1 --- [io-8080-exec-16] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.188+09:00  WARN 1 --- [io-8080-exec-16] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:24:56.188+09:00  WARN 1 --- [io-8080-exec-16] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.188+09:00  WARN 1 --- [io-8080-exec-16] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=21)
+ai-finance-app  | 2026-11-20T17:24:56.189+09:00  WARN 1 --- [nio-8080-exec-6] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.189+09:00  WARN 1 --- [io-8080-exec-16] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.189+09:00  WARN 1 --- [nio-8080-exec-8] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.189+09:00  WARN 1 --- [nio-8080-exec-8] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:24:56.189+09:00  WARN 1 --- [io-8080-exec-15] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [io-8080-exec-15] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=19)
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [io-8080-exec-15] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [io-8080-exec-15] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=19)
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [nio-8080-exec-8] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [nio-8080-exec-8] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=20)
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [io-8080-exec-15] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [io-8080-exec-10] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [io-8080-exec-10] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=18)
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [io-8080-exec-10] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [io-8080-exec-10] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=18)
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [io-8080-exec-10] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.190+09:00  WARN 1 --- [nio-8080-exec-8] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.191+09:00  WARN 1 --- [io-8080-exec-23] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.191+09:00  WARN 1 --- [io-8080-exec-23] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3001ms (total=0, active=0, idle=0, waiting=17)
+ai-finance-app  | 2026-11-20T17:24:56.191+09:00  WARN 1 --- [io-8080-exec-23] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.191+09:00  WARN 1 --- [io-8080-exec-23] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3001ms (total=0, active=0, idle=0, waiting=17)
+ai-finance-app  | 2026-11-20T17:24:56.191+09:00  WARN 1 --- [io-8080-exec-23] c.a.adapter.in.web.ApiExceptionHandler   : DB 연결 불가로 요청 거절: CannotCreateTransactionException
+ai-finance-app  | 2026-11-20T17:24:56.216+09:00  WARN 1 --- [ntainer#0-0-C-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.216+09:00  WARN 1 --- [ntainer#0-0-C-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.216+09:00  WARN 1 --- [ntainer#0-0-C-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:56.216+09:00  WARN 1 --- [ntainer#0-0-C-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=22)
+ai-finance-app  | 2026-11-20T17:24:56.229+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Seeking to offset 159 for partition ai-finance.transactions-1
+ai-finance-app  | 2026-11-20T17:24:56.229+09:00  INFO 1 --- [ntainer#0-0-C-1] o.a.k.c.c.i.ClassicKafkaConsumer         : [Consumer clientId=consumer-external-settlement-1, groupId=external-settlement] Seeking to offset 59 for partition ai-finance.transactions-2
+ai-finance-app  | 2026-11-20T17:24:56.229+09:00  INFO 1 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : Record in retry and not yet recovered
+ai-finance-app  | 2026-11-20T17:24:57.034+09:00  WARN 1 --- [   scheduling-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:57.034+09:00  WARN 1 --- [   scheduling-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 2026-11-20T17:24:57.034+09:00  WARN 1 --- [   scheduling-1] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:57.034+09:00  WARN 1 --- [   scheduling-1] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 2026-11-20T17:24:57.035+09:00 ERROR 1 --- [   scheduling-1] o.s.s.s.TaskUtils$LoggingErrorHandler    : Unexpected error occurred in scheduled task
+ai-finance-app  | 
+ai-finance-app  | org.springframework.transaction.CannotCreateTransactionException: Could not open JPA EntityManager for transaction
+ai-finance-app  | 	at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:457) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(AbstractPlatformTransactionManager.java:532) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:405) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.transaction.support.TransactionTemplate.execute(TransactionTemplate.java:134) ~[spring-tx-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at com.aifinance.application.service.OutboxRelayService.doRelay(OutboxRelayService.java:126) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at com.aifinance.application.service.OutboxRelayService.relayOnce(OutboxRelayService.java:87) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at com.aifinance.adapter.in.scheduler.OutboxRelayScheduler.relay(OutboxRelayScheduler.java:24) ~[!/:0.0.1-SNAPSHOT]
+ai-finance-app  | 	at jdk.internal.reflect.GeneratedMethodAccessor67.invoke(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Method.invoke(Unknown Source) ~[na:na]
+ai-finance-app  | 	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:128) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$1(ScheduledMethodRunnable.java:122) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at io.micrometer.observation.Observation.observe(Observation.java:569) ~[micrometer-observation-1.16.5.jar!/:1.16.5]
+ai-finance-app  | 	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:122) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.scheduling.config.Task$OutcomeTrackingRunnable.run(Task.java:88) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54) ~[spring-context-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.FutureTask.runAndReset(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.Thread.run(Unknown Source) ~[na:na]
+ai-finance-app  | Caused by: org.hibernate.exception.JDBCConnectionException: Unable to acquire JDBC Connection [HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)] [n/a]
+ai-finance-app  | 	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:49) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:101) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:190) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquireConnectionIfNeeded(LogicalConnectionManagedImpl.java:87) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.getPhysicalConnection(LogicalConnectionManagedImpl.java:126) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.getConnectionForTransactionManagement(LogicalConnectionManagedImpl.java:277) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.begin(LogicalConnectionManagedImpl.java:286) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.begin(JdbcResourceLocalTransactionCoordinatorImpl.java:226) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.engine.transaction.internal.TransactionImpl.begin(TransactionImpl.java:75) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.beginTransaction(HibernateJpaDialect.java:147) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	at org.springframework.orm.jpa.JpaTransactionManager.doBegin(JpaTransactionManager.java:411) ~[spring-orm-7.0.7.jar!/:7.0.7]
+ai-finance-app  | 	... 21 common frames omitted
+ai-finance-app  | Caused by: java.sql.SQLTransientConnectionException: HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:714) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:184) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:142) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:127) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at org.hibernate.engine.jdbc.connections.internal.DataSourceConnectionProvider.getConnection(DataSourceConnectionProvider.java:137) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.internal.NonContextualJdbcConnectionAccess.obtainConnection(NonContextualJdbcConnectionAccess.java:47) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	at org.hibernate.resource.jdbc.internal.LogicalConnectionManagedImpl.acquire(LogicalConnectionManagedImpl.java:187) ~[hibernate-core-7.2.12.Final.jar!/:7.2.12.Final]
+ai-finance-app  | 	... 29 common frames omitted
+ai-finance-app  | Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+ai-finance-app  | 
+ai-finance-app  | The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:165) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:55) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:840) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:416) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:237) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:373) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:210) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:752) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at com.zaxxer.hikari.pool.HikariPool$PoolEntryCreator.call(HikariPool.java:731) ~[HikariCP-7.0.2.jar!/:na]
+ai-finance-app  | 	at java.base/java.util.concurrent.FutureTask.run(Unknown Source) ~[na:na]
+ai-finance-app  | 	... 3 common frames omitted
+ai-finance-app  | Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+ai-finance-app  | 
+ai-finance-app  | The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+ai-finance-app  | 	at jdk.internal.reflect.GeneratedConstructorAccessor76.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.lang.reflect.Constructor.newInstance(Unknown Source) ~[na:na]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:52) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:95) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:140) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:156) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:79) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.NativeSession.connect(NativeSession.java:142) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.connectOneTryOnly(ConnectionImpl.java:964) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:828) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	... 13 common frames omitted
+ai-finance-app  | Caused by: java.net.UnknownHostException: mysql
+ai-finance-app  | 	at java.base/java.net.InetAddress$CachedAddresses.get(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName0(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName(Unknown Source) ~[na:na]
+ai-finance-app  | 	at java.base/java.net.InetAddress.getAllByName(Unknown Source) ~[na:na]
+ai-finance-app  | 	at com.mysql.cj.protocol.StandardSocketFactory.connect(StandardSocketFactory.java:121) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	at com.mysql.cj.protocol.a.NativeSocketConnection.connect(NativeSocketConnection.java:53) ~[mysql-connector-j-9.7.0.jar!/:9.7.0]
+ai-finance-app  | 	... 16 common frames omitted
+ai-finance-app  | 
+ai-finance-app  | 2026-11-20T17:24:57.086+09:00  WARN 1 --- [nio-8080-exec-9] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:57.086+09:00  WARN 1 --- [nio-8080-exec-9] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 2026-11-20T17:24:57.086+09:00  WARN 1 --- [nio-8080-exec-9] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 0, SQLState: 08S01
+ai-finance-app  | 2026-11-20T17:24:57.086+09:00  WARN 1 --- [nio-8080-exec-9] org.hibernate.orm.jdbc.error             : HikariPool-1 - Connection is not available, request timed out after 3000ms (total=0, active=0, idle=0, waiting=23)
+ai-finance-app  | 2026-11-20T17:25:20.775+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1752, 누적 중복 1건)
+ai-finance-app  | 2026-11-20T17:25:20.777+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1756, 누적 중복 2건)
+ai-finance-app  | 2026-11-20T17:25:20.778+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1757, 누적 중복 3건)
+ai-finance-app  | 2026-11-20T17:25:20.780+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1758, 누적 중복 4건)
+ai-finance-app  | 2026-11-20T17:25:20.783+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1760, 누적 중복 5건)
+ai-finance-app  | 2026-11-20T17:25:20.784+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1763, 누적 중복 6건)
+ai-finance-app  | 2026-11-20T17:25:20.787+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1769, 누적 중복 7건)
+ai-finance-app  | 2026-11-20T17:25:20.791+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1767, 누적 중복 8건)
+ai-finance-app  | 2026-11-20T17:25:20.793+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1768, 누적 중복 9건)
+ai-finance-app  | 2026-11-20T17:25:20.795+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1779, 누적 중복 10건)
+ai-finance-app  | 2026-11-20T17:25:20.796+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1777, 누적 중복 11건)
+ai-finance-app  | 2026-11-20T17:25:20.798+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1791, 누적 중복 12건)
+ai-finance-app  | 2026-11-20T17:25:20.800+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1789, 누적 중복 13건)
+ai-finance-app  | 2026-11-20T17:25:20.802+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1793, 누적 중복 14건)
+ai-finance-app  | 2026-11-20T17:25:20.803+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1795, 누적 중복 15건)
+ai-finance-app  | 2026-11-20T17:25:20.805+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1796, 누적 중복 16건)
+ai-finance-app  | 2026-11-20T17:25:20.806+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1798, 누적 중복 17건)
+ai-finance-app  | 2026-11-20T17:25:20.808+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1800, 누적 중복 18건)
+ai-finance-app  | 2026-11-20T17:25:20.809+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1804, 누적 중복 19건)
+ai-finance-app  | 2026-11-20T17:25:20.810+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1808, 누적 중복 20건)
+ai-finance-app  | 2026-11-20T17:25:20.812+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1809, 누적 중복 21건)
+ai-finance-app  | 2026-11-20T17:25:20.813+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1814, 누적 중복 22건)
+ai-finance-app  | 2026-11-20T17:25:20.815+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1820, 누적 중복 23건)
+ai-finance-app  | 2026-11-20T17:25:20.816+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1819, 누적 중복 24건)
+ai-finance-app  | 2026-11-20T17:25:20.817+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1827, 누적 중복 25건)
+ai-finance-app  | 2026-11-20T17:25:20.819+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1828, 누적 중복 26건)
+ai-finance-app  | 2026-11-20T17:25:20.820+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1829, 누적 중복 27건)
+ai-finance-app  | 2026-11-20T17:25:20.822+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1832, 누적 중복 28건)
+ai-finance-app  | 2026-11-20T17:25:20.823+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1841, 누적 중복 29건)
+ai-finance-app  | 2026-11-20T17:25:20.825+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1837, 누적 중복 30건)
+ai-finance-app  | 2026-11-20T17:25:20.826+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1840, 누적 중복 31건)
+ai-finance-app  | 2026-11-20T17:25:20.827+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1843, 누적 중복 32건)
+ai-finance-app  | 2026-11-20T17:25:20.828+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1852, 누적 중복 33건)
+ai-finance-app  | 2026-11-20T17:25:20.830+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1853, 누적 중복 34건)
+ai-finance-app  | 2026-11-20T17:25:20.831+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1854, 누적 중복 35건)
+ai-finance-app  | 2026-11-20T17:25:20.832+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1855, 누적 중복 36건)
+ai-finance-app  | 2026-11-20T17:25:20.834+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1858, 누적 중복 37건)
+ai-finance-app  | 2026-11-20T17:25:20.835+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1861, 누적 중복 38건)
+ai-finance-app  | 2026-11-20T17:25:20.838+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1867, 누적 중복 39건)
+ai-finance-app  | 2026-11-20T17:25:20.839+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1864, 누적 중복 40건)
+ai-finance-app  | 2026-11-20T17:25:20.841+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1870, 누적 중복 41건)
+ai-finance-app  | 2026-11-20T17:25:20.842+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1872, 누적 중복 42건)
+ai-finance-app  | 2026-11-20T17:25:20.843+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1877, 누적 중복 43건)
+ai-finance-app  | 2026-11-20T17:25:20.845+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1885, 누적 중복 44건)
+ai-finance-app  | 2026-11-20T17:25:20.846+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1882, 누적 중복 45건)
+ai-finance-app  | 2026-11-20T17:25:20.847+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1886, 누적 중복 46건)
+ai-finance-app  | 2026-11-20T17:25:20.848+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1888, 누적 중복 47건)
+ai-finance-app  | 2026-11-20T17:25:20.849+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1889, 누적 중복 48건)
+ai-finance-app  | 2026-11-20T17:25:20.851+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1890, 누적 중복 49건)
+ai-finance-app  | 2026-11-20T17:25:20.852+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1894, 누적 중복 50건)
+ai-finance-app  | 2026-11-20T17:25:20.853+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1900, 누적 중복 51건)
+ai-finance-app  | 2026-11-20T17:25:20.854+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1903, 누적 중복 52건)
+ai-finance-app  | 2026-11-20T17:25:20.856+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1906, 누적 중복 53건)
+ai-finance-app  | 2026-11-20T17:25:20.857+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1909, 누적 중복 54건)
+ai-finance-app  | 2026-11-20T17:25:20.858+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1910, 누적 중복 55건)
+ai-finance-app  | 2026-11-20T17:25:20.859+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1913, 누적 중복 56건)
+ai-finance-app  | 2026-11-20T17:25:20.860+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1915, 누적 중복 57건)
+ai-finance-app  | 2026-11-20T17:25:20.861+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1914, 누적 중복 58건)
+ai-finance-app  | 2026-11-20T17:25:20.863+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1920, 누적 중복 59건)
+ai-finance-app  | 2026-11-20T17:25:20.864+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1922, 누적 중복 60건)
+ai-finance-app  | 2026-11-20T17:25:20.865+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1918, 누적 중복 61건)
+ai-finance-app  | 2026-11-20T17:25:20.866+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1919, 누적 중복 62건)
+ai-finance-app  | 2026-11-20T17:25:20.867+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1921, 누적 중복 63건)
+ai-finance-app  | 2026-11-20T17:25:20.868+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1927, 누적 중복 64건)
+ai-finance-app  | 2026-11-20T17:25:20.869+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1925, 누적 중복 65건)
+ai-finance-app  | 2026-11-20T17:25:20.870+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1924, 누적 중복 66건)
+ai-finance-app  | 2026-11-20T17:25:20.872+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1936, 누적 중복 67건)
+ai-finance-app  | 2026-11-20T17:25:20.873+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1937, 누적 중복 68건)
+ai-finance-app  | 2026-11-20T17:25:20.874+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1943, 누적 중복 69건)
+ai-finance-app  | 2026-11-20T17:25:20.876+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1944, 누적 중복 70건)
+ai-finance-app  | 2026-11-20T17:25:25.004+09:00  INFO 1 --- [io-8080-exec-25] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9561건 / 정산 2813건, 누락 6748 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 70 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:25:25.585+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1751, 누적 중복 71건)
+ai-finance-app  | 2026-11-20T17:25:25.586+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1759, 누적 중복 72건)
+ai-finance-app  | 2026-11-20T17:25:25.588+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1772, 누적 중복 73건)
+ai-finance-app  | 2026-11-20T17:25:25.590+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1774, 누적 중복 74건)
+ai-finance-app  | 2026-11-20T17:25:25.592+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1775, 누적 중복 75건)
+ai-finance-app  | 2026-11-20T17:25:25.595+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1778, 누적 중복 76건)
+ai-finance-app  | 2026-11-20T17:25:25.597+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1783, 누적 중복 77건)
+ai-finance-app  | 2026-11-20T17:25:25.599+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1784, 누적 중복 78건)
+ai-finance-app  | 2026-11-20T17:25:25.601+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1788, 누적 중복 79건)
+ai-finance-app  | 2026-11-20T17:25:25.603+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1794, 누적 중복 80건)
+ai-finance-app  | 2026-11-20T17:25:25.605+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1797, 누적 중복 81건)
+ai-finance-app  | 2026-11-20T17:25:25.606+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1799, 누적 중복 82건)
+ai-finance-app  | 2026-11-20T17:25:25.608+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1801, 누적 중복 83건)
+ai-finance-app  | 2026-11-20T17:25:25.609+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1810, 누적 중복 84건)
+ai-finance-app  | 2026-11-20T17:25:25.611+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1811, 누적 중복 85건)
+ai-finance-app  | 2026-11-20T17:25:25.612+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1815, 누적 중복 86건)
+ai-finance-app  | 2026-11-20T17:25:25.615+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1818, 누적 중복 87건)
+ai-finance-app  | 2026-11-20T17:25:25.617+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1821, 누적 중복 88건)
+ai-finance-app  | 2026-11-20T17:25:25.619+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1824, 누적 중복 89건)
+ai-finance-app  | 2026-11-20T17:25:25.621+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1826, 누적 중복 90건)
+ai-finance-app  | 2026-11-20T17:25:25.623+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1830, 누적 중복 91건)
+ai-finance-app  | 2026-11-20T17:25:25.624+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1834, 누적 중복 92건)
+ai-finance-app  | 2026-11-20T17:25:25.626+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1835, 누적 중복 93건)
+ai-finance-app  | 2026-11-20T17:25:25.627+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1838, 누적 중복 94건)
+ai-finance-app  | 2026-11-20T17:25:25.628+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1844, 누적 중복 95건)
+ai-finance-app  | 2026-11-20T17:25:25.630+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1848, 누적 중복 96건)
+ai-finance-app  | 2026-11-20T17:25:25.632+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1850, 누적 중복 97건)
+ai-finance-app  | 2026-11-20T17:25:25.634+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1847, 누적 중복 98건)
+ai-finance-app  | 2026-11-20T17:25:25.636+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1862, 누적 중복 99건)
+ai-finance-app  | 2026-11-20T17:25:25.643+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1868, 누적 중복 100건)
+ai-finance-app  | 2026-11-20T17:25:25.645+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1869, 누적 중복 101건)
+ai-finance-app  | 2026-11-20T17:25:25.648+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1874, 누적 중복 102건)
+ai-finance-app  | 2026-11-20T17:25:25.814+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1878, 누적 중복 103건)
+ai-finance-app  | 2026-11-20T17:25:25.817+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1879, 누적 중복 104건)
+ai-finance-app  | 2026-11-20T17:25:25.820+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1883, 누적 중복 105건)
+ai-finance-app  | 2026-11-20T17:25:25.830+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1905, 누적 중복 106건)
+ai-finance-app  | 2026-11-20T17:25:25.832+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1908, 누적 중복 107건)
+ai-finance-app  | 2026-11-20T17:25:25.834+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1912, 누적 중복 108건)
+ai-finance-app  | 2026-11-20T17:25:25.838+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1917, 누적 중복 109건)
+ai-finance-app  | 2026-11-20T17:25:25.842+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1926, 누적 중복 110건)
+ai-finance-app  | 2026-11-20T17:25:25.844+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1940, 누적 중복 111건)
+ai-finance-app  | 2026-11-20T17:25:25.846+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1942, 누적 중복 112건)
+ai-finance-app  | 2026-11-20T17:25:25.848+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1941, 누적 중복 113건)
+ai-finance-app  | 2026-11-20T17:25:25.851+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1947, 누적 중복 114건)
+ai-finance-app  | 2026-11-20T17:25:25.853+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1945, 누적 중복 115건)
+ai-finance-app  | 2026-11-20T17:25:27.135+09:00  INFO 1 --- [nio-8080-exec-3] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9561건 / 정산 3350건, 누락 6211 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 115 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:25:27.502+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1746, 누적 중복 116건)
+ai-finance-app  | 2026-11-20T17:25:27.504+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1749, 누적 중복 117건)
+ai-finance-app  | 2026-11-20T17:25:27.505+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1754, 누적 중복 118건)
+ai-finance-app  | 2026-11-20T17:25:27.507+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1753, 누적 중복 119건)
+ai-finance-app  | 2026-11-20T17:25:27.508+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1755, 누적 중복 120건)
+ai-finance-app  | 2026-11-20T17:25:27.509+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1762, 누적 중복 121건)
+ai-finance-app  | 2026-11-20T17:25:27.511+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1761, 누적 중복 122건)
+ai-finance-app  | 2026-11-20T17:25:27.512+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1764, 누적 중복 123건)
+ai-finance-app  | 2026-11-20T17:25:27.513+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1765, 누적 중복 124건)
+ai-finance-app  | 2026-11-20T17:25:27.514+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1766, 누적 중복 125건)
+ai-finance-app  | 2026-11-20T17:25:27.516+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1770, 누적 중복 126건)
+ai-finance-app  | 2026-11-20T17:25:27.517+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1771, 누적 중복 127건)
+ai-finance-app  | 2026-11-20T17:25:27.518+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1773, 누적 중복 128건)
+ai-finance-app  | 2026-11-20T17:25:27.519+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1776, 누적 중복 129건)
+ai-finance-app  | 2026-11-20T17:25:27.521+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1781, 누적 중복 130건)
+ai-finance-app  | 2026-11-20T17:25:27.522+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1782, 누적 중복 131건)
+ai-finance-app  | 2026-11-20T17:25:27.523+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1780, 누적 중복 132건)
+ai-finance-app  | 2026-11-20T17:25:27.591+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1786, 누적 중복 133건)
+ai-finance-app  | 2026-11-20T17:25:27.594+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1785, 누적 중복 134건)
+ai-finance-app  | 2026-11-20T17:25:27.595+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1787, 누적 중복 135건)
+ai-finance-app  | 2026-11-20T17:25:27.596+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1790, 누적 중복 136건)
+ai-finance-app  | 2026-11-20T17:25:27.597+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1792, 누적 중복 137건)
+ai-finance-app  | 2026-11-20T17:25:27.704+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1802, 누적 중복 138건)
+ai-finance-app  | 2026-11-20T17:25:27.706+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1803, 누적 중복 139건)
+ai-finance-app  | 2026-11-20T17:25:27.707+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1805, 누적 중복 140건)
+ai-finance-app  | 2026-11-20T17:25:27.710+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1807, 누적 중복 141건)
+ai-finance-app  | 2026-11-20T17:25:27.711+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1806, 누적 중복 142건)
+ai-finance-app  | 2026-11-20T17:25:27.712+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1812, 누적 중복 143건)
+ai-finance-app  | 2026-11-20T17:25:27.713+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1813, 누적 중복 144건)
+ai-finance-app  | 2026-11-20T17:25:27.714+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1816, 누적 중복 145건)
+ai-finance-app  | 2026-11-20T17:25:27.716+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1817, 누적 중복 146건)
+ai-finance-app  | 2026-11-20T17:25:27.717+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1822, 누적 중복 147건)
+ai-finance-app  | 2026-11-20T17:25:27.719+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1823, 누적 중복 148건)
+ai-finance-app  | 2026-11-20T17:25:27.720+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1825, 누적 중복 149건)
+ai-finance-app  | 2026-11-20T17:25:27.739+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1831, 누적 중복 150건)
+ai-finance-app  | 2026-11-20T17:25:27.740+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1833, 누적 중복 151건)
+ai-finance-app  | 2026-11-20T17:25:27.742+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1836, 누적 중복 152건)
+ai-finance-app  | 2026-11-20T17:25:27.743+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1839, 누적 중복 153건)
+ai-finance-app  | 2026-11-20T17:25:27.744+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1842, 누적 중복 154건)
+ai-finance-app  | 2026-11-20T17:25:27.745+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1845, 누적 중복 155건)
+ai-finance-app  | 2026-11-20T17:25:27.746+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1846, 누적 중복 156건)
+ai-finance-app  | 2026-11-20T17:25:27.748+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1849, 누적 중복 157건)
+ai-finance-app  | 2026-11-20T17:25:27.749+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1851, 누적 중복 158건)
+ai-finance-app  | 2026-11-20T17:25:27.750+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1856, 누적 중복 159건)
+ai-finance-app  | 2026-11-20T17:25:27.751+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1859, 누적 중복 160건)
+ai-finance-app  | 2026-11-20T17:25:27.753+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1857, 누적 중복 161건)
+ai-finance-app  | 2026-11-20T17:25:27.754+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1860, 누적 중복 162건)
+ai-finance-app  | 2026-11-20T17:25:27.755+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1863, 누적 중복 163건)
+ai-finance-app  | 2026-11-20T17:25:27.768+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1865, 누적 중복 164건)
+ai-finance-app  | 2026-11-20T17:25:27.769+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1866, 누적 중복 165건)
+ai-finance-app  | 2026-11-20T17:25:27.770+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1873, 누적 중복 166건)
+ai-finance-app  | 2026-11-20T17:25:27.771+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1871, 누적 중복 167건)
+ai-finance-app  | 2026-11-20T17:25:27.772+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1875, 누적 중복 168건)
+ai-finance-app  | 2026-11-20T17:25:27.773+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1876, 누적 중복 169건)
+ai-finance-app  | 2026-11-20T17:25:27.775+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1881, 누적 중복 170건)
+ai-finance-app  | 2026-11-20T17:25:27.776+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1884, 누적 중복 171건)
+ai-finance-app  | 2026-11-20T17:25:27.777+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1880, 누적 중복 172건)
+ai-finance-app  | 2026-11-20T17:25:27.779+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1887, 누적 중복 173건)
+ai-finance-app  | 2026-11-20T17:25:28.453+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1892, 누적 중복 174건)
+ai-finance-app  | 2026-11-20T17:25:28.454+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1891, 누적 중복 175건)
+ai-finance-app  | 2026-11-20T17:25:28.455+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1893, 누적 중복 176건)
+ai-finance-app  | 2026-11-20T17:25:28.456+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1897, 누적 중복 177건)
+ai-finance-app  | 2026-11-20T17:25:28.458+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1895, 누적 중복 178건)
+ai-finance-app  | 2026-11-20T17:25:28.459+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1896, 누적 중복 179건)
+ai-finance-app  | 2026-11-20T17:25:28.460+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1898, 누적 중복 180건)
+ai-finance-app  | 2026-11-20T17:25:28.461+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1899, 누적 중복 181건)
+ai-finance-app  | 2026-11-20T17:25:28.462+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1902, 누적 중복 182건)
+ai-finance-app  | 2026-11-20T17:25:28.463+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1901, 누적 중복 183건)
+ai-finance-app  | 2026-11-20T17:25:28.465+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1904, 누적 중복 184건)
+ai-finance-app  | 2026-11-20T17:25:28.466+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1907, 누적 중복 185건)
+ai-finance-app  | 2026-11-20T17:25:28.467+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1911, 누적 중복 186건)
+ai-finance-app  | 2026-11-20T17:25:28.469+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1916, 누적 중복 187건)
+ai-finance-app  | 2026-11-20T17:25:28.470+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1923, 누적 중복 188건)
+ai-finance-app  | 2026-11-20T17:25:28.471+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1928, 누적 중복 189건)
+ai-finance-app  | 2026-11-20T17:25:28.472+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1930, 누적 중복 190건)
+ai-finance-app  | 2026-11-20T17:25:28.474+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1932, 누적 중복 191건)
+ai-finance-app  | 2026-11-20T17:25:28.475+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1933, 누적 중복 192건)
+ai-finance-app  | 2026-11-20T17:25:28.476+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1929, 누적 중복 193건)
+ai-finance-app  | 2026-11-20T17:25:28.477+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1931, 누적 중복 194건)
+ai-finance-app  | 2026-11-20T17:25:28.478+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1934, 누적 중복 195건)
+ai-finance-app  | 2026-11-20T17:25:28.479+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1935, 누적 중복 196건)
+ai-finance-app  | 2026-11-20T17:25:28.480+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1938, 누적 중복 197건)
+ai-finance-app  | 2026-11-20T17:25:28.481+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1939, 누적 중복 198건)
+ai-finance-app  | 2026-11-20T17:25:28.483+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1948, 누적 중복 199건)
+ai-finance-app  | 2026-11-20T17:25:28.485+09:00  INFO 1 --- [ntainer#0-0-C-1] c.a.external.settlement.SettlementInbox  : [외부 정산] 중복 수신 무시 (transfer 1946, 누적 중복 200건)
+ai-finance-app  | 2026-11-20T17:25:29.244+09:00  INFO 1 --- [io-8080-exec-23] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9561건 / 정산 4292건, 누락 5269 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 200 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:25:31.454+09:00  INFO 1 --- [io-8080-exec-12] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9561건 / 정산 5541건, 누락 4020 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 200 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:25:33.567+09:00  INFO 1 --- [io-8080-exec-17] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9561건 / 정산 6394건, 누락 3167 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 200 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:25:35.685+09:00  INFO 1 --- [nio-8080-exec-5] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9561건 / 정산 7488건, 누락 2073 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 200 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:25:37.819+09:00  INFO 1 --- [io-8080-exec-21] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 UNMATCHED — 은행 9561건 / 정산 8989건, 누락 572 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 200 · 원장무결성 true
+ai-finance-app  | 2026-11-20T17:25:39.908+09:00  INFO 1 --- [io-8080-exec-13] c.a.a.usecase.ReconciliationUseCase      : [대사] 2026-01-01 MATCHED — 은행 9561건 / 정산 9561건, 누락 0 · 전달중 0 · 불명 0 · 금액불일치 0 · 중복수신 200 · 원장무결성 true
