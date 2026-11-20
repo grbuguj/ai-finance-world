@@ -43,17 +43,23 @@
 기존 테스트 수정은 3건: `OutboxReliabilityTest`(requeue 직후 재시도 시각을 명시적으로 당겨 같은 밀리초 경합 제거),
 `StatsScaleBenchmark`, `LockStrategyBenchmark`(raw INSERT 에서 `refunded` 컬럼 제거).
 
-## 4. 아직 하지 않은 것: DB 수준 가드 (결정 대기)
+## 4. DB 수준 가드 (MySQL 트리거)
 
-`ledger_entries`, `transfers` 에 `BEFORE UPDATE/DELETE` 트리거를 걸어 앱을 우회한 직접 SQL 도 막는 안.
+앱을 우회한 직접 SQL(JDBC·콘솔)로도 원장을 고치거나 지우지 못하게 `transfers`, `ledger_entries` 에 트리거를 건다.
 
 ```sql
-CREATE TRIGGER trg_ledger_no_update BEFORE UPDATE ON ledger_entries FOR EACH ROW
-  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ledger_entries is append-only';
-CREATE TRIGGER trg_ledger_no_delete BEFORE DELETE ON ledger_entries FOR EACH ROW
-  BEGIN IF @afw_allow_reset IS NULL THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ledger_entries is append-only'; END IF; END;
+CREATE TRIGGER trg_ledger_entries_no_update BEFORE UPDATE ON ledger_entries FOR EACH ROW
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ledger_entries is append-only (update blocked)';
+CREATE TRIGGER trg_ledger_entries_no_delete BEFORE DELETE ON ledger_entries FOR EACH ROW
+  BEGIN IF @afw_allow_reset IS NULL THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '... (delete blocked)'; END IF; END;
+-- transfers 도 동일
 ```
 
-`reset()`(시뮬레이션 초기화)가 DELETE 를 하므로 충돌한다. 대안: 초기화 트랜잭션만 세션 변수 `@afw_allow_reset` 을 켜서 통과시키고,
-`app.ledger.guard.enabled` 설정으로 트리거 설치 자체를 끄고 켠다. **MySQL 에서만 동작하며 이 PC 에는 MySQL/Docker 가 없어
-검증하지 못했다 — 미실행(CI 의 mysqlTest 필요).** 코드에는 넣지 않았다.
+- **reset 과의 충돌 해결**: 시뮬레이션 초기화는 DELETE 가 필요하다. `deleteAllForSimulationReset` 이 *그 트랜잭션 안에서만* 세션 변수 `@afw_allow_reset` 을
+  켜고(같은 트랜잭션 = 같은 커넥션) 끝나면 NULL 로 되돌린다. 다른 세션에는 영향이 없다 (`LedgerGuard.allowResetDuring`).
+- **켜고 끄기**: `app.ledger.guard.enabled` (기본 off = H2·로컬 개발). `mysqltest` 프로필은 on 이라 **모든 MySQL 테스트가 트리거가 켜진 상태로 돈다**
+  (reset·환불·벤치마크가 트리거와 충돌하지 않는지 함께 검증됨).
+- **운영 전제**: 바이너리 로그가 켜진 MySQL 8 에서 SUPER 권한 없는 계정이 트리거를 만들려면 `--log-bin-trust-function-creators=1` 이 필요하다
+  (compose 의 mysql 과 테스트 컨테이너에 추가함).
+- **테스트**: `MySqlLedgerGuardTest` — 직접 UPDATE/DELETE 4종이 모두 예외, 데이터 불변, 정상 INSERT 와 reset 은 통과, reset 후 다시 차단.
+  **MySQL 에서만 동작하므로 이 PC 에서는 실행하지 못했다. CI 의 mysqlTest 잡 통과로 검증한다.**
