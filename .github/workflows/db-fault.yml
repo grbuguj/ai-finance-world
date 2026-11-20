@@ -51,6 +51,7 @@ jobs:
         run: |
           mkdir -p results/db-fault
           docker compose logs --no-color app 2>&1 | tail -400 > results/db-fault/app.log || true
+          docker compose logs --no-color app 2>&1 | grep -E "ERROR|예상하지 못한|Exception|Backoff|건너뜀|retry" | head -300 > results/db-fault/app-errors.log || true
           docker logs ai-finance-mysql 2>&1 | tail -80 > results/db-fault/mysql.log || true
 
       - name: Publish results to experiment-results branch

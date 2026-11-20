@@ -192,6 +192,7 @@ class OutboxReliabilityTest {
         for (int i = 0; i < 5; i++) {
             transferUseCase.transfer(a.getId(), b.getId(), BigDecimal.valueOf(100), "정리 대상 " + i);
         }
+        jdbc.update("update outbox_events set next_attempt_at = created_at where status = 'PENDING'"); // 같은 마이크로초 경합 방지
         relay.drain(10);
         faults.setBrokerDown(true);
         transferUseCase.transfer(a.getId(), b.getId(), BigDecimal.valueOf(100), "대기 중");

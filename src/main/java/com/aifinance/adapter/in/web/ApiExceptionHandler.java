@@ -9,6 +9,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.transaction.CannotCreateTransactionException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -59,11 +60,18 @@ public class ApiExceptionHandler {
     }
 
     /** DB 연결 불가 (커넥션 풀 타임아웃 등). Hikari connection-timeout 이 짧아 오래 매달리지 않고 빠르게 실패한다. */
-    @ExceptionHandler({CannotCreateTransactionException.class, DataAccessResourceFailureException.class})
+    @ExceptionHandler({CannotCreateTransactionException.class, DataAccessResourceFailureException.class, TransactionSystemException.class})
     public ResponseEntity<Map<String, String>> databaseUnavailable(RuntimeException e) {
         log.warn("DB 연결 불가로 요청 거절: {}", e.getClass().getSimpleName());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Retry-After", "2")
                 .body(Map.of("error", "데이터베이스에 일시적으로 연결할 수 없습니다. 잠시 후 다시 시도해 주세요."));
+    }
+
+    /** 위에서 처리하지 않은 예외: 500 으로 응답하되 원인 클래스를 로그에 남긴다 (db-fault 실험의 500 원인 추적용) */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> unexpected(Exception e) {
+        log.error("예상하지 못한 오류 [{}]", e.getClass().getName(), e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "서버 오류가 발생했습니다."));
     }
 
     @ExceptionHandler(IllegalStateException.class)
