@@ -1,0 +1,64 @@
+name: DB fault (MySQL restart)
+
+# ④(b) 부하 중 MySQL 컨테이너 재시작 실험. push 마다 돌지 않는다 (수동 실행 + 이 실험 파일을 고쳤을 때만).
+# 결과(JSON/로그)는 experiment-results 브랜치에 커밋된다: git fetch origin experiment-results
+# (주의: 커밋 메시지에 skip-ci 문구가 있으면 GitHub 가 푸시 트리거를 통째로 건너뛴다)
+# 재실행 기록: KafkaTopicConfig 로 통합한 소비자 재시도 수정 확인용 (2회차)
+on:
+  workflow_dispatch:
+    inputs:
+      outage_s:
+        description: "MySQL 정지 유지 시간(초)"
+        default: "20"
+  push:
+    branches: [feature/realism-hardening]
+    paths: [".github/workflows/db-fault.yml", "tools/experiments/db_restart.py", "tools/experiments/publish_results.sh"]
+
+permissions:
+  contents: write
+
+jobs:
+  db-fault:
+    name: MySQL restart under load
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      APP_PROFILES: infra,loadtest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start stack
+        run: docker compose --profile app up -d --build
+
+      - name: Wait for app health
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fs localhost:8080/actuator/health | grep -q '"UP"'; then echo "app is UP"; exit 0; fi
+            sleep 2
+          done
+          docker compose logs app | tail -100
+          exit 1
+
+      - name: Run experiment (MySQL stop → start under HTTP load)
+        env:
+          OUT: results/db-fault
+          OUTAGE_S: ${{ github.event.inputs.outage_s || '20' }}
+        run: |
+          mkdir -p results/db-fault
+          python3 tools/experiments/db_restart.py 2>&1 | tee results/db-fault/stdout.txt
+
+      - name: Collect logs
+        if: always()
+        run: |
+          mkdir -p results/db-fault
+          docker compose logs --no-color app 2>&1 | tail -400 > results/db-fault/app.log || true
+          docker compose logs --no-color app 2>&1 | grep -E "ERROR|예상하지 못한|Exception|Backoff|건너뜀|retry" | head -300 > results/db-fault/app-errors.log || true
+          docker logs ai-finance-mysql 2>&1 | tail -80 > results/db-fault/mysql.log || true
+
+      - name: Publish results to experiment-results branch
+        if: always()
+        run: bash tools/experiments/publish_results.sh results/db-fault db-fault
+
+      - name: Stop stack
+        if: always()
+        run: docker compose --profile app down -v

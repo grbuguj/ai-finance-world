@@ -35,6 +35,10 @@ public interface LedgerRepository extends JpaRepository<LedgerEntry, Long> {
             """)
     List<Object[]> integritySnapshot();
 
+    @Query("select coalesce(sum(case when l.type = com.aifinance.domain.ledger.EntryType.CREDIT then l.amount else -l.amount end), 0) "
+            + "from LedgerEntry l where l.account.id = :accountId")
+    BigDecimal ledgerBalanceOf(@Param("accountId") Long accountId);
+
     // 거래별 분개 건수가 2건이 아닌 거래 수 (항상 0이어야 함)
     @Query("select count(t) from Transfer t where (select count(l) from LedgerEntry l where l.transfer = t) <> 2")
     long countTransfersWithoutTwoEntries();

@@ -9,6 +9,8 @@ services:
   mysql:
     image: mysql:8.0
     container_name: ai-finance-mysql
+    # 원장 불변성 가드(app.ledger.guard.enabled=true)가 트리거를 만들 수 있도록 (바이너리 로그 ON + 비SUPER 계정)
+    command: --log-bin-trust-function-creators=1
     environment:
       MYSQL_ROOT_PASSWORD: root1234
       MYSQL_DATABASE: ai_finance
@@ -71,7 +73,7 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${APP_PROFILES:-infra}
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ai_finance?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ai_finance?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&connectTimeout=2000&socketTimeout=15000
       SPRING_DATASOURCE_USERNAME: finance
       SPRING_DATASOURCE_PASSWORD: finance1234
       SPRING_DATA_REDIS_HOST: redis
@@ -79,6 +81,36 @@ services:
       APP_CHAOS_ENABLED: "true"   # 시연용 장애 주입 버튼 활성화
       APP_LOCK_DISTRIBUTED_ENABLED: ${APP_LOCK_DISTRIBUTED_ENABLED:-false}
       APP_LOCK_MAX_BACKOFF_MS: ${APP_LOCK_MAX_BACKOFF_MS:-50}
+      # 앱 2대 실험(multi-instance workflow)에서 엔진을 끄거나 Redis 를 끄는 변형을 주기 위한 통과 변수 (기본값은 기존 동작 그대로)
+      APP_SIMULATION_AUTO_START: ${APP_SIMULATION_AUTO_START:-true}
+      APP_REDIS_ENABLED: ${APP_REDIS_ENABLED:-true}
+    depends_on:
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+
+  # ── 앱 2번째 인스턴스 (앱 2대 실험 전용: --profile app2) ─────────────────
+  # 같은 DB·Redis·Kafka 를 본다. 스키마는 첫 번째 앱이 만들므로 ddl-auto=none (create 로 두면 2번째 앱 기동이 DB 를 지운다).
+  # 반드시 app 이 healthy 해진 뒤 기동할 것 (기동 순서는 workflow 가 보장).
+  app2:
+    profiles: ["app2"]
+    build: .
+    container_name: ai-finance-app2
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${APP_PROFILES:-infra}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ai_finance?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&connectTimeout=2000&socketTimeout=15000
+      SPRING_DATASOURCE_USERNAME: finance
+      SPRING_DATASOURCE_PASSWORD: finance1234
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      APP_CHAOS_ENABLED: "true"
+      APP_LOCK_DISTRIBUTED_ENABLED: ${APP_LOCK_DISTRIBUTED_ENABLED:-false}
+      APP_LOCK_MAX_BACKOFF_MS: ${APP_LOCK_MAX_BACKOFF_MS:-50}
+      APP_SIMULATION_AUTO_START: ${APP_SIMULATION_AUTO_START:-true}
+      APP_REDIS_ENABLED: ${APP_REDIS_ENABLED:-true}
     depends_on:
       mysql: { condition: service_healthy }
       redis: { condition: service_healthy }

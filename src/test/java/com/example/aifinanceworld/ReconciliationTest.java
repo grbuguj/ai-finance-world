@@ -4,6 +4,7 @@ import com.aifinance.AiFinanceWorldApplication;
 import com.aifinance.adapter.in.scheduler.SimulationEngine;
 import com.aifinance.application.port.out.FaultInjectionPort;
 import com.aifinance.application.service.OutboxRelayService;
+import com.aifinance.application.service.VirtualClock;
 import com.aifinance.application.usecase.AgentUseCase;
 import com.aifinance.application.usecase.ReconciliationUseCase;
 import com.aifinance.application.usecase.ReconciliationUseCase.RunView;
@@ -35,6 +36,7 @@ class ReconciliationTest {
     @Autowired ReconciliationUseCase reconciliation;
     @Autowired FaultInjectionPort faults;
     @Autowired JdbcTemplate jdbc;
+    @Autowired VirtualClock virtualClock;
 
     Account a;
     Account b;
@@ -104,8 +106,8 @@ class ReconciliationTest {
         // 정산 시스템 쪽 사고를 재현
         jdbc.update("delete from settlement_records where transfer_id = ?", ids.get(0));                 // 누락
         jdbc.update("update settlement_records set amount = amount + 1 where transfer_id = ?", ids.get(1)); // 금액 불일치
-        // 불명 — 시각은 DB 서버 시계(current_timestamp, 컨테이너는 UTC)가 아니라 앱 시계로 넣어야 대사 기간과 맞는다
-        java.sql.Timestamp now = java.sql.Timestamp.valueOf(java.time.LocalDateTime.now());
+        // 불명 — 시각은 DB 서버 시계도 실제 앱 시계도 아니라, 대사가 보는 가상 시각(VirtualClock)으로 넣어야 대사 기간과 맞는다
+        java.sql.Timestamp now = java.sql.Timestamp.valueOf(virtualClock.now());
         jdbc.update("""
                 insert into settlement_records (transfer_id, tx_type, sender_account_id, receiver_account_id,
                                                 amount, occurred_at, received_at, delivery_count)

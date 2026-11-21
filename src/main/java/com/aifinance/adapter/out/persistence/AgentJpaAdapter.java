@@ -37,4 +37,9 @@ public class AgentJpaAdapter implements AgentPort {
         return agentRepository.count();
     }
 
+    @Override
+    public void deleteAll() {
+        agentRepository.deleteAllInBatch();
+    }
+
 }

@@ -4,7 +4,13 @@ import com.aifinance.domain.account.InsufficientBalanceException;
 import com.aifinance.domain.idempotency.IdempotencyKeyMismatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.dao.QueryTimeoutException;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.transaction.CannotCreateTransactionException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,6 +47,54 @@ public class ApiExceptionHandler {
         log.warn("동시 수정 충돌로 요청 거절 (락을 우회한 갱신 경로 점검 필요): {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", "다른 거래와 동시에 처리되어 거절되었습니다. 다시 시도해 주세요."));
+    }
+
+    /**
+     * 락 대기 시간 초과·데드락 (InnoDB innodb_lock_wait_timeout, DeadlockLoser 포함). 트랜잭션 전체가 롤백되어
+     * 거래·원장·Outbox·잔액 어디에도 흔적이 없으므로, 500 이 아니라 "잠시 후 다시 시도"를 뜻하는 503 + Retry-After 로 응답한다.
+     */
+    @ExceptionHandler({PessimisticLockingFailureException.class, QueryTimeoutException.class})
+    public ResponseEntity<Map<String, String>> lockTimeout(RuntimeException e) {
+        log.warn("락 대기 초과/데드락으로 요청 거절 (롤백됨, 재시도 가능): {}", e.getClass().getSimpleName());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Retry-After", "1")
+                .body(Map.of("error", "같은 계좌를 처리 중인 다른 거래 때문에 지연되어 거절되었습니다. 기록은 남지 않았으니 잠시 후 다시 시도해 주세요."));
+    }
+
+    /** DB 연결 불가 (커넥션 풀 타임아웃 등). Hikari connection-timeout 이 짧아 오래 매달리지 않고 빠르게 실패한다. */
+    @ExceptionHandler({CannotCreateTransactionException.class, DataAccessResourceFailureException.class, TransactionSystemException.class})
+    public ResponseEntity<Map<String, String>> databaseUnavailable(RuntimeException e) {
+        log.warn("DB 연결 불가로 요청 거절: {}", e.getClass().getSimpleName());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Retry-After", "2")
+                .body(Map.of("error", "데이터베이스에 일시적으로 연결할 수 없습니다. 잠시 후 다시 시도해 주세요."));
+    }
+
+    /**
+     * JpaSystemException 은 Hibernate 가 연결 오류(커밋·조회 중 연결 끊김)를 감싼 것일 수도, 다른 영속성 오류일 수도 있다.
+     * 원인 체인에 연결 오류(SQLState 08xx, Communications/JDBCConnection 계열)가 있을 때만 503 으로, 아니면 500 으로 둔다
+     * (db-fault 실험에서 MySQL 이 종료되는 순간의 500 이 모두 이 경우였다).
+     */
+    @ExceptionHandler(JpaSystemException.class)
+    public ResponseEntity<Map<String, String>> jpaSystem(JpaSystemException e) {
+        return isConnectionFailure(e) ? databaseUnavailable(e) : unexpected(e);
+    }
+
+    static boolean isConnectionFailure(Throwable t) {
+        for (Throwable c = t; c != null; c = (c.getCause() == c ? null : c.getCause())) {
+            if (c instanceof java.sql.SQLException s && s.getSQLState() != null && s.getSQLState().startsWith("08")) return true;
+            if (c instanceof java.sql.SQLTransientConnectionException || c instanceof java.sql.SQLNonTransientConnectionException) return true;
+            // 커넥션이 이미 닫힌 뒤 롤백하려는 경우 (db-fault 실험: "Unable to rollback against JDBC Connection" ← "Connection is closed", SQLState 없음)
+            if (c instanceof java.sql.SQLException s2 && s2.getMessage() != null && s2.getMessage().toLowerCase().contains("connection is closed")) return true;
+            String n = c.getClass().getName();
+            if (n.contains("CommunicationsException") || n.contains("JDBCConnectionException")) return true;
+        }
+        return false;
+    }
+
+    /** 위에서 처리하지 않은 예외: 500 으로 응답하되 원인 클래스를 로그에 남긴다 (db-fault 실험의 500 원인 추적용) */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> unexpected(Exception e) {
+        log.error("예상하지 못한 오류 [{}]", e.getClass().getName(), e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "서버 오류가 발생했습니다."));
     }
 
     @ExceptionHandler(IllegalStateException.class)

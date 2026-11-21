@@ -11,7 +11,8 @@
 ![Gradle](https://img.shields.io/badge/Gradle-8.x-02303A?style=flat&logo=gradle&logoColor=white)
 
 > 멀티에이전트 기반 금융 거래 백엔드 시뮬레이션 시스템
-<img width="1128" height="573" alt="image" src="https://github.com/user-attachments/assets/38b26162-58f0-4c8b-82bb-e84964693518" />
+<p align="center"><img src="docs/screenshots/virtual-run-broker-down.png" alt="실행 화면: 에이전트 50명, 브로커 중단 중 — Outbox 대기 건수와 대사 상태가 실시간으로 표시된다" width="900"></p>
+<p align="center"><sub>에이전트 50명, 가상 3일차, 브로커 중단 중의 실행 화면 (설정 · 실행 · 종료 요약 3단계 대시보드)</sub></p>
 <br>
 
 ## 📅 개발 로드맵
@@ -21,7 +22,7 @@
 | 1주 | 5/11~5/17 | 프로젝트 뼈대 | 헥사고날 구조, DB 스키마, Docker Compose | ✅ 완료 |
 | 2주 | 5/18~5/24 | 계좌 도메인 | Account 엔티티, 복식부기 원장(DEBIT/CREDIT) | ✅ 완료 |
 | 3주 | 5/25~5/31 | 송금 코어 | TransferUseCase, 비관적 락, 데드락 방지(ID 오름차순) | ✅ 완료 |
-| 4주 | 6/1~6/14 | 에이전트 엔진 | SimulationEngine(@Scheduled), 에이전트 10명, chancePay 기반 자율 송금 | ✅ 완료 |
+| 4주 | 6/1~6/14 | 에이전트 엔진 | SimulationEngine(@Scheduled), 에이전트 페르소나, chancePay 기반 자율 송금 | ✅ 완료 |
 | 5주 | 6/15~6/28 | 실시간 대시보드 | SSE 피드, SVG 거래흐름 그래프, 예측 패널, 시뮬레이션 제어 | ✅ 완료 |
 | 6주 | 6/29~7/5 | 소비 UseCase | SpendUseCase — 에이전트 → 외부 가맹점 결제 (chanceSpend 기반) | ✅ 완료 |
 | 7주 | 7/6~7/12 | 투자 UseCase | InvestUseCase — 수익률 정규분포 N(μ,σ²), 음수 수익률 포함 (chanceInvest 기반) | ✅ 완료 |
@@ -31,6 +32,7 @@
 | 11주 | 8/3~8/9 | 부하 테스트 | 동시 N건 송금 → Lost Update 0건 증명, ∑DEBIT=∑CREDIT 검증 | ✅ 완료 |
 | 12주 | 8/10~8/16 | 마무리 | 멱등성 키, 관측성(Prometheus/Grafana), k6 부하 테스트 | ✅ 완료 |
 | 2차 | 11/6~11/15 | 신뢰성 고도화 | Transactional Outbox, 멱등 소비자, 일마감 대사, 락 전략 실험, ArchUnit, CI | ✅ 완료 |
+| 3차 | 11/16~11/21 | 현실성 고도화 | 에이전트 수 설정(2~200), 가상 시계, 시작 전 설정·종료 요약 화면, 시드 재현, 원장 불변성, DB 장애·앱 2대 실험 | ✅ 완료 |
 
 <br>
 
@@ -64,6 +66,10 @@
 | 이벤트 유실 | 브로커 장애 / ACK 유실을 주입한 채 송금 | 커밋된 거래 수 = 외부 정산 장부 행 수 (유실 0, 중복 0) |
 | 장부 대사 | 정산 장부에 누락·변조·불명 거래를 일부러 만듦 | 일마감 대사가 거래 id 단위로 정확히 탐지 |
 | 락 전략 선택 | 비관적·낙관적·조건부 UPDATE 를 4개 시나리오로 실측 | 핫스팟에서 비관적 락 4배 처리량, 낙관적 락 Lost Update 발견 |
+| DB 장애 | 부하 중 MySQL 을 20초 정지 후 재기동 | 요청은 약 3초 만에 503, 복구 후 오류 0, 사후 대사 MATCHED (정산 유실 1건 발견·수정) |
+| 앱 2대 | 같은 DB 를 보는 앱 2대에 부하, Redis 락 on/off | 락이 꺼져도 중복은 멱등 소비자가 흡수해 대사 MATCHED |
+| 재현성 | 같은 시드로 두 번 실행 | 거래 순서·최종 잔액 완전 동일 |
+| 원장 불변성 | 원장·거래 수정 경로 감사, 잔액 변조 후 재구성 | 수정·삭제 경로 0 (ArchUnit·DB 트리거), 잔액은 원장으로 재구성 |
 
 <br>
 
@@ -82,19 +88,19 @@
 
 ## 📌 프로젝트 소개
 
-AI 에이전트 10명이 가상 금융 생태계에서 **송금 · 소비 · 투자 · 환불** 등  
+AI 에이전트(시작 전에 **2~200명** 설정)가 가상 금융 생태계에서 **송금 · 소비 · 투자 · 환불** 등  
 실제 경제 활동을 수행하고, 그 모든 거래를 은행 백엔드가 안정적으로 처리합니다.  
-모든 거래는 **SSE(Server-Sent Events)** 로 실시간 대시보드에 push됩니다.
+시뮬레이션은 **가상 시계**로 돌며(144틱 = 가상 하루), 모든 거래는 **SSE(Server-Sent Events)** 로 실시간 대시보드에 push됩니다.
 
 ```
-에이전트 10명 ── 송금/소비/투자/환불 ──▶  은행 백엔드  ──▶  실시간 대시보드
+에이전트 N명 ─── 송금/소비/투자/환불 ──▶  은행 백엔드  ──▶  실시간 대시보드
                                         (핵심 시스템)       SSE push / SVG 그래프
                                         비관적 락(ID 오름차순)  잔액 예측 패널
                                         복식부기 원장        시뮬레이션 제어
                                              │
                                              ├─ 같은 트랜잭션 ──▶ Outbox ──릴레이──▶ Kafka ──▶ 외부 정산 시스템(멱등)
                                              ├─ 커밋 후 ──▶ Redis 잔액 캐시                         │
-                                             └─ 매일 00:10 일마감 대사 ◀──────────────────────────┘
+                                             └─ 가상 자정+10분 일마감 대사 ◀──────────────────────────┘
 ```
 
 > "이 프로젝트의 주인공은 AI가 아니라, **백엔드 시스템**입니다."
@@ -115,13 +121,15 @@ com.aifinance
 │   ├── investment               # 투자 포지션 (만기, 수익률, 정산)
 │   ├── outbox                   # 발행 대기 이벤트 (PENDING / PUBLISHED / DEAD, 백오프)
 │   ├── reconciliation           # 일마감 대사 결과·차이 내역
-│   └── agent                    # AI 에이전트 페르소나
+│   ├── agent                    # AI 에이전트 페르소나 (처음 10명 고정, 이후 번호 시드로 생성)
+│   └── simulation               # 가상 시계(VirtualClock), 시뮬레이션 상태(SETUP/RUNNING/PAUSED/ENDED)
 ├── application
 │   ├── port/out                 # 외부 기술 추상화 (Account/Ledger/Transfer/Investment,
 │   │                            #   DistributedLock, BalanceCache, TransactionEvent)
 │   ├── service
 │   │   ├── LedgerPostingService # 모든 거래의 단일 기장 지점 (ID 오름차순 비관적 락 + 분개 2건)
 │   │   ├── AccountLockExecutor  # (선택) 분산 락 → 트랜잭션 → 해제 템플릿
+│   │   ├── EndOfDayService      # 가상 자정 일마감 (Outbox drain → 대사)
 │   │   ├── OutboxRelayService   # Outbox → 브로커 동기 발행 (순서 보장, 재시도, DEAD 격리)
 │   │   └── TransactionPostedListener # AFTER_COMMIT → 잔액 캐시 갱신
 │   └── usecase                  # Transfer / Spend / Invest / Refund / Agent(급여)
@@ -159,6 +167,7 @@ OutboxRelay (100ms) : PENDING 을 id 순으로 동기 발행 → ack 받으면 P
 | **실제 Kafka 컨테이너 일시정지**(`docker pause`) 중 송금 → 재가동 | 거래 성공, 대사 `PENDING_IN_FLIGHT` → 재가동 후 전량 도착, `MATCHED` (MySQL+Kafka+Redis 컨테이너) |
 | 처리할 수 없는 독(poison) 메시지 | 건너뛰지 않고 DLT 에 원인과 함께 보존, 뒤 메시지는 계속 처리 |
 
+- 같은 키(보내는 계좌)의 순서는 평상시에는 보장되지만, **브로커 장애 직후에는 순서가 바뀐 사례가 관찰됐다** — [앱 2대 실험](docs/experiments/multi-instance.md) 참고(원인 미검증, 정산은 멱등이라 정합성에는 영향 없음).
 - 발행 완료 이벤트는 7일 보관 후 1,000건 단위로 정리(`OutboxCleaner`), 대기·DEAD 이벤트는 지우지 않는다.
 - 대시보드 상단 **신뢰성 컨트롤 룸**에서 Outbox 대기 건수, 장애 주입 버튼, 대사 결과를 실시간으로 볼 수 있다.
 
@@ -170,9 +179,11 @@ curl -X POST localhost:8080/chaos/broker/up     # 복구 → pending 0 으로 �
 
 <br>
 
-## 📒 일마감 대사 — Reconciliation ([ADR-0003](docs/adr/0003-end-of-day-reconciliation.md))
+## 📒 일마감 대사 — Reconciliation ([ADR-0003](docs/adr/0003-end-of-day-reconciliation.md) · [ADR-0006](docs/adr/0006-virtual-time.md))
 
-매일 00:10 전날 영업일의 **은행 원장 ↔ 외부 정산 장부**를 맞춰 본다. 두 장부를 메모리에 올리지 않고 SQL anti-join 으로 차이만 뽑는다.
+**가상 시계**(ADR-0006)가 새 날의 00:10 을 지나는 틱에 직전 영업일의 **은행 원장 ↔ 외부 정산 장부**를 맞춰 본다.
+기준 시각은 실제 생성 시각이 아니라 거래에 기록한 가상 발생 시각(`transfers.occurred_at`)이라, 시뮬레이션 속도와 무관하게 "하루"가 정해지고
+장애 주입 → 복구 → 대사 일치 흐름을 짧은 시간에 재현할 수 있다. 두 장부를 메모리에 올리지 않고 SQL anti-join 으로 차이만 뽑는다.
 
 | 분류 | 의미 |
 |---|---|
@@ -214,9 +225,37 @@ curl -X POST localhost:8080/chaos/broker/up     # 복구 → pending 0 으로 �
 | 공정성 없는 Redis 스핀 락 | 같은 E2E 에서 락 방식 3종 실측 | 핫 계좌 p99 1.2초 | 계좌 락은 DB 행 락만 (p99 412ms, TPS 1.4배) |
 | 소수 금액 송금 시 잔액·원장 따로 반올림 | `AmountPrecisionTest` | 0.005원 × 3 → 시스템 총액 +0.03원 | 원 단위 정수만 허용 |
 | `/stats` 가 요청마다 원장 전체 집계 | `StatsScaleBenchmark` | 51만 건에서 요청 1회 4.2초 | 스냅샷 캐시 + 적응형 주기 무결성 감시 |
-| EOD cron(KST)과 날짜 계산(서버 시간대) 불일치 | 코드 리뷰 | 서버가 UTC 면 엉뚱한 날 대사 | 영업일 시간대 고정 |
+| 일마감이 실제 시계(cron)에 묶여 시뮬레이션 속도와 무관 | 설계 검토 | 시연 중 하루를 기다려야 대사를 볼 수 있음 | 가상 시계 + 가상 자정 대사 ([ADR-0006](docs/adr/0006-virtual-time.md)) |
 | 정산 소비자가 처리 불가 메시지를 건너뜀 | 실제 Kafka 통합 테스트 | 정산 누락 | DLT 보존 (기본 이름 `-dlt` 함정도 테스트로 발견) |
 | Gradle 9 에서 `mysqlTest` 실행 불가 | CI | MySQL 검증이 돌지 않음 | 소스셋 중복 등록 제거 |
+| **DB 장애 중 정산 수신 레코드가 DLT 로 빠져 정산 장부에서 영구 누락** | MySQL 재시작 실험 후 대사 UNMATCHED (은행 9,981 / 정산 9,979) | 원장·Outbox 는 맞는데 정산만 2건 유실 | 일시적 오류는 지수 백오프로 무제한 재시도, 처리 불가 메시지만 DLT → 재실험 MATCHED ([보고서](docs/experiments/db-fault.md)) |
+| 락 대기 초과가 서버 오류(500)로 응답 | 락 대기 초과 시험 | 클라이언트가 일시 지연과 버그를 구분 못 함 | 503 + `Retry-After`, 부분 기록 없음 |
+| DB 정지 시 요청이 커넥션 풀에서 30초씩 대기 | 설정 검토, MySQL 재시작 실험 | 장애 중 요청 적체 | Hikari 대기 3초, 연결 오류 503 |
+| `transfers.refunded` UPDATE — 원장 불변성 위반 | 수정·삭제 경로 감사 | "원장은 UPDATE 하지 않는다"가 완전히 참이 아니었음 | 컬럼 제거, 환불은 REFUND 거래의 존재로 판정, 원거래 번호 유니크 제약 ([보고서](docs/experiments/ledger-immutability.md)) |
+| CI(UTC)에서만 가상 시간 테스트 실패 | CI | 로컬(KST)에서는 통과 | 테스트 JVM 시간대를 Asia/Seoul 로 고정 |
+
+<br>
+
+## 🧪 실험 문서
+
+| 문서 | 내용 |
+|---|---|
+| [락 전략 비교](docs/experiments/lock-strategy-benchmark.md) | 비관적·낙관적·조건부 UPDATE 4개 시나리오 실측 |
+| [DB 장애](docs/experiments/db-fault.md) | 락 대기 초과, MySQL 재시작, 정산 유실 발견과 수정 |
+| [앱 2대 동시 실행](docs/experiments/multi-instance.md) | Redis 락 on/off, 중복 흡수, 인계 시간, 순서 위반 관찰 |
+| [시드 재현](docs/experiments/seed-reproducibility.md) | 같은 시드 → 같은 거래 순서 |
+| [원장 불변성](docs/experiments/ledger-immutability.md) | 수정 경로 감사, ArchUnit·트리거, 잔액 재구성 |
+
+> 실험은 CI(GitHub Actions) 러너 한 대에서 한두 번 돌린 값이라 절대 수치보다 상대 비교와 정합성 확인에 의미가 있다. 원본 JSON 은 `experiment-results` 브랜치에 있다.
+
+## ⚠️ 한계
+
+- 데이터베이스는 한 대 구성이며 여러 DB 에 걸친 거래는 다루지 않는다. 외부 정산 시스템은 같은 DB 의 별도 저장소로 단순화했다.
+- 순서 보장을 위해 발행을 한 건씩 확인(ack)하므로 발행 처리량에 상한이 있다.
+- 앱 2대 실험은 엔진을 양쪽 다 끈 구성이다. 가상 시계와 엔진 상태는 JVM 별 메모리에 있어 두 앱에서 동시에 시뮬레이션을 돌리는 경우는 다루지 않았다.
+- 브로커 장애 복구 직후 같은 키의 순서가 바뀐 사례(50건)의 원인은 검증하지 못했다.
+- DB 장애 실험은 조건별로 1~3회 실행했고, 마지막 오류 처리 수정(연결 종료 시 롤백 실패를 503 으로 매핑) 이후의 컨테이너 재실행은 하지 않았다.
+- 에이전트는 확률로 거래를 만드는 부하 발생기이며 실제 이용자 행동을 모사한 것이 아니다.
 
 <br>
 
@@ -257,6 +296,14 @@ curl -X POST localhost:8080/chaos/broker/up     # 복구 → pending 0 으로 �
 > 송금만 있을 때는 ①이 구조상 항상 참이라 검증력이 약했습니다.
 > 시스템 계좌를 도입하고 ③·④를 추가해, 잔액 필드와 원장이 실제로 일치하는지까지 증명합니다.
 
+**원장 불변성 — 지우지 않고, 고치지 않고, 반대 분개로 정정**
+```
+Transfer · LedgerEntry 엔티티는 @Immutable, 수정·삭제 메서드 없음 (ArchUnit 규칙 3개로 강제)
+MySQL 에서는 트리거(app.ledger.guard.enabled)로 앱을 우회한 직접 UPDATE/DELETE 도 차단
+잔액은 원장에서 다시 만들 수 있는 파생값: POST /ops/rebuild-balances (기본 dry-run, 실행 중 apply 는 409)
+```
+> 감사·검증 내용은 [원장 불변성 보고서](docs/experiments/ledger-immutability.md).
+
 **동시성 제어**
 ```
 [DB 트랜잭션 시작]
@@ -281,7 +328,7 @@ if (fromAccountId < toAccountId) {
 fromAccount.withdraw(amount);   // 에이전트 계좌는 잔액 초과 시 예외 → 전체 롤백
 toAccount.deposit(amount);
 ```
-- **환불 이중 처리 방지**: 원거래 행을 `PESSIMISTIC_WRITE` 로 잠근 뒤 `refunded` 플래그 확인
+- **환불 이중 처리 방지**: 원거래 행을 `PESSIMISTIC_WRITE` 로 잠근 뒤 REFUND 거래 존재 여부를 확인하고, 마지막 방어선으로 `transfers.original_transfer_id` 유니크 제약
 - **투자 이중 정산 방지**: 투자 행을 잠근 뒤 상태(OPEN/SETTLED) 확인
 - **캐시 역전 방지**: Redis 에 `version(거래 id):잔액` 저장, Lua 스크립트로 더 최신 version 일 때만 덮어씀
 - **롤백된 거래는 외부로 안 나감**: `@TransactionalEventListener(AFTER_COMMIT)`
@@ -299,6 +346,8 @@ toAccount.deposit(amount);
 ## 👤 에이전트 페르소나
 
 > 각 확률은 틱당 해당 행동 발생 여부를 결정하는 베르누이 분포 파라미터입니다.
+> 에이전트 수는 시작 전에 2~200명으로 정합니다. **처음 10명은 아래의 고정 페르소나**이고, 그 이후는 번호를 시드로 한 난수로 초기 자본과 확률이 정해져 같은 설정이면 같은 에이전트가 만들어집니다.
+> `시드`를 지정하면 틱마다 시드와 틱 번호로 난수를 만들고 에이전트를 번호 순으로 처리해 **같은 거래 순서가 재현**됩니다 ([실험](docs/experiments/seed-reproducibility.md)).
 
 | 에이전트 | 초기 잔액 | 특성 | 소비(chanceSpend) | 송금(chancePay) | 투자(chanceInvest) | 환불(chanceRefund) |
 |---------|---------|------|:-:|:-:|:-:|:-:|
@@ -319,14 +368,14 @@ toAccount.deposit(amount);
 
 | 기능 | 설명 |
 |------|------|
-| SVG 거래흐름 그래프 | 에이전트 노드 크기 = 잔액 비례, 거래 시 애니메이션 |
+| 거래흐름 시각화 | 에이전트·가맹점·시스템 계좌를 입자 은하로 그리고, 거래마다 입자가 이동 (상위 12명 라벨) |
 | 실시간 거래 피드 | SSE push — 새 거래가 위에서 쌓이는 채팅창 방식 |
-| 터미널 로그 | 거래 발생 시 백엔드 로그처럼 출력 |
 | 통계 패널 | 총 거래건수, 총 통화량, 복식부기 무결성(balanced) |
-| 잔액 예측 패널 | 선형회귀로 에이전트별 상승/하락 트렌드 예측 |
-| 에이전트 팝업 | 클릭 시 잔액·성격·지출확률 정보 표시 |
-| 속도 슬라이더 | 1ms ~ 3000ms/틱 실시간 조절 (느림/보통/빠름/초고속) |
-| 시뮬레이션 제어 | 시작 / 일시정지 / 정지 / 초기화 |
+| 설정 화면 | 시작 전에 에이전트 수(2~200)·속도·시드 선택, 가상 시간 정보 표시 |
+| 종료 요약 화면 | 정지하면 종료. 총 거래 수, 가상 경과 일수, 유형별 거래, 무결성 4조건, 마지막 대사 결과 |
+| 가상 날짜·시각 | 상단에 "DAY n  hh:mm" 표시 (실제 시각과 무관) |
+| 속도 조절 | 느림/보통/빠름/초고속 (1ms ~ 3000ms/틱) |
+| 시뮬레이션 제어 | 일시정지 / 종료 (종료 후 "새 시뮬레이션"으로 설정 화면 복귀) |
 | 거래 유형 표시 | 피드에 송금 · 소비 · 투자 · 투자정산 · 환불 · 급여 표시 |
 | 외부 시스템 애니메이션 | 소비/투자/환불 시 에이전트 ↔ 은행 ↔ 가맹점·증권사 박스로 이동 |
 
@@ -351,15 +400,19 @@ toAccount.deposit(amount);
 | POST | `/refunds/{spendTransferId}` | 환불 |
 | POST | `/investments?from=&amount=&holdTicks=` | 투자 납입 |
 | POST | `/investments/{id}/settle?rate=` | 투자 정산 (rate 생략 시 정규분포 샘플링) |
-| POST | `/simulation/start` | 시뮬레이션 시작 |
+| GET | `/simulation/status` | 상태(SETUP / RUNNING / PAUSED / ENDED), 틱, 가상 시각, 시드 |
+| POST | `/simulation/setup?agentCount=&seed=` | 에이전트 수(2~200)와 시드를 정해 월드를 만들고 시작 (SETUP 상태에서만) |
+| POST | `/simulation/start` | 일시정지에서 재개 |
 | POST | `/simulation/pause` | 일시정지 |
-| POST | `/simulation/stop` | 정지 |
-| POST | `/simulation/reset` | 초기화 (거래 삭제 + 잔액 복원) |
+| POST | `/simulation/stop` | 종료 (ENDED, 되돌릴 수 없음) |
+| GET | `/simulation/summary` | 종료 요약 (거래 수, 유형별, 무결성, 마지막 대사, 가상 경과 일수) |
+| POST | `/simulation/reset` | 새 시뮬레이션 — ENDED 에서만, 데이터를 지우고 SETUP 으로 |
 | POST | `/simulation/speed?ms={n}` | 틱 속도 설정 (1 ~ 3000ms) |
 | GET | `/ops/outbox` | Outbox 상태 (PENDING / PUBLISHED / DEAD, 가장 오래된 대기 시간) |
 | POST | `/ops/outbox/relay` | 릴레이 즉시 1회 실행 |
 | POST | `/ops/outbox/requeue-dead` | DEAD 이벤트 재발행 대기열로 |
-| POST | `/ops/reconciliation?date=` | 대사 실행 (date 생략 시 오늘 0시~지금) |
+| POST | `/ops/reconciliation?date=` | 대사 실행 (date 생략 시 가상 오늘 0시~지금) |
+| POST | `/ops/rebuild-balances?apply=` | 잔액 재구성 (기본 dry-run, apply=true 는 실행 중이면 409) |
 | GET | `/ops/reconciliation[/latest]` | 대사 이력 / 최근 결과 상세 |
 | POST | `/chaos/broker/down` · `/up` · `/ack-loss?n=` | 장애 주입 (`app.chaos.enabled=true` 일 때만) |
 
@@ -390,6 +443,8 @@ docker compose up -d          # MySQL + Redis + Kafka (+ Prometheus, Grafana)
 ```
 http://localhost:8080
 ```
+설정 화면에서 에이전트 수와 속도를 고르고 **시뮬레이션 시작**을 누르면 거래가 시작된다. **종료**를 누르면 요약 화면이 나오고, "새 시뮬레이션"으로 다시 설정할 수 있다.
+(테스트·부하 시험 프로필은 설정 화면 없이 `app.simulation.bootstrap=true` 로 월드를 바로 만든다.)
 
 ### 4. 테스트
 ```bash
@@ -414,7 +469,12 @@ http://localhost:8080
 | `DashboardStatsCacheTest` | 통계 스냅샷 TTL 재사용, 동시 50건 단일 집계, 만료 후 반영 |
 | `StatsScaleBenchmark` | 원장 1만~51만 건에서 `/stats` 비용 수정 전후 비교 (`benchmark` 태그) |
 | `ReconciliationTest` | MATCHED / 전달 중 오탐 방지 / 누락·불명·금액불일치 정확 탐지 / 이력 |
-| `ArchitectureTest` | 헥사고날 의존 방향·외부 시스템 분리·순환 의존 금지 (ArchUnit) |
+| `ArchitectureTest` | 헥사고날 의존 방향·외부 시스템 분리·순환 의존 금지, 원장 불변성 규칙 3개 (ArchUnit) |
+| `VirtualTimeTest` · `SimulationStateTest` · `AgentCountTest` | 가상 시계·가상 자정 대사, 상태 전이(정지=종료), 에이전트 수 설정 |
+| `SeedReproducibilityTest` | 같은 시드 → 거래 순서·최종 잔액 동일, 다른 시드·시드 없음 → 상이 |
+| `LedgerImmutabilityTest` · `BalanceRebuildTest` | 환불 시 원본 불변, 이중 환불 거절(앱·DB), 잔액 변조 감지·재구성 |
+| `LockTimeoutResponseTest` · `ApiExceptionHandlerTest` | 락 대기 초과 → 503, 부분 기록 없음, 연결 오류 → 503 매핑 |
+| `KafkaConsumerErrorHandlingTest` | 일시적 오류는 재시도, 처리 불가 메시지만 DLT |
 | `LockStrategyBenchmark` | 락 전략 4종 × 시나리오 4종 처리량·지연·정합성 (`benchmark` 태그, 별도 실행) |
 
 <br>

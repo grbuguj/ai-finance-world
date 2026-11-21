@@ -59,10 +59,15 @@ public class Investment {
         return principal.multiply(BigDecimal.ONE.add(r)).setScale(0, RoundingMode.DOWN);
     }
 
-    public void settle(BigDecimal rate, BigDecimal payout, Long settleTransferId) {
+    /** 정산 전에 호출해, 정산 거래를 기록하기 전에 중복 정산을 거절한다 */
+    public void assertOpen() {
         if (status != InvestmentStatus.OPEN) {
             throw new IllegalStateException("이미 정산된 투자입니다 (투자 " + id + ")");
         }
+    }
+
+    public void settle(BigDecimal rate, BigDecimal payout, Long settleTransferId) {
+        assertOpen();
         this.status = InvestmentStatus.SETTLED;
         this.returnRate = rate.max(BigDecimal.ONE.negate());
         this.payout = payout;

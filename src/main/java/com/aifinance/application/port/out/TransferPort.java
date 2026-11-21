@@ -15,10 +15,12 @@ public interface TransferPort {
     /** 최신순 키셋 페이지. beforeId 가 null 이면 첫 페이지. */
     List<Transfer> findPage(Long beforeId, int limit);
     List<Transfer> findRecent();
-    List<Transfer> findUndescribed();
     List<Transfer> findRefundableSpends(Long accountId);
     long count();
     BigDecimal sumAmount();
     Map<TransactionType, Long> countByType();
-    void deleteAll();
+    /** 이 소비 건에 대한 환불(REFUND)이 이미 있는가 */
+    boolean existsRefundOf(Long spendTransferId);
+    /** 시뮬레이션 초기화 전용 — 원장 불변성 예외. ArchitectureTest 가 이 이름 외의 삭제·수정 메서드를 금지한다. */
+    void deleteAllForSimulationReset();
 }

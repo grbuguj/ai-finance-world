@@ -63,6 +63,13 @@ dependencies {
     mysqlTestImplementation 'org.testcontainers:testcontainers-kafka'   // 실제 Kafka 브로커로 Outbox 전 구간 검증
 }
 
+// 영업일 기준 시간대(AiFinanceWorldApplication.BUSINESS_ZONE)와 테스트 JVM 시간대를 맞춘다.
+// CI 러너는 UTC 라서, H2 드라이버가 앱의 static 블록(TimeZone.setDefault)보다 먼저 UTC 로 초기화되면
+// LocalDate(영업일)가 하루 밀려 저장된다 (가상 시간 대사 테스트가 CI 에서만 실패하던 원인).
+tasks.withType(Test).configureEach {
+    systemProperty 'user.timezone', 'Asia/Seoul'
+}
+
 tasks.named('test') {
     useJUnitPlatform {
         excludeTags 'benchmark'

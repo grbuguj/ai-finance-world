@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 시뮬레이션 세계 생성 / 초기화.
@@ -34,7 +35,7 @@ public class SimulationSetupUseCase {
     public static final List<String> MERCHANT_NAMES = List.of("쿠팡", "무신사", "배달의민족", "넷플릭스", "KT 통신");
 
     // name, 초기잔액, chanceSpend, chancePay, chanceInvest, chanceRefund
-    private record Persona(String name, long initial, double spend, double pay, double invest, double refund) {}
+    public record Persona(String name, long initial, double spend, double pay, double invest, double refund) {}
 
     private static final List<Persona> PERSONAS = List.of(
             new Persona("일론머스크", 2_900_000, 0.80, 0.40, 0.10, 0.20),
@@ -79,20 +80,31 @@ public class SimulationSetupUseCase {
         this.reconciliationPort = reconciliationPort;
     }
 
-    /** 최초 1회: 시스템 계좌 + 에이전트 10명 생성 후 초기 자본금 지급 */
+    /**
+     * 시스템 계좌 + 에이전트 생성 후 초기 자본금 지급.
+     * 처음 10명은 고정 페르소나이고, 그 이후는 번호별 고정 시드의 난수로 확률을 정하므로
+     * 같은 설정(agentCount)이면 항상 같은 에이전트가 만들어진다 (재현성).
+     * 이미 만들어진 세계에서 설정 수가 더 크면 부족한 만큼만 추가한다 (기존 에이전트와 거래는 그대로).
+     */
     @Transactional
-    public void initialize() {
-        if (agentPort.count() > 0) {
+    public void initialize(int agentCount) {
+        int targetCount = Math.max(1, agentCount);
+        long existing = agentPort.count();
+        if (existing >= targetCount) {
             return;
         }
-        accountPort.save(Account.builder().name(CAPITAL_NAME).accountType(AccountType.CAPITAL).build());
-        accountPort.save(Account.builder().name(MARKET_NAME).accountType(AccountType.MARKET).build());
-        for (String merchant : MERCHANT_NAMES) {
-            accountPort.save(Account.builder().name(merchant).accountType(AccountType.MERCHANT).build());
+        if (existing == 0) {
+            accountPort.save(Account.builder().name(CAPITAL_NAME).accountType(AccountType.CAPITAL).build());
+            accountPort.save(Account.builder().name(MARKET_NAME).accountType(AccountType.MARKET).build());
+            for (String merchant : MERCHANT_NAMES) {
+                accountPort.save(Account.builder().name(merchant).accountType(AccountType.MERCHANT).build());
+            }
         }
-        for (Persona p : PERSONAS) {
+        Long capitalId = accountPort.findByType(AccountType.CAPITAL).get(0).getId();
+        for (int i = (int) existing; i < targetCount; i++) {
+            Persona p = personaOf(i);
             Account account = accountPort.save(Account.builder().name(p.name()).accountType(AccountType.AGENT).build());
-            agentPort.save(Agent.builder()
+            Agent agent = agentPort.save(Agent.builder()
                     .name(p.name())
                     .salary(p.initial())
                     .account(account)
@@ -101,26 +113,61 @@ public class SimulationSetupUseCase {
                     .chanceInvest(p.invest())
                     .chanceRefund(p.refund())
                     .build());
+            postingService.post(capitalId, agent.getAccount().getId(),
+                    BigDecimal.valueOf(agent.getSalary()), TransactionType.OPENING, "초기 자본금", null);
         }
-        fundOpeningBalances();
+    }
+
+    /** i번째(0부터) 에이전트의 페르소나. 앞 10명은 고정, 이후는 번호를 시드로 한 난수. */
+    public static Persona personaOf(int i) {
+        if (i < PERSONAS.size()) {
+            return PERSONAS.get(i);
+        }
+        Random r = new Random(1_000_003L * (i + 1));
+        long initial = 1_000_000 + 100_000L * r.nextInt(36);       // 100만 ~ 460만원
+        return new Persona(String.format("에이전트-%03d", i + 1), initial,
+                round(0.30 + 0.65 * r.nextDouble()),   // 소비 0.30~0.95
+                round(0.20 + 0.60 * r.nextDouble()),   // 송금 0.20~0.80
+                round(0.50 * r.nextDouble()),          // 투자 0.00~0.50
+                round(0.05 + 0.25 * r.nextDouble()));  // 환불 0.05~0.30
+    }
+
+    private static double round(double v) {
+        return Math.round(v * 100) / 100.0;
     }
 
     /** 초기화: 거래/원장/투자/이벤트/정산/대사 삭제 → 모든 잔액 0 → 개설 거래로 초기 잔액 재지급 */
     @Transactional
     public void reset() {
-        reconciliationPort.deleteAll();
-        outboxPort.deleteAll();
-        settlementLedgerPort.deleteAll(); // 외부 정산 장부도 같은 세계의 일부이므로 함께 초기화
-        investmentPort.deleteAll();
-        idempotencyPort.deleteAll(); // 원거래가 삭제되므로 키도 함께 정리
-        ledgerPort.deleteAll();   // FK 순서: ledger → transfer
-        transferPort.deleteAll();
+        clearTransactions();
         for (Account account : accountPort.findAll()) {
             account.resetBalance();
             accountPort.save(account);
         }
         balanceCachePort.evictAll();
         fundOpeningBalances();
+    }
+
+    /**
+     * "새 시뮬레이션": 거래/원장뿐 아니라 에이전트와 모든 계좌까지 삭제한다.
+     * 그래야 다음 initialize(N) 이 N 을 그대로 지켜 새 월드를 만든다 (reset() 은 에이전트를 남긴다).
+     */
+    @Transactional
+    public void resetAll() {
+        clearTransactions();
+        agentPort.deleteAll();   // FK 순서: agent → account
+        accountPort.deleteAll();
+        balanceCachePort.evictAll();
+    }
+
+    private void clearTransactions() {
+        reconciliationPort.deleteAll();
+        outboxPort.deleteAll();
+        settlementLedgerPort.deleteAll(); // 외부 정산 장부도 같은 세계의 일부이므로 함께 초기화
+        investmentPort.deleteAll();
+        idempotencyPort.deleteAll(); // 원거래가 삭제되므로 키도 함께 정리
+        ledgerPort.deleteAllForSimulationReset();   // FK 순서: ledger → transfer
+        transferPort.deleteAllForSimulationReset();
     }
 
     /**

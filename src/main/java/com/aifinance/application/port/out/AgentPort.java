@@ -10,4 +10,5 @@ public interface AgentPort {
     Agent save(Agent agent);
     List<Agent> findAll();
     long count();
+    void deleteAll();
 }

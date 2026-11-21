@@ -17,9 +17,11 @@ import java.util.Optional;
 public class TransferJpaAdapter implements TransferPort {
 
     private final TransferRepository transferRepository;
+    private final LedgerGuard guard;
 
-    public TransferJpaAdapter(TransferRepository transferRepository) {
+    public TransferJpaAdapter(TransferRepository transferRepository, LedgerGuard guard) {
         this.transferRepository = transferRepository;
+        this.guard = guard;
     }
 
     @Override
@@ -51,13 +53,8 @@ public class TransferJpaAdapter implements TransferPort {
     }
 
     @Override
-    public List<Transfer> findUndescribed() {
-        return transferRepository.findTop3ByDescriptionIsNullOrderByIdDesc();
-    }
-
-    @Override
     public List<Transfer> findRefundableSpends(Long accountId) {
-        return transferRepository.findTop5BySenderIdAndTxTypeAndRefundedFalseOrderByIdDesc(accountId, TransactionType.SPEND);
+        return transferRepository.findRefundable(accountId, TransactionType.SPEND, PageRequest.of(0, 5));
     }
 
     @Override
@@ -80,7 +77,12 @@ public class TransferJpaAdapter implements TransferPort {
     }
 
     @Override
-    public void deleteAll() {
-        transferRepository.deleteAllInBatch();
+    public boolean existsRefundOf(Long spendTransferId) {
+        return transferRepository.existsRefundOf(spendTransferId);
+    }
+
+    @Override
+    public void deleteAllForSimulationReset() {
+        guard.allowResetDuring(transferRepository::deleteAllInBatch);
     }
 }

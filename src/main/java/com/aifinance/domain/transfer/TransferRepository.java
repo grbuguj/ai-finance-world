@@ -21,11 +21,16 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
 
     List<Transfer> findByIdLessThanOrderByIdDesc(Long beforeId, Pageable pageable);
 
-    // 사유 미생성건 - 최신순 3건
-    List<Transfer> findTop3ByDescriptionIsNullOrderByIdDesc();
 
-    // 환불 대상 - 해당 계좌의 아직 환불되지 않은 최근 소비 5건
-    List<Transfer> findTop5BySenderIdAndTxTypeAndRefundedFalseOrderByIdDesc(Long senderId, TransactionType txType);
+    // 환불 후보: 아직 REFUND 가 없는 소비 건 (uk_transfers_original 인덱스로 NOT EXISTS)
+    @Query("select t from Transfer t where t.sender.id = :senderId and t.txType = :txType "
+            + "and not exists (select 1 from Transfer r where r.originalTransferId = t.id "
+            + "and r.txType = com.aifinance.domain.transfer.TransactionType.REFUND) order by t.id desc")
+    List<Transfer> findRefundable(@Param("senderId") Long senderId, @Param("txType") TransactionType txType, Pageable pageable);
+
+    @Query("select count(r) > 0 from Transfer r where r.originalTransferId = :id "
+            + "and r.txType = com.aifinance.domain.transfer.TransactionType.REFUND")
+    boolean existsRefundOf(@Param("id") Long id);
 
     // 환불 시 원거래 행 잠금 (동시 중복 환불 방지)
     @Lock(LockModeType.PESSIMISTIC_WRITE)

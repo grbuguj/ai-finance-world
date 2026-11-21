@@ -13,4 +13,5 @@ public interface AccountPort {
     Account save(Account account);
     List<Account> findAll();
     List<Account> findByType(AccountType type);
+    void deleteAll();
 }

@@ -4,6 +4,7 @@ import com.aifinance.application.port.out.ReconciliationPort;
 import com.aifinance.application.port.out.SettlementLedgerPort;
 import com.aifinance.application.port.out.SettlementLedgerPort.BreakKind;
 import com.aifinance.application.port.out.SettlementLedgerPort.Totals;
+import com.aifinance.application.service.VirtualClock;
 import com.aifinance.domain.reconciliation.ReconciliationBreakItem;
 import com.aifinance.domain.reconciliation.ReconciliationRun;
 import org.slf4j.Logger;
@@ -62,12 +63,14 @@ public class ReconciliationUseCase {
     private final SettlementLedgerPort settlementLedger;
     private final ReconciliationPort reconciliationPort;
     private final IntegrityUseCase integrityUseCase;
+    private final VirtualClock virtualClock;
 
     public ReconciliationUseCase(SettlementLedgerPort settlementLedger, ReconciliationPort reconciliationPort,
-                                 IntegrityUseCase integrityUseCase) {
+                                 IntegrityUseCase integrityUseCase, VirtualClock virtualClock) {
         this.settlementLedger = settlementLedger;
         this.reconciliationPort = reconciliationPort;
         this.integrityUseCase = integrityUseCase;
+        this.virtualClock = virtualClock;
     }
 
     /** 영업일 하루 [00:00, 다음날 00:00) 대사 — EOD 배치가 전날을 대상으로 호출 */
@@ -76,11 +79,12 @@ public class ReconciliationUseCase {
         return reconcile(businessDate, businessDate.atStartOfDay(), businessDate.plusDays(1).atStartOfDay());
     }
 
-    /** 오늘 0시부터 지금까지 (시연·운영 중 수시 점검용) */
+    /** 가상 영업일 0시부터 지금(가상 시각)까지 (시연·운영 중 수시 점검용) — 거래가 가상 시각 기준이므로 "오늘"도 가상 시각 기준 */
     @Transactional
     public RunView reconcileToday() {
-        LocalDate today = LocalDate.now();
-        return reconcile(today, today.atStartOfDay(), LocalDateTime.now().plusSeconds(1));
+        LocalDateTime virtualNow = virtualClock.now();
+        LocalDate today = virtualNow.toLocalDate();
+        return reconcile(today, today.atStartOfDay(), virtualNow.plusSeconds(1));
     }
 
     @Transactional

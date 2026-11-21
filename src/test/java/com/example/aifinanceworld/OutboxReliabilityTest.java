@@ -179,6 +179,8 @@ class OutboxReliabilityTest {
 
         faults.setBrokerDown(false);
         assertEquals(1, relay.requeueDead());
+        // requeue 시각과 릴레이의 '지금' 이 같은 밀리초 안에 있으면 한 건을 건너뛸 수 있어, 재시도 시각을 명시적으로 당겨 결정적으로 만든다
+        jdbc.update("update outbox_events set next_attempt_at = created_at where status = 'PENDING'");
         relay.drain(10);
 
         assertEquals(0L, count("select count(*) from outbox_events where status <> 'PUBLISHED'"));
@@ -190,6 +192,7 @@ class OutboxReliabilityTest {
         for (int i = 0; i < 5; i++) {
             transferUseCase.transfer(a.getId(), b.getId(), BigDecimal.valueOf(100), "정리 대상 " + i);
         }
+        jdbc.update("update outbox_events set next_attempt_at = created_at where status = 'PENDING'"); // 같은 마이크로초 경합 방지
         relay.drain(10);
         faults.setBrokerDown(true);
         transferUseCase.transfer(a.getId(), b.getId(), BigDecimal.valueOf(100), "대기 중");

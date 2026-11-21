@@ -3,6 +3,7 @@ package com.aifinance.domain.ledger;
 import com.aifinance.domain.account.Account;
 import com.aifinance.domain.transfer.Transfer;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Immutable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 @EntityListeners(AuditingEntityListener.class)
 
+@Immutable // 원장 불변성: 분개는 INSERT 만 된다 — UPDATE 는 막고, 정정은 반대 분개로만 한다
 @Entity
 @Table(name = "ledger_entries")
 public class LedgerEntry {
